@@ -1,0 +1,26 @@
+{
+  "name": "zukki-design-system",
+  "version": "1.0.0",
+  "description": "デザインシステム",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:tokens:default": "node style-dictionary/build.js",
+    "build:tokens:dark": "node style-dictionary/build-dark.js",
+    "build:tokens": "npm run build:tokens:default && npm run build:tokens:dark",
+    "token:transform:light": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/light.json --expandTypography=true --expandShadow=true PrimitiveColor/light,ThemeColor/light,SemanticColor/light",
+    "token:transform:dark": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/dark.json --expandTypography=true --expandShadow=true PrimitiveColor/dark,ThemeColor/dark,SemanticColor/dark",
+    "token:transform:typography": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/typography.json --expandTypography=true --expandShadow=true Typography/value",
+    "token:transform:other": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/token.json --expandTypography=true --expandShadow=true global,Token/value",
+    "token:transform": "npm run token:transform:light && npm run token:transform:dark && npm run token:transform:typography && npm run token:transform:other"
+  },
+  "author": "",
+  "license": "ISC",
+  "volta": {
+    "node": "20.11.1",
+    "npm": "10.2.4"
+  },
+  "devDependencies": {
+    "style-dictionary": "^3.9.2",
+    "token-transformer": "^0.0.33"
+  }
+}

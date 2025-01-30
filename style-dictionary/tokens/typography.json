@@ -1,0 +1,102 @@
+{
+  "font-family": {
+    "default": {
+      "value": "BIZ UDPGothic",
+      "type": "text"
+    },
+    "mintyo": {
+      "value": "BIZ UDPMincho",
+      "type": "text"
+    },
+    "number": {
+      "value": "Lato",
+      "type": "text"
+    }
+  },
+  "line-height": {
+    "default": {
+      "value": "150%",
+      "type": "text"
+    },
+    "relax": {
+      "value": "175%",
+      "type": "text"
+    },
+    "heading": {
+      "value": "130%",
+      "type": "text"
+    },
+    "line": {
+      "value": "113.4%",
+      "type": "text"
+    },
+    "input": {
+      "value": "120%",
+      "type": "text"
+    }
+  },
+  "font-weight": {
+    "normal": {
+      "value": 400,
+      "type": "number"
+    },
+    "bold": {
+      "value": 700,
+      "type": "number"
+    }
+  },
+  "font-size": {
+    "base": {
+      "value": 16,
+      "type": "number"
+    },
+    "sm": {
+      "value": 14,
+      "type": "number"
+    },
+    "xs": {
+      "value": 12,
+      "type": "number"
+    },
+    "lg": {
+      "value": 18,
+      "type": "number"
+    },
+    "xl": {
+      "value": 20,
+      "type": "number"
+    },
+    "2xl": {
+      "value": 24,
+      "type": "number"
+    },
+    "3xl": {
+      "value": 28,
+      "type": "number"
+    },
+    "2xs": {
+      "value": 10,
+      "type": "number"
+    },
+    "7xl": {
+      "value": 48,
+      "type": "number"
+    },
+    "6xl": {
+      "value": 40,
+      "type": "number"
+    },
+    "5xl": {
+      "value": 36,
+      "type": "number"
+    },
+    "4xl": {
+      "value": 32,
+      "type": "number"
+    },
+    "8xl": {
+      "value": 56,
+      "type": "number"
+    }
+  }
+}
