@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "preview": "vite preview",
     "build:tokens:default": "node style-dictionary/build.js",
     "build:tokens:dark": "node style-dictionary/build-dark.js",
@@ -16,7 +16,8 @@
     "token:transform:dark": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/dark.json --expandTypography=true --expandShadow=true PrimitiveColor/dark,ThemeColor/dark,SemanticColor/dark",
     "token:transform:typography": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/typography.json --expandTypography=true --expandShadow=true Typography/value",
     "token:transform:other": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/token.json --expandTypography=true --expandShadow=true global,Token/value",
-    "token:transform": "npm run token:transform:light && npm run token:transform:dark && npm run token:transform:typography && npm run token:transform:other"
+    "token:transform": "npm run token:transform:light && npm run token:transform:dark && npm run token:transform:typography && npm run token:transform:other",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "author": "",
   "license": "ISC",
@@ -34,13 +35,18 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "install": "^0.13.0",
+    "npm": "^11.1.0",
+    "prettier": "^3.4.2",
+    "style-dictionary": "^3.9.2",
+    "token-transformer": "^0.0.33",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.5",
-    "style-dictionary": "^3.9.2",
-    "token-transformer": "^0.0.33"
+    "vite": "^6.0.5"
   }
 }
