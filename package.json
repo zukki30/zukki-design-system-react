@@ -17,7 +17,9 @@
     "token:transform:typography": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/typography.json --expandTypography=true --expandShadow=true Typography/value",
     "token:transform:other": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/token.json --expandTypography=true --expandShadow=true global,Token/value",
     "token:transform": "npm run token:transform:light && npm run token:transform:dark && npm run token:transform:typography && npm run token:transform:other",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "author": "",
   "license": "ISC",
@@ -30,7 +32,15 @@
     "react-dom": "19.0.0"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^3.2.4",
     "@eslint/js": "^9.17.0",
+    "@storybook/addon-essentials": "^8.5.3",
+    "@storybook/addon-interactions": "^8.5.3",
+    "@storybook/addon-onboarding": "^8.5.3",
+    "@storybook/blocks": "^8.5.3",
+    "@storybook/react": "^8.5.3",
+    "@storybook/react-vite": "^8.5.3",
+    "@storybook/test": "^8.5.3",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "@vitejs/plugin-react-swc": "^3.5.0",
@@ -39,14 +49,21 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
+    "eslint-plugin-storybook": "^0.11.2",
     "globals": "^15.14.0",
     "install": "^0.13.0",
     "npm": "^11.1.0",
     "prettier": "^3.4.2",
+    "storybook": "^8.5.3",
     "style-dictionary": "^3.9.2",
     "token-transformer": "^0.0.33",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
   }
 }
