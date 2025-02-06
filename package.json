@@ -5,7 +5,7 @@
   "type": "module",
   "description": "デザインシステム",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run storybook",
     "build": "tsc -b && vite build",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "preview": "vite preview",
