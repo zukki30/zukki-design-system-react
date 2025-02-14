@@ -9,32 +9,26 @@ const pxToRem = (px) => {
 // Style Dictionary設定
 const styleDictionary = StyleDictionary.extend({
   source: [
-    "style-dictionary/tokens/light.json",
-    "style-dictionary/tokens/token.json",
-    "style-dictionary/tokens/typography.json",
+    'style-dictionary/tokens/light.json',
+    'style-dictionary/tokens/token.json',
+    'style-dictionary/tokens/typography.json',
   ],
   platforms: {
     css: {
-      transformGroup: "css",
-      buildPath: "src/styles/",
-      transforms: [
-        "attribute/cti",
-        "name/cti/kebab",
-        "size/px",
-        "size/rem",
-        "color/css"
-      ],
+      transformGroup: 'css',
+      buildPath: 'src/styles/',
+      transforms: ['attribute/cti', 'name/cti/kebab', 'size/px', 'size/rem', 'color/css'],
       options: {
         showFileHeader: false,
-        outputReferences: false
+        outputReferences: false,
       },
       files: [
         {
-          destination: "variables.css",
-          format: "css/variables",
-        }
+          destination: 'variables.css',
+          format: 'css/variables',
+        },
       ],
-    }
+    },
   },
 });
 
@@ -43,10 +37,7 @@ styleDictionary.registerTransform({
   name: 'size/px',
   type: 'value',
   matcher: (token) => {
-    return (
-      token.name.includes('border-radius') ||
-      token.name.includes('spacing')
-    );
+    return token.name.includes('border-radius') || token.name.includes('spacing');
   },
   transformer: (token) => {
     return `${token.value}px`;
