@@ -17,8 +17,6 @@ const pxToRem = (px) => {
 StyleDictionary.registerFormat({
   name: 'typescript/constants',
   formatter: ({ dictionary, file }) => {
-    console.log(1111, file.destination);
-
     // file.destination から .ts を削除
     const fileName = file.destination.replace('.ts', '');
 

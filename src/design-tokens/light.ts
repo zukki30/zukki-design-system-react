@@ -1,278 +1,278 @@
 // このファイルは自動生成されています。直接編集しないでください。
 
 export const lightDesignTokens = {
-  "color": {
-    "focus": "#0e70f1",
-    "textOnLight": {
-      "default": "#15171a",
-      "strong": "#000000",
-      "subtle": "#565b66",
-      "disabled": "#6b7280",
-      "placeholder": "#a6aab3"
+  color: {
+    focus: '#0e70f1',
+    textOnLight: {
+      default: '#15171a',
+      strong: '#000000',
+      subtle: '#565b66',
+      disabled: '#6b7280',
+      placeholder: '#a6aab3',
     },
-    "textOnDark": {
-      "default": "#f0f1f2",
-      "strong": "#ffffff",
-      "subtle": "#c4c7cc",
-      "disabled": "#a6aab3",
-      "placeholder": "#2b2e33"
+    textOnDark: {
+      default: '#f0f1f2',
+      strong: '#ffffff',
+      subtle: '#c4c7cc',
+      disabled: '#a6aab3',
+      placeholder: '#2b2e33',
     },
-    "textOnLink": {
-      "default": "#0e70f1",
-      "hover": "#0e70f1",
-      "seleted": "#0a4ca4",
-      "disabled": "#5b9ef5"
+    textOnLink: {
+      default: '#0e70f1',
+      hover: '#0e70f1',
+      seleted: '#0a4ca4',
+      disabled: '#5b9ef5',
     },
-    "primary": {
-      "default": "#0e70f1",
-      "hover": "#0a4ca4",
-      "seleted": "#073a7d",
-      "disabled": "#5b9ef5",
-      "strong": "#0c5eca",
-      "subtle": "#95c0f9"
+    primary: {
+      default: '#0e70f1',
+      hover: '#0a4ca4',
+      seleted: '#073a7d',
+      disabled: '#5b9ef5',
+      strong: '#0c5eca',
+      subtle: '#95c0f9',
     },
-    "secondary": {
-      "default": "#898e99",
-      "strong": "#6b7280",
-      "subtle": "#c4c7cc",
-      "hover": "#565b66",
-      "seleted": "#40444d",
-      "disabled": "#c4c7cc"
+    secondary: {
+      default: '#898e99',
+      strong: '#6b7280',
+      subtle: '#c4c7cc',
+      hover: '#565b66',
+      seleted: '#40444d',
+      disabled: '#c4c7cc',
     },
-    "success": {
-      "default": "#22c55e",
-      "strong": "#1b9e4b",
-      "subtle": "#afebc5",
-      "hover": "#147638",
-      "seleted": "#0e4f26",
-      "disabled": "#9be5b6"
+    success: {
+      default: '#22c55e',
+      strong: '#1b9e4b',
+      subtle: '#afebc5',
+      hover: '#147638',
+      seleted: '#0e4f26',
+      disabled: '#9be5b6',
     },
-    "failure": {
-      "default": "#ef0e0e",
-      "strong": "#c80c0c",
-      "subtle": "#f89494",
-      "hover": "#a20a0a",
-      "seleted": "#7b0707",
-      "disabled": "#f78181"
+    failure: {
+      default: '#ef0e0e',
+      strong: '#c80c0c',
+      subtle: '#f89494',
+      hover: '#a20a0a',
+      seleted: '#7b0707',
+      disabled: '#f78181',
     },
-    "warning": {
-      "default": "#eab308",
-      "strong": "#bb8f06",
-      "subtle": "#f9e8b5",
-      "hover": "#8c6b05",
-      "seleted": "#5e4803",
-      "disabled": "#f7e19c"
+    warning: {
+      default: '#eab308',
+      strong: '#bb8f06',
+      subtle: '#f9e8b5',
+      hover: '#8c6b05',
+      seleted: '#5e4803',
+      disabled: '#f7e19c',
     },
-    "info": {
-      "default": "#0e70f1",
-      "strong": "#0c5eca",
-      "subtle": "#95c0f9",
-      "hover": "#0a4ca4",
-      "seleted": "#073a7d",
-      "disabled": "#82b4f8"
+    info: {
+      default: '#0e70f1',
+      strong: '#0c5eca',
+      subtle: '#95c0f9',
+      hover: '#0a4ca4',
+      seleted: '#073a7d',
+      disabled: '#82b4f8',
     },
-    "profile": {
-      "default": "#22c55e",
-      "strong": "#1b9e4b",
-      "subtle": "#afebc5",
-      "hover": "#147638",
-      "seleted": "#0e4f26",
-      "disabled": "#9be5b6"
+    profile: {
+      default: '#22c55e',
+      strong: '#1b9e4b',
+      subtle: '#afebc5',
+      hover: '#147638',
+      seleted: '#0e4f26',
+      disabled: '#9be5b6',
     },
-    "works": {
-      "default": "#14b8a6",
-      "strong": "#109385",
-      "subtle": "#98e6dd",
-      "hover": "#0c6e64",
-      "seleted": "#084a42",
-      "disabled": "#85e0d5"
+    works: {
+      default: '#14b8a6',
+      strong: '#109385',
+      subtle: '#98e6dd',
+      hover: '#0c6e64',
+      seleted: '#084a42',
+      disabled: '#85e0d5',
     },
-    "outputs": {
-      "default": "#0ea5e9",
-      "strong": "#0b84ba",
-      "subtle": "#b1e2f8",
-      "hover": "#08638c",
-      "seleted": "#06425d",
-      "disabled": "#9ad9f6"
+    outputs: {
+      default: '#0ea5e9',
+      strong: '#0b84ba',
+      subtle: '#b1e2f8',
+      hover: '#08638c',
+      seleted: '#06425d',
+      disabled: '#9ad9f6',
     },
-    "default": {
-      "default": "#ffffff",
-      "strong": "#898e99",
-      "subtle": "#d3d5d9",
-      "hover": "#d3d5d9",
-      "seleted": "#a6aab3",
-      "disabled": "#e1e3e6"
+    default: {
+      default: '#ffffff',
+      strong: '#898e99',
+      subtle: '#d3d5d9',
+      hover: '#d3d5d9',
+      seleted: '#a6aab3',
+      disabled: '#e1e3e6',
     },
-    "exposed": {
-      "default": "rgba(0, 0, 0, 0)",
-      "hover": "rgba(0, 0, 0, 0.1)",
-      "selected": "rgba(0, 0, 0, 0.2)"
+    exposed: {
+      default: 'rgba(0, 0, 0, 0)',
+      hover: 'rgba(0, 0, 0, 0.1)',
+      selected: 'rgba(0, 0, 0, 0.2)',
     },
-    "input": {
-      "background": {
-        "default": "#ffffff",
-        "disabled": "#f0f1f2",
-        "error": "#fee2e2"
+    input: {
+      background: {
+        default: '#ffffff',
+        disabled: '#f0f1f2',
+        error: '#fee2e2',
       },
-      "border": {
-        "default": "#a6aab3",
-        "hover": "#0e70f1",
-        "disabled": "#c4c7cc",
-        "error": "#f78181",
-        "error hover": "#ef0e0e"
+      border: {
+        default: '#a6aab3',
+        hover: '#0e70f1',
+        disabled: '#c4c7cc',
+        error: '#f78181',
+        'error hover': '#ef0e0e',
       },
-      "spinButtonBackground": {
-        "default": "#ffffff",
-        "hover": "#e1e3e6"
-      }
-    },
-    "textOnFailure": {
-      "default": "#f45a5a"
-    },
-    "checkbox & radio": {
-      "background": {
-        "disabled": "#f0f1f2",
-        "default": "#ffffff",
-        "checked": "#0e70f1",
-        "checked hover": "#5b9ef5",
-        "checked disabled": "#c4c7cc"
+      spinButtonBackground: {
+        default: '#ffffff',
+        hover: '#e1e3e6',
       },
-      "border": {
-        "disabled": "#c4c7cc",
-        "hover": "#0e70f1",
-        "default": "#a6aab3",
-        "checked disabled": "#c4c7cc",
-        "checked hover": "#5b9ef5",
-        "checked": "#0e70f1"
+    },
+    textOnFailure: {
+      default: '#f45a5a',
+    },
+    'checkbox & radio': {
+      background: {
+        disabled: '#f0f1f2',
+        default: '#ffffff',
+        checked: '#0e70f1',
+        'checked hover': '#5b9ef5',
+        'checked disabled': '#c4c7cc',
       },
-      "icon": {
-        "default": "#ffffff",
-        "checked disabled": "#898e99",
-        "disabled": "#f0f1f2"
-      }
-    },
-    "switch": {
-      "icon": {
-        "default": "#ffffff",
-        "disabled": "#f0f1f2"
+      border: {
+        disabled: '#c4c7cc',
+        hover: '#0e70f1',
+        default: '#a6aab3',
+        'checked disabled': '#c4c7cc',
+        'checked hover': '#5b9ef5',
+        checked: '#0e70f1',
       },
-      "background": {
-        "default": "#a6aab3",
-        "hover": "#e1e3e6",
-        "disabled": "#c4c7cc",
-        "checked hover": "#5b9ef5",
-        "checked": "#0e70f1",
-        "checked disabled": "#c4c7cc"
-      }
+      icon: {
+        default: '#ffffff',
+        'checked disabled': '#898e99',
+        disabled: '#f0f1f2',
+      },
     },
-    "teal": {
-      "0": "#d1faf5",
-      "50": "#bef3ed",
-      "100": "#abede5",
-      "150": "#98e6dd",
-      "200": "#85e0d5",
-      "300": "#60d2c6",
-      "400": "#3ac5b6",
-      "500": "#14b8a6",
-      "600": "#109385",
-      "700": "#0c6e64",
-      "800": "#084a42",
-      "850": "#063732",
-      "900": "#042521"
+    switch: {
+      icon: {
+        default: '#ffffff',
+        disabled: '#f0f1f2',
+      },
+      background: {
+        default: '#a6aab3',
+        hover: '#e1e3e6',
+        disabled: '#c4c7cc',
+        'checked hover': '#5b9ef5',
+        checked: '#0e70f1',
+        'checked disabled': '#c4c7cc',
+      },
     },
-    "green": {
-      "0": "#ebfbf1",
-      "50": "#d7f6e2",
-      "100": "#c3f0d4",
-      "150": "#afebc5",
-      "200": "#9be5b6",
-      "300": "#72db99",
-      "400": "#4ad07b",
-      "500": "#22c55e",
-      "600": "#1b9e4b",
-      "700": "#147638",
-      "800": "#0e4f26",
-      "850": "#0a3b1c",
-      "900": "#072713"
+    teal: {
+      '0': '#d1faf5',
+      '50': '#bef3ed',
+      '100': '#abede5',
+      '150': '#98e6dd',
+      '200': '#85e0d5',
+      '300': '#60d2c6',
+      '400': '#3ac5b6',
+      '500': '#14b8a6',
+      '600': '#109385',
+      '700': '#0c6e64',
+      '800': '#084a42',
+      '850': '#063732',
+      '900': '#042521',
     },
-    "sky": {
-      "0": "#f7fcff",
-      "50": "#e0f3fd",
-      "100": "#c8ebfb",
-      "150": "#b1e2f8",
-      "200": "#9ad9f6",
-      "300": "#6bc8f2",
-      "400": "#3db6ed",
-      "500": "#0ea5e9",
-      "600": "#0b84ba",
-      "700": "#08638c",
-      "800": "#06425d",
-      "850": "#043246",
-      "900": "#03212f"
+    green: {
+      '0': '#ebfbf1',
+      '50': '#d7f6e2',
+      '100': '#c3f0d4',
+      '150': '#afebc5',
+      '200': '#9be5b6',
+      '300': '#72db99',
+      '400': '#4ad07b',
+      '500': '#22c55e',
+      '600': '#1b9e4b',
+      '700': '#147638',
+      '800': '#0e4f26',
+      '850': '#0a3b1c',
+      '900': '#072713',
     },
-    "grey": {
-      "0": "#ffffff",
-      "50": "#f0f1f2",
-      "100": "#e1e3e6",
-      "150": "#d3d5d9",
-      "200": "#c4c7cc",
-      "300": "#a6aab3",
-      "400": "#898e99",
-      "500": "#6b7280",
-      "600": "#565b66",
-      "700": "#40444d",
-      "800": "#2b2e33",
-      "850": "#202226",
-      "900": "#15171a",
-      "950": "#0b0b0d",
-      "1000": "#000000"
+    sky: {
+      '0': '#f7fcff',
+      '50': '#e0f3fd',
+      '100': '#c8ebfb',
+      '150': '#b1e2f8',
+      '200': '#9ad9f6',
+      '300': '#6bc8f2',
+      '400': '#3db6ed',
+      '500': '#0ea5e9',
+      '600': '#0b84ba',
+      '700': '#08638c',
+      '800': '#06425d',
+      '850': '#043246',
+      '900': '#03212f',
     },
-    "red": {
-      "0": "#fef2f2",
-      "50": "#fee2e2",
-      "100": "#f9a7a7",
-      "150": "#f89494",
-      "200": "#f78181",
-      "300": "#f45a5a",
-      "400": "#f23434",
-      "500": "#ef0e0e",
-      "600": "#c80c0c",
-      "700": "#a20a0a",
-      "800": "#7b0707",
-      "850": "#680606",
-      "900": "#550505"
+    grey: {
+      '0': '#ffffff',
+      '50': '#f0f1f2',
+      '100': '#e1e3e6',
+      '150': '#d3d5d9',
+      '200': '#c4c7cc',
+      '300': '#a6aab3',
+      '400': '#898e99',
+      '500': '#6b7280',
+      '600': '#565b66',
+      '700': '#40444d',
+      '800': '#2b2e33',
+      '850': '#202226',
+      '900': '#15171a',
+      '950': '#0b0b0d',
+      '1000': '#000000',
     },
-    "blue": {
-      "0": "#cfe2fc",
-      "50": "#bcd7fb",
-      "100": "#a8cbfa",
-      "150": "#95c0f9",
-      "200": "#82b4f8",
-      "300": "#5b9ef5",
-      "400": "#3587f3",
-      "500": "#0e70f1",
-      "600": "#0c5eca",
-      "700": "#0a4ca4",
-      "800": "#073a7d",
-      "850": "#06316a",
-      "900": "#052857"
+    red: {
+      '0': '#fef2f2',
+      '50': '#fee2e2',
+      '100': '#f9a7a7',
+      '150': '#f89494',
+      '200': '#f78181',
+      '300': '#f45a5a',
+      '400': '#f23434',
+      '500': '#ef0e0e',
+      '600': '#c80c0c',
+      '700': '#a20a0a',
+      '800': '#7b0707',
+      '850': '#680606',
+      '900': '#550505',
     },
-    "yellow": {
-      "0": "#ffffff",
-      "50": "#fdf7e6",
-      "100": "#fbf0ce",
-      "150": "#f9e8b5",
-      "200": "#f7e19c",
-      "300": "#f2d16b",
-      "400": "#eec239",
-      "500": "#eab308",
-      "600": "#bb8f06",
-      "700": "#8c6b05",
-      "800": "#5e4803",
-      "850": "#463602",
-      "900": "#2f2402"
+    blue: {
+      '0': '#cfe2fc',
+      '50': '#bcd7fb',
+      '100': '#a8cbfa',
+      '150': '#95c0f9',
+      '200': '#82b4f8',
+      '300': '#5b9ef5',
+      '400': '#3587f3',
+      '500': '#0e70f1',
+      '600': '#0c5eca',
+      '700': '#0a4ca4',
+      '800': '#073a7d',
+      '850': '#06316a',
+      '900': '#052857',
     },
-    "white": "#ffffff",
-    "black": "#000000"
-  }
+    yellow: {
+      '0': '#ffffff',
+      '50': '#fdf7e6',
+      '100': '#fbf0ce',
+      '150': '#f9e8b5',
+      '200': '#f7e19c',
+      '300': '#f2d16b',
+      '400': '#eec239',
+      '500': '#eab308',
+      '600': '#bb8f06',
+      '700': '#8c6b05',
+      '800': '#5e4803',
+      '850': '#463602',
+      '900': '#2f2402',
+    },
+    white: '#ffffff',
+    black: '#000000',
+  },
 } as const;
