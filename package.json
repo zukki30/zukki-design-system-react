@@ -52,8 +52,6 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "eslint-plugin-storybook": "^0.11.2",
     "globals": "^15.14.0",
-    "install": "^0.13.0",
-    "npm": "^11.1.0",
     "prettier": "^3.4.2",
     "storybook": "^8.5.3",
     "style-dictionary": "^3.9.2",
