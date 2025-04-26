@@ -1,13 +1,13 @@
-const StyleDictionary = require('style-dictionary');
+import StyleDictionary from 'style-dictionary';
 
 // Style Dictionary設定
-const styleDictionary = StyleDictionary.extend({
+const config = {
   source: ['style-dictionary/tokens/dark.json'],
   platforms: {
     css: {
       transformGroup: 'css',
       buildPath: 'src/styles/',
-      transforms: ['attribute/cti', 'name/cti/kebab', 'color/css'],
+      transforms: ['attribute/cti', 'name/kebab', 'color/css'],
       options: {
         showFileHeader: false,
         outputReferences: false,
@@ -21,8 +21,13 @@ const styleDictionary = StyleDictionary.extend({
       ],
     },
   },
-});
+};
 
-styleDictionary.cleanAllPlatforms();
+const buildTokens = async () => {
+  const styleDictionary = new StyleDictionary(config);
+  await styleDictionary.hasInitialized;
+  await styleDictionary.cleanAllPlatforms();
+  await styleDictionary.buildAllPlatforms();
+};
 
-styleDictionary.buildAllPlatforms();
+buildTokens().catch(console.error);

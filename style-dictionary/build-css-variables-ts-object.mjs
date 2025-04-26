@@ -1,4 +1,4 @@
-const StyleDictionary = require('style-dictionary');
+import StyleDictionary from 'style-dictionary';
 
 const sources = [
   'style-dictionary/tokens/light.json',
@@ -16,7 +16,7 @@ const pxToRem = (px) => {
 // json を TypeScript の型定義とオブジェクトに変換するフォーマット
 StyleDictionary.registerFormat({
   name: 'typescript/constants',
-  formatter: ({ dictionary, file }) => {
+  format: async ({ dictionary, file }) => {
     // file.destination から .ts を削除
     const fileName = file.destination.replace('.ts', '');
 
@@ -49,7 +49,7 @@ StyleDictionary.registerTransform({
   matcher: (token) => {
     return token.name.includes('border-radius') || token.name.includes('spacing');
   },
-  transformer: (token) => {
+  transform: (token) => {
     return `${token.value}px`;
   },
 });
@@ -60,7 +60,7 @@ StyleDictionary.registerTransform({
   matcher: (token) => {
     return token.name.includes('font-size');
   },
-  transformer: (token) => {
+  transform: (token) => {
     return pxToRem(token.value);
   },
 });
@@ -75,7 +75,7 @@ const configs = sources.map((source) => {
       ts: {
         transformGroup: 'js',
         buildPath: 'src/design-tokens/',
-        transforms: ['attribute/cti', 'name/cti/kebab', 'size/px', 'size/rem', 'color/css'],
+        transforms: ['attribute/cti', 'name/kebab', 'size/px', 'size/rem', 'color/css'],
         options: {
           showFileHeader: false,
           outputReferences: false,
@@ -88,8 +88,15 @@ const configs = sources.map((source) => {
   return config;
 });
 
-configs.forEach((config) => {
-  const sd = StyleDictionary.extend(config);
-  sd.cleanAllPlatforms();
-  sd.buildAllPlatforms();
-});
+// for...ofを使用し、各ステップを非同期処理するように修正
+const buildAllConfigs = async () => {
+  for (const config of configs) {
+    const sd = new StyleDictionary(config);
+    await sd.hasInitialized;
+    await sd.cleanAllPlatforms();
+    await sd.buildAllPlatforms();
+  }
+};
+
+// トップレベルでの非同期実行
+buildAllConfigs().catch(console.error);
