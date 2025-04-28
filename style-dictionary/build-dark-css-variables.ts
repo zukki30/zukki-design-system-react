@@ -1,7 +1,8 @@
 import StyleDictionary from 'style-dictionary';
+import type { Config } from 'style-dictionary';
 
 // Style Dictionary設定
-const config = {
+const config: Config = {
   source: ['style-dictionary/tokens/dark.json'],
   platforms: {
     css: {
@@ -23,9 +24,10 @@ const config = {
   },
 };
 
-const buildTokens = async () => {
+const buildTokens = async (): Promise<void> => {
   const styleDictionary = new StyleDictionary(config);
   await styleDictionary.hasInitialized;
+
   await styleDictionary.cleanAllPlatforms();
   await styleDictionary.buildAllPlatforms();
 };
