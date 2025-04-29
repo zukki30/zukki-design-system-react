@@ -1,5 +1,5 @@
 import StyleDictionary from 'style-dictionary';
-import type { Token, Config } from 'style-dictionary';
+import type { Config, Token } from 'style-dictionary';
 
 type ColorTokenJsonFileNameType = 'light' | 'dark';
 
@@ -41,6 +41,10 @@ export const convertFontSizeToRem = (px: number): string => {
 };
 
 export const transformFontSizeToRem = (token: Token) => {
+  if (token.type === 'color') {
+    console.log(token);
+  }
+
   if (token.name?.includes('font-size')) {
     return convertFontSizeToRem(token.value);
   }
