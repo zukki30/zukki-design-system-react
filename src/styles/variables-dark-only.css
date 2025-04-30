@@ -259,7 +259,7 @@
   --button-size-md-line-height-line-font-weight: Bold;
   --button-size-md-line-height-line-line-height: 113.4%;
   --button-size-md-line-height-line-font-size: 0.875rem;
-  --button-size-md-line-height-line-letter-spacing: 0%px;
+  --button-size-md-line-height-line-letter-spacing: 0%;
   --button-size-md-line-height-line-paragraph-spacing: 0;
   --button-size-md-line-height-line-paragraph-indent: 0px;
   --button-size-md-line-height-line-text-case: none;
@@ -268,7 +268,7 @@
   --button-size-sm-line-height-line-font-weight: Bold;
   --button-size-sm-line-height-line-line-height: 113.4%;
   --button-size-sm-line-height-line-font-size: 0.75rem;
-  --button-size-sm-line-height-line-letter-spacing: 0%px;
+  --button-size-sm-line-height-line-letter-spacing: 0%;
   --button-size-sm-line-height-line-paragraph-spacing: 0;
   --button-size-sm-line-height-line-paragraph-indent: 0px;
   --button-size-sm-line-height-line-text-case: none;
@@ -277,7 +277,7 @@
   --input-size-md-line-height-line-font-weight: Regular;
   --input-size-md-line-height-line-line-height: 125%;
   --input-size-md-line-height-line-font-size: 1rem;
-  --input-size-md-line-height-line-letter-spacing: 0%px;
+  --input-size-md-line-height-line-letter-spacing: 0%;
   --input-size-md-line-height-line-paragraph-spacing: 0;
   --input-size-md-line-height-line-paragraph-indent: 0px;
   --input-size-md-line-height-line-text-case: none;
@@ -286,7 +286,7 @@
   --input-number-size-md-line-height-line-font-weight: Regular;
   --input-number-size-md-line-height-line-line-height: 125%;
   --input-number-size-md-line-height-line-font-size: 1rem;
-  --input-number-size-md-line-height-line-letter-spacing: 0%px;
+  --input-number-size-md-line-height-line-letter-spacing: 0%;
   --input-number-size-md-line-height-line-paragraph-spacing: 0;
   --input-number-size-md-line-height-line-paragraph-indent: 0px;
   --input-number-size-md-line-height-line-text-case: none;
@@ -295,7 +295,7 @@
   --text-area-size-md-font-weight: Regular;
   --text-area-size-md-line-height: 150%;
   --text-area-size-md-font-size: 1rem;
-  --text-area-size-md-letter-spacing: 0%px;
+  --text-area-size-md-letter-spacing: 0%;
   --text-area-size-md-paragraph-spacing: 0;
   --text-area-size-md-paragraph-indent: 0px;
   --text-area-size-md-text-case: none;
@@ -304,7 +304,7 @@
   --checkbox-radio-size-md-font-weight: Regular;
   --checkbox-radio-size-md-line-height: 130%;
   --checkbox-radio-size-md-font-size: 1rem;
-  --checkbox-radio-size-md-letter-spacing: 0%px;
+  --checkbox-radio-size-md-letter-spacing: 0%;
   --checkbox-radio-size-md-paragraph-spacing: 0;
   --checkbox-radio-size-md-paragraph-indent: 0px;
   --checkbox-radio-size-md-text-case: none;

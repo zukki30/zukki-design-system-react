@@ -41,10 +41,6 @@ export const convertFontSizeToRem = (px: number): string => {
 };
 
 export const transformFontSizeToRem = (token: Token) => {
-  if (token.type === 'color') {
-    console.log(token);
-  }
-
   if (token.name?.includes('font-size')) {
     return convertFontSizeToRem(token.value);
   }
@@ -54,7 +50,7 @@ export const transformFontSizeToRem = (token: Token) => {
 
 export const transformSizePx = (token: Token) => {
   const isBorderRadius = token.name?.includes('border-radius') && token.value !== 0;
-  const isSpacing = token.name?.includes('spacing') && token.value !== 0;
+  const isSpacing = token.name?.includes('spacing') && token.value !== 0 && token.value !== '0%';
   const isElevationY =
     token.name?.includes('elevation') && token.name?.includes('-y') && token.value !== 0;
   const isElevationX =
@@ -101,4 +97,24 @@ export const buildTokens = async (
 
   await styleDictionary.cleanAllPlatforms();
   await styleDictionary.buildAllPlatforms();
+};
+
+/**
+ * @description
+ * light-dark関数の値を生成する関数
+ * @param lightJson - light.json
+ * @param darkJson - dark.json
+ * @returns light-dark関数の値
+ */
+export const buildLightDarkFunctionValue = (lightJson: unknown, darkJson: unknown) => {
+  const lightJsonObject = JSON.parse(lightJson as string) as Record<string, string>;
+  const darkJsonObject = JSON.parse(darkJson as string) as Record<string, string>;
+  const lightDarkFunctionValue = {};
+
+  for (const key in lightJsonObject) {
+    lightDarkFunctionValue[`--${key}`] =
+      `light-dark(${lightJsonObject[key]}, ${darkJsonObject[key]})`;
+  }
+
+  return lightDarkFunctionValue;
 };
