@@ -1,69 +1,147 @@
 import StyleDictionary from 'style-dictionary';
-import type { Config, Token } from 'style-dictionary';
+import type { TransformedTokens } from 'style-dictionary';
 
-const sources = [
-  'style-dictionary/tokens/light.json',
-  'style-dictionary/tokens/token.json',
-  'style-dictionary/tokens/typography.json',
-  'style-dictionary/tokens/dark.json',
-];
+import {
+  buildSimplifyTokens,
+  combineLightDarkTokens,
+  transformFontSizeToRem,
+  transformSizePx,
+} from './utils';
 
-// pxをremに変換する関数
-const convertFontSizeToRem = (px: number): string => {
-  const baseFontSize = 16;
-  return `${px / baseFontSize}rem`;
-};
+const FORMAT_NAME = 'typescript/constants';
 
-const configs = sources.map((source) => {
-  // source から style-dictionary/tokens/ と .json を削除
-  const sourceWithoutTokens = source.replace('style-dictionary/tokens/', '').replace('.json', '');
-
-  const config: Config = {
-    source: [source],
-    platforms: {
-      ts: {
-        transformGroup: 'js',
-        buildPath: 'src/design-tokens/',
-        transforms: ['attribute/cti', 'name/kebab', 'font-size/rem', 'color/css'],
-        options: {
-          showFileHeader: false,
-          outputReferences: false,
-        },
-        files: [{ destination: `${sourceWithoutTokens}.ts`, format: 'typescript/constants' }],
+const colorConfig = (fileName: 'light' | 'dark') => ({
+  source: [`style-dictionary/tokens/${fileName}.json`],
+  platforms: {
+    ts: {
+      transformGroup: 'js',
+      buildPath: 'src/design-tokens/',
+      transforms: ['attribute/cti', 'name/kebab', 'color/css'],
+      options: {
+        showFileHeader: false,
+        outputReferences: false,
       },
+      files: [{ destination: `${fileName}.ts`, format: FORMAT_NAME }],
     },
-  };
+  },
+});
 
-  return config;
+const lightDarkConfig = () => ({
+  source: ['style-dictionary/tokens/light.json'],
+  platforms: {
+    ts: {
+      transformGroup: 'js',
+      buildPath: 'src/design-tokens/',
+      transforms: ['attribute/cti', 'name/kebab', 'color/css'],
+      options: {
+        showFileHeader: false,
+        outputReferences: false,
+      },
+      files: [{ destination: 'light-dark.ts', format: FORMAT_NAME }],
+    },
+  },
+});
+
+const DEFAULT_FILES = ['token', 'typography'] as const;
+type DefaultFile = (typeof DEFAULT_FILES)[number];
+
+const defaultConfig = (fileName: DefaultFile) => ({
+  source: [`style-dictionary/tokens/${fileName}.json`],
+  platforms: {
+    ts: {
+      transformGroup: 'js',
+      buildPath: 'src/design-tokens/',
+      transforms: ['attribute/cti', 'name/kebab', 'font-size/rem', 'size/px'],
+      options: {
+        showFileHeader: false,
+        outputReferences: false,
+      },
+      files: [{ destination: `${fileName}.ts`, format: FORMAT_NAME }],
+    },
+  },
 });
 
 const buildAllConfigs = async (): Promise<void> => {
-  for (const config of configs) {
-    const sd = new StyleDictionary(config);
+  let lightJson: TransformedTokens;
+  let darkJson: TransformedTokens;
+
+  // light.ts を生成し、 lightJson に格納
+  const lightStyleDictionary = new StyleDictionary(colorConfig('light'));
+  await lightStyleDictionary.hasInitialized;
+
+  lightStyleDictionary.registerFormat({
+    name: FORMAT_NAME,
+    format: async ({ dictionary, file }) => {
+      lightJson = dictionary.tokens;
+
+      // file.destination から .ts を削除
+      const fileName = file.destination?.replace('.ts', '');
+      const tokens = buildSimplifyTokens(dictionary.tokens);
+
+      return `// このファイルは自動生成されています。直接編集しないでください。
+
+export const ${fileName}DesignTokens = ${JSON.stringify(tokens, null, 2)} as const;
+`;
+    },
+  });
+
+  await lightStyleDictionary.cleanAllPlatforms();
+  await lightStyleDictionary.buildAllPlatforms();
+
+  // dark.ts を生成し、 darkJson に格納
+  const darkStyleDictionary = new StyleDictionary(colorConfig('dark'));
+  await darkStyleDictionary.hasInitialized;
+
+  darkStyleDictionary.registerFormat({
+    name: FORMAT_NAME,
+    format: async ({ dictionary, file }) => {
+      darkJson = dictionary.tokens;
+
+      // file.destination から .ts を削除
+      const fileName = file.destination?.replace('.ts', '');
+      const tokens = buildSimplifyTokens(dictionary.tokens);
+
+      return `// このファイルは自動生成されています。直接編集しないでください。
+
+export const ${fileName}DesignTokens = ${JSON.stringify(tokens, null, 2)} as const;
+`;
+    },
+  });
+
+  await darkStyleDictionary.cleanAllPlatforms();
+  await darkStyleDictionary.buildAllPlatforms();
+
+  // light-dark.ts を生成
+  const lightDarkStyleDictionary = new StyleDictionary(lightDarkConfig());
+  await lightDarkStyleDictionary.hasInitialized;
+
+  lightDarkStyleDictionary.registerFormat({
+    name: FORMAT_NAME,
+    format: async () => {
+      const result = combineLightDarkTokens(lightJson, darkJson);
+
+      return `// このファイルは自動生成されています。直接編集しないでください。
+
+export const lightDarkDesignTokens = ${JSON.stringify(result, null, 2)} as const;
+`;
+    },
+  });
+
+  await lightDarkStyleDictionary.cleanAllPlatforms();
+  await lightDarkStyleDictionary.buildAllPlatforms();
+
+  // トークンを TypeScript の型定義とオブジェクトに変換
+  for (const file of DEFAULT_FILES) {
+    const sd = new StyleDictionary(defaultConfig(file));
     await sd.hasInitialized;
 
     // json を TypeScript の型定義とオブジェクトに変換するフォーマット
     sd.registerFormat({
-      name: 'typescript/constants',
+      name: FORMAT_NAME,
       format: async ({ dictionary, file }) => {
         // file.destination から .ts を削除
         const fileName = file.destination?.replace('.ts', '');
-
-        const simplifyTokens = (obj: Record<string, unknown>): Record<string, unknown> => {
-          const result: Record<string, unknown> = {};
-
-          for (const [key, value] of Object.entries(obj)) {
-            if (value && typeof value === 'object' && 'value' in value) {
-              result[key] = value.value;
-            } else if (typeof value === 'object') {
-              result[key] = value ? simplifyTokens(value as Record<string, unknown>) : value;
-            }
-          }
-
-          return result;
-        };
-
-        const tokens = simplifyTokens(dictionary.tokens);
+        const tokens = buildSimplifyTokens(dictionary.tokens);
 
         return `// このファイルは自動生成されています。直接編集しないでください。
 
@@ -77,13 +155,15 @@ export const ${fileName}DesignTokens = ${JSON.stringify(tokens, null, 2)} as con
       name: 'font-size/rem',
       type: 'value',
       transitive: true,
-      transform: (token: Token): string => {
-        if (token.name?.includes('font-size')) {
-          return convertFontSizeToRem(token.value);
-        }
+      transform: transformFontSizeToRem,
+    });
 
-        return token.value;
-      },
+    // font-size 以外の size を px に変換するトランスフォーム
+    sd.registerTransform({
+      name: 'size/px',
+      type: 'value',
+      transitive: true,
+      transform: transformSizePx,
     });
 
     await sd.cleanAllPlatforms();

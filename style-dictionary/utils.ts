@@ -118,3 +118,85 @@ export const buildLightDarkFunctionValue = (lightJson: unknown, darkJson: unknow
 
   return lightDarkFunctionValue;
 };
+
+/**
+ * @description
+ * トークンを簡略化する関数
+ * @param obj - トークン
+ * @returns 簡略化されたトークン
+ */
+export const buildSimplifyTokens = (obj: Record<string, unknown>): Record<string, unknown> => {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (value && typeof value === 'object' && 'value' in value) {
+      result[key] = value.value;
+    } else if (typeof value === 'object') {
+      result[key] = value ? buildSimplifyTokens(value as Record<string, unknown>) : value;
+    }
+  }
+
+  return result;
+};
+
+/**
+ * @description
+ * lightとdarkのデザイントークンを結合し、light-dark関数の形式に変換する
+ * @param lightTokens - lightのデザイントークン
+ * @param darkTokens - darkのデザイントークン
+ * @returns light-dark関数の形式に変換されたトークン
+ * @example
+ * const result = combineLightDarkTokens(lightTokens, darkTokens);
+ * // {
+ * //   "color": {
+ * //     "focus": "light-dark(#ffffff, #000000)"
+ * //   }
+ * // }
+ */
+export const combineLightDarkTokens = (
+  lightTokens: Record<string, unknown>,
+  darkTokens: Record<string, unknown>
+): Record<string, unknown> => {
+  const processTokens = (
+    light: Record<string, unknown>,
+    dark: Record<string, unknown>,
+    currentPath: string[] = []
+  ): Record<string, unknown> => {
+    const processed: Record<string, unknown> = {};
+
+    for (const [key, lightValue] of Object.entries(light)) {
+      const darkValue = dark[key];
+      const newPath = [...currentPath, key];
+
+      if (
+        lightValue &&
+        darkValue &&
+        typeof lightValue === 'object' &&
+        typeof darkValue === 'object' &&
+        !(('value' in lightValue) as unknown as object) &&
+        !(('value' in darkValue) as unknown as object)
+      ) {
+        processed[key] = processTokens(
+          lightValue as Record<string, unknown>,
+          darkValue as Record<string, unknown>,
+          newPath
+        );
+      } else if (
+        lightValue &&
+        darkValue &&
+        typeof lightValue === 'object' &&
+        typeof darkValue === 'object' &&
+        'value' in (lightValue as object) &&
+        'value' in (darkValue as object)
+      ) {
+        processed[key] = `light-dark(${(lightValue as { value: string }).value}, ${
+          (darkValue as { value: string }).value
+        })`;
+      }
+    }
+
+    return processed;
+  };
+
+  return processTokens(lightTokens, darkTokens);
+};
