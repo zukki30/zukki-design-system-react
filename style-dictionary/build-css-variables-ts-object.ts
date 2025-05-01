@@ -51,7 +51,7 @@ const defaultConfig = (fileName: DefaultFile) => ({
     ts: {
       transformGroup: 'js',
       buildPath: 'src/design-tokens/',
-      transforms: ['attribute/cti', 'name/kebab', 'font-size/rem', 'size/px'],
+      transforms: ['attribute/cti', 'name/kebab', 'font-size/rem', 'size/px', 'number/string'],
       options: {
         showFileHeader: false,
         outputReferences: false,
@@ -164,6 +164,20 @@ export const ${fileName}DesignTokens = ${JSON.stringify(tokens, null, 2)} as con
       type: 'value',
       transitive: true,
       transform: transformSizePx,
+    });
+
+    // number を string に変換するトランスフォーム
+    sd.registerTransform({
+      name: 'number/string',
+      type: 'value',
+      transitive: true,
+      transform: (token) => {
+        if (typeof token.value === 'number') {
+          return token.value.toString();
+        }
+
+        return token.value;
+      },
     });
 
     await sd.cleanAllPlatforms();

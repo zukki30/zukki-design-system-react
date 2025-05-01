@@ -14,8 +14,8 @@ export const typographyDesignTokens = {
     input: '120%',
   },
   'font-weight': {
-    normal: 400,
-    bold: 700,
+    normal: '400',
+    bold: '700',
   },
   'font-size': {
     base: '1rem',
