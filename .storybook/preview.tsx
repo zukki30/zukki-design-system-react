@@ -2,6 +2,8 @@ import type { Preview } from '@storybook/react';
 import { themes } from '@storybook/theming';
 import { prefersDark } from './theme';
 
+import './style.css';
+
 const preview: Preview = {
   parameters: {
     docs: {

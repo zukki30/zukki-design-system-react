@@ -1,3 +1,21 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=BIZ+UDMincho:wght@400;700&family=Lato:wght@400;700&display=swap');
 </style>
+
+<script>
+  function setTheme() {
+    // url を取得
+    const url = window.location.href;
+    // url から '&globals=backgrounds.value:!hex(333)' が含まれているか確認
+    const isDark = url.includes('backgrounds.value:!hex(333)');
+
+    // 含まれていれば html に dark-theme を設定
+    if (isDark) {
+      document.documentElement.classList.add('dark-theme');
+    } else {
+      document.documentElement.classList.add('light-theme');
+    }
+  }
+
+  setTheme();
+</script>
