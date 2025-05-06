@@ -12,3 +12,5 @@ import './styles/variables.css';
 
 // components
 export { Icon } from './components/Icon';
+export { Button } from './components/Button';
+export { Spinner } from './components/Spinner';
