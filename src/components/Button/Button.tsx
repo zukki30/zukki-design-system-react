@@ -1,16 +1,112 @@
-// import "./button.css";
+import { clsx } from 'clsx';
+import { type ComponentProps, type ComponentPropsWithoutRef, useMemo } from 'react';
 
-// export type ButtonProps = {};
+import type { SizeType, ZukkiVariantType } from '@/types';
+
+import { Spinner } from '../Spinner';
+
+import {
+  button,
+  buttonInner,
+  buttonLabel,
+  buttonLoading,
+  buttonSize,
+  buttonVariant,
+} from './Button.css';
 
 type Props = {
-  onClick: () => void;
-};
+  /**
+   * ボタンの中身
+   */
+  children: React.ReactNode;
+  /**
+   * ボタンの前に表示する要素
+   */
+  startIcon?: React.ReactNode;
+  /**
+   * ボタンの後に表示する要素
+   */
+  endIcon?: React.ReactNode;
+  /**
+   * ボタンのバリアント
+   */
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'failure' | ZukkiVariantType;
+  /**
+   * ボタンのサイズ
+   */
+  size?: Exclude<SizeType, 'lg'>;
+  /**
+   * ボタンの selected 属性
+   */
+  selected?: boolean;
+  /**
+   * ボタンの disabled 属性
+   */
+  disabled?: boolean;
+  /**
+   * ボタンの loading 属性
+   */
+  loading?: boolean;
+} & Omit<ComponentPropsWithoutRef<'button'>, 'disabled' | 'prefix' | 'suffix'>;
 
-/** Primary UI component for user interaction */
-export const Button = ({ onClick }: Props) => {
+const SPINNER_SIZE_SM = 14;
+const SPINNER_SIZE_MD = 24;
+
+export const Button = ({
+  children,
+  startIcon,
+  endIcon,
+  variant = 'default',
+  size = 'md',
+  selected,
+  disabled,
+  loading,
+  type = 'button',
+  className,
+  onClick,
+  ...props
+}: Props) => {
+  const spinnerVariant: ComponentProps<typeof Spinner>['variant'] =
+    variant === 'default' ? 'light' : 'dark';
+  const spinnerSize = useMemo(() => {
+    switch (size) {
+      case 'sm':
+        return `${SPINNER_SIZE_SM}px`;
+      case 'md':
+        return `${SPINNER_SIZE_MD}px`;
+      default:
+        return `${SPINNER_SIZE_MD}px`;
+    }
+  }, [size]);
+
   return (
-    <button type="button" onClick={onClick}>
-      test
+    <button
+      type={type}
+      onClick={onClick}
+      className={clsx(buttonSize[size], buttonVariant[variant], button, className)}
+      disabled={disabled}
+      data-selected={selected}
+      data-has-start-icon={!!startIcon}
+      data-has-end-icon={!!endIcon}
+      data-loading={loading}
+      {...props}
+    >
+      <span className={buttonInner} data-loading={loading}>
+        {startIcon}
+        <span className={buttonLabel[size]}>{children}</span>
+        {endIcon}
+      </span>
+
+      {loading && (
+        <span className={buttonLoading}>
+          <Spinner
+            variant={spinnerVariant}
+            width={spinnerSize}
+            height={spinnerSize}
+            aria-label="loading"
+          />
+        </span>
+      )}
     </button>
   );
 };
