@@ -1,6 +1,7 @@
 // このファイルは自動生成されています。直接編集しないでください。
 
 export const typographyDesignTokens = {
+  'leading-trim': 'calc((1em - 1lh) / 2)',
   'font-family': {
     default: 'BIZ UDPGothic',
     mintyo: 'BIZ UDPMincho',

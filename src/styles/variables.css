@@ -313,6 +313,7 @@
   --checkbox-radio-size-md-paragraph-indent: 0px;
   --checkbox-radio-size-md-text-case: none;
   --checkbox-radio-size-md-text-decoration: none;
+  --leading-trim: calc((1em - 1lh) / 2);
   --font-family-default: BIZ UDPGothic;
   --font-family-mintyo: BIZ UDPMincho;
   --font-family-number: Lato;
