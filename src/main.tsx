@@ -14,3 +14,4 @@ import './styles/variables.css';
 export { Icon } from './components/Icon';
 export { Button } from './components/Button';
 export { Spinner } from './components/Spinner';
+export { IconButton } from './components/IconButton';
