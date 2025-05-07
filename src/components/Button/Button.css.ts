@@ -17,7 +17,7 @@ export const buttonSize = styleVariants({
   },
   md: {
     paddingInline: vars.spacing['3xl'],
-    borderRadius: vars['border-radius'].lg,
+    borderRadius: vars['border-radius'].md,
 
     selectors: {
       '&[data-has-start-icon="true"]': {
@@ -248,11 +248,19 @@ const buttonLabelBase = style({
 export const buttonLabel = styleVariants({
   sm: [
     buttonLabelBase,
-    { paddingBlock: vars.spacing.md, ...vars.Button['Size sm - line-height line'] },
+    {
+      paddingBlockStart: vars.spacing.lg,
+      paddingBlockEnd: vars.spacing.md,
+      ...vars.Button['Size sm - line-height line'],
+    },
   ],
   md: [
     buttonLabelBase,
-    { paddingBlock: vars.spacing.lg, ...vars.Button['Size md - line-height line'] },
+    {
+      paddingBlockStart: vars.spacing.xl,
+      paddingBlockEnd: vars.spacing.lg,
+      ...vars.Button['Size md - line-height line'],
+    },
   ],
 });
 
