@@ -1,9 +1,10 @@
+import { clsx } from 'clsx';
 import type { ComponentPropsWithoutRef } from 'react';
 
-import { spinner } from './Spinner.css';
+import { spinner, spinnerVariant } from './Spinner.css';
 
 type Props = {
-  variant?: 'light' | 'dark';
+  variant?: 'light' | 'dark' | 'primary';
   /**
    * The aria-label attribute providing the accessible name of the icon.
    */
@@ -19,8 +20,7 @@ export const Spinner = ({ 'aria-label': ariaLabel, variant = 'light', ...restPro
         width="24"
         height="24"
         role="img"
-        className={spinner}
-        data-variant={variant}
+        className={clsx(spinner, spinnerVariant[variant], restProps.className)}
         aria-hidden={ariaLabel ? undefined : 'true'}
         {...restProps}
       >

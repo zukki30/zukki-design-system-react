@@ -33,3 +33,11 @@ export const Dark: Story = {
     </div>
   ),
 };
+
+export const Primary: Story = {
+  args: {
+    variant: 'primary',
+    'aria-label': 'Loading Spinner...',
+  },
+  render: (args) => <Spinner {...args} />,
+};

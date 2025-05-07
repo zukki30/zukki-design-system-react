@@ -1,5 +1,5 @@
 import { vars } from '@/styles/theme.css';
-import { keyframes, style } from '@vanilla-extract/css';
+import { keyframes, style, styleVariants } from '@vanilla-extract/css';
 
 const rotate = keyframes({
   '0%': { transform: 'rotate(0deg)' },
@@ -11,14 +11,17 @@ export const spinner = style({
   fill: 'none',
   strokeWidth: 2,
   strokeLinecap: 'round',
-  stroke: vars.color.grey[1000],
   animation: `${rotate} 1s linear infinite`,
-  selectors: {
-    '&[data-variant="light"]': {
-      stroke: vars.color.grey[1000],
-    },
-    '&[data-variant="dark"]': {
-      stroke: vars.color.grey[0],
-    },
+});
+
+export const spinnerVariant = styleVariants({
+  light: {
+    stroke: vars.color.grey[1000],
+  },
+  dark: {
+    stroke: vars.color.grey[0],
+  },
+  primary: {
+    stroke: vars.color.primary.default,
   },
 });
