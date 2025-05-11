@@ -1,8 +1,4 @@
 {
-  "leading-trim": {
-    "value": "calc((1em - 1lh) / 2)",
-    "type": "string"
-  },
   "font-family": {
     "default": {
       "value": "BIZ UDPGothic",
@@ -102,5 +98,9 @@
       "value": 56,
       "type": "number"
     }
+  },
+  "leading-trim": {
+    "value": "calc((1em - 1lh) / 2)",
+    "type": "text"
   }
 }
