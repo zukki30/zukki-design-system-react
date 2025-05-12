@@ -243,6 +243,9 @@ const buttonLabelBase = style({
   marginBlock: vars['leading-trim'],
   boxSizing: 'border-box',
   display: 'flex',
+  fontFamily: vars['font-family'].default,
+  fontWeight: vars['font-weight'].bold,
+  lineHeight: vars['line-height'].line,
 });
 
 export const buttonLabel = styleVariants({
@@ -251,7 +254,7 @@ export const buttonLabel = styleVariants({
     {
       paddingBlockStart: vars.spacing.lg,
       paddingBlockEnd: vars.spacing.md,
-      ...vars.Button['Size sm - line-height line'],
+      fontSize: vars['font-size'].xs,
     },
   ],
   md: [
@@ -259,7 +262,7 @@ export const buttonLabel = styleVariants({
     {
       paddingBlockStart: vars.spacing.xl,
       paddingBlockEnd: vars.spacing.lg,
-      ...vars.Button['Size md - line-height line'],
+      fontSize: vars['font-size'].sm,
     },
   ],
 });
