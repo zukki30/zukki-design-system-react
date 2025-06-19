@@ -1,7 +1,7 @@
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
-export const tagBase = style({
+export const tag = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.spacing.xs,
@@ -41,7 +41,7 @@ export const tagVariant = styleVariants({
     backgroundColor: vars.color.yellow[50],
     color: vars.color.yellow[600],
   },
-  profle: {
+  profile: {
     borderColor: vars.color.emerald[300],
     backgroundColor: vars.color.emerald[50],
     color: vars.color.emerald[600],
@@ -55,5 +55,69 @@ export const tagVariant = styleVariants({
     borderColor: vars.color.sky[300],
     backgroundColor: vars.color.sky[50],
     color: vars.color.sky[600],
+  },
+});
+
+export const tagCloseButton = style({
+  padding: vars.spacing.none,
+  width: 14,
+  height: 14,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  lineHeight: vars['line-height'].line,
+  border: 'none',
+  backgroundColor: 'transparent',
+  cursor: 'pointer',
+});
+
+export const tagCloseButtonVariant = styleVariants({
+  default: {
+    color: vars.color.grey[500],
+    ':hover': {
+      color: vars.color.grey[700],
+    },
+  },
+  red: {
+    color: vars.color.red[300],
+    ':hover': {
+      color: vars.color.red[500],
+    },
+  },
+  blue: {
+    color: vars.color.blue[300],
+    ':hover': {
+      color: vars.color.blue[500],
+    },
+  },
+  green: {
+    color: vars.color.green[300],
+    ':hover': {
+      color: vars.color.green[500],
+    },
+  },
+  yellow: {
+    color: vars.color.yellow[300],
+    ':hover': {
+      color: vars.color.yellow[600],
+    },
+  },
+  profile: {
+    color: vars.color.emerald[300],
+    ':hover': {
+      color: vars.color.emerald[600],
+    },
+  },
+  works: {
+    color: vars.color.teal[300],
+    ':hover': {
+      color: vars.color.teal[600],
+    },
+  },
+  outputs: {
+    color: vars.color.sky[300],
+    ':hover': {
+      color: vars.color.sky[600],
+    },
   },
 });
