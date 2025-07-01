@@ -1,5 +1,5 @@
-import type { Preview } from '@storybook/react';
-import { themes } from '@storybook/theming';
+import type { Preview } from '@storybook/react-vite';
+import { themes } from 'storybook/theming';
 import { prefersDark } from './theme';
 
 import './style.css';
@@ -17,6 +17,8 @@ const preview: Preview = {
       },
     },
   },
+
+  tags: ['autodocs']
 };
 
 export default preview;
