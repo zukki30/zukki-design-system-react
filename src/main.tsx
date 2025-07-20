@@ -16,3 +16,4 @@ export { Button } from './components/Button';
 export { Spinner } from './components/Spinner';
 export { IconButton } from './components/IconButton';
 export { Skeleton } from './components/Skeleton';
+export { Steps } from './components/Steps';

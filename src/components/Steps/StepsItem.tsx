@@ -7,7 +7,7 @@ type Props = {
   /**
    * The step number to display.
    */
-  number: number;
+  stepNumber: number;
   /**
    * The label for the step.
    */
@@ -26,17 +26,23 @@ type Props = {
    * Optional click handler for the step.
    * If provided, the step will be clickable.
    */
-  onClick?: () => void;
+  onClick?: (step: number) => void;
 };
 
-export const StepsItem = ({ number, label, current = false, finished = false, onClick }: Props) => {
+export const StepsItem = ({
+  stepNumber,
+  label,
+  current = false,
+  finished = false,
+  onClick,
+}: Props) => {
   const isClickable = !onClick;
   const Component = isClickable ? 'span' : 'button';
   const buttonProps = isClickable
     ? {}
     : {
         type: 'button' as const,
-        onClick,
+        onClick: () => onClick(stepNumber),
       };
 
   return (
@@ -46,7 +52,9 @@ export const StepsItem = ({ number, label, current = false, finished = false, on
           <Icon name="outlineCheck" width={20} height={20} />
         </span>
       ) : (
-        <span className={current ? stepsItemIcon.current : stepsItemIcon.default}>{number}</span>
+        <span className={current ? stepsItemIcon.current : stepsItemIcon.default}>
+          {stepNumber}
+        </span>
       )}
       <span className={stepsItemLabel}>{label}</span>
     </Component>

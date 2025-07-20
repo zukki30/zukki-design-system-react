@@ -4,8 +4,10 @@ import { style, styleVariants } from '@vanilla-extract/css';
 const ICON_SIZE = '32px';
 
 export const stepsItem = style({
+  flexShrink: 0,
   display: 'grid',
   alignItems: 'center',
+  justifyContent: 'flex-start',
   gridTemplateColumns: `${ICON_SIZE} auto`,
   gap: vars.spacing.sm,
   lineHeight: 1,

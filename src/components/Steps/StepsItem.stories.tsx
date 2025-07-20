@@ -13,14 +13,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    number: 1,
+    stepNumber: 1,
     label: 'Step 1 Label',
   },
 };
 
 export const Current: Story = {
   args: {
-    number: 1,
+    stepNumber: 1,
     label: 'Step 1 Label',
     current: true,
   },
@@ -28,7 +28,7 @@ export const Current: Story = {
 
 export const Finished: Story = {
   args: {
-    number: 2,
+    stepNumber: 2,
     label: 'Step 2 Label',
     finished: true,
   },
@@ -36,7 +36,7 @@ export const Finished: Story = {
 
 export const DefaultClickable: Story = {
   args: {
-    number: 3,
+    stepNumber: 3,
     label: 'Step 3 Label',
     onClick: fn(),
   },
@@ -44,7 +44,7 @@ export const DefaultClickable: Story = {
 
 export const CurrentClickable: Story = {
   args: {
-    number: 4,
+    stepNumber: 4,
     label: 'Step 4 Label',
     current: true,
     onClick: fn(),
