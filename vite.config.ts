@@ -1,12 +1,14 @@
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { configDefaults } from 'vitest/config';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [tsconfigPaths(), react(), vanillaExtractPlugin()],
+  plugins: [react(), vanillaExtractPlugin()],
+  resolve: {
+    tsconfigPaths: true,
+  },
   build: {
     lib: {
       entry: './src/main.tsx',
