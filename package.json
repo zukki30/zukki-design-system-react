@@ -4,19 +4,19 @@
   "version": "1.0.0",
   "description": "デザインシステム",
   "scripts": {
-    "dev": "npm run storybook",
+    "dev": "pnpm storybook",
     "build": "tsc -b && vite build",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "preview": "vite preview",
     "build:tokens:css-only": "tsx style-dictionary/build-css-only-variables-to-files.ts",
     "build:tokens:css": "tsx style-dictionary/build-css-variables-to-files.ts",
     "build:tokens:ts-object": "tsx style-dictionary/build-css-variables-ts-object.ts",
-    "build:tokens": "npm run build:tokens:css-only && npm run build:tokens:css && npm run build:tokens:ts-object && npm run format",
+    "build:tokens": "pnpm build:tokens:css-only && pnpm build:tokens:css && pnpm build:tokens:ts-object && pnpm format",
     "token:transform:light": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/light.json --expandTypography=true --expandShadow=true PrimitiveColor/light,ThemeColor/light,SemanticColor/light",
     "token:transform:dark": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/dark.json --expandTypography=true --expandShadow=true PrimitiveColor/dark,ThemeColor/dark,SemanticColor/dark",
     "token:transform:typography": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/typography.json --expandTypography=true --expandShadow=true Typography/value",
     "token:transform:other": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/token.json --expandTypography=true --expandShadow=true global,Token/value",
-    "token:transform": "npm run token:transform:light && npm run token:transform:dark && npm run token:transform:typography && npm run token:transform:other",
+    "token:transform": "pnpm token:transform:light && pnpm token:transform:dark && pnpm token:transform:typography && pnpm token:transform:other",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -27,9 +27,10 @@
   },
   "author": "",
   "license": "ISC",
+  "packageManager": "pnpm@10.33.0",
   "volta": {
     "node": "20.18.2",
-    "npm": "10.9.2"
+    "pnpm": "10.33.0"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",
     "@eslint/js": "^9.25.1",
+    "@storybook/addon-docs": "^9.0.14",
     "@storybook/addon-links": "^9.0.14",
     "@storybook/addon-onboarding": "^9.0.14",
     "@storybook/react-vite": "^9.0.14",
@@ -46,6 +48,7 @@
     "@testing-library/react": "^16.3.0",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
+    "@vanilla-extract/css": "^1.20.1",
     "@vanilla-extract/vite-plugin": "^5.0.1",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "eslint": "^9.25.1",
@@ -65,12 +68,18 @@
     "typescript-eslint": "^8.31.0",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.2",
-    "@storybook/addon-docs": "^9.0.14"
+    "vitest": "^3.1.2"
   },
   "eslintConfig": {
     "extends": [
       "plugin:storybook/recommended"
+    ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "esbuild",
+      "style-dictionary"
     ]
   }
 }

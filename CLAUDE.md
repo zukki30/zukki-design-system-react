@@ -6,23 +6,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Development (Storybook on port 6006)
-npm run dev
+pnpm dev
 
 # Build (TypeScript compile + Vite bundle)
-npm run build
+pnpm build
 
 # Lint & format
-npm run lint
-npm run format
+pnpm lint
+pnpm format
 
 # Tests
-npm run test           # Single run
-npm run test:watch     # Watch mode
-npm run test:coverage  # With coverage report
+pnpm test           # Single run
+pnpm test:watch     # Watch mode
+pnpm test:coverage  # With coverage report
 
 # Design tokens (Figma → CSS variables → TypeScript)
-npm run token:transform   # Figma export → JSON
-npm run build:tokens      # JSON → CSS + TypeScript files
+pnpm token:transform   # Figma export → JSON
+pnpm build:tokens      # JSON → CSS + TypeScript files
 ```
 
 ## Architecture
@@ -33,7 +33,7 @@ This is a **React component library** (design system) built with TypeScript and 
 
 **Library entry point:** `src/main.tsx` exports all components. Vite builds to UMD + ES modules (`zukki-design-system.umd.js`, `zukki-design-system.es.js`).
 
-**Design token pipeline:** Figma (tokens.json) → `npm run token:transform` → `style-dictionary/tokens/*.json` → `npm run build:tokens` → `src/design-tokens/*.ts` + global CSS variables in `src/styles/theme.css.ts`.
+**Design token pipeline:** Figma (tokens.json) → `pnpm token:transform` → `style-dictionary/tokens/*.json` → `pnpm build:tokens` → `src/design-tokens/*.ts` + global CSS variables in `src/styles/theme.css.ts`.
 
 All component styles reference CSS variables via the `vars` object exported from `src/styles/theme.css.ts`.
 

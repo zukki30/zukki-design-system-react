@@ -19,8 +19,8 @@ https://github.com/zukki30/zukki-design-system の React only のデザインシ
 ## CSS variables の生成
 
 1. Figma で、 Tokens Studio for figma を使用し、デザインシステムのトークンを export し、このリポジトリに push する。
-2. pull 後に、 `npm run token:transform` を使用し、CSS variables を生成する。
-3. 変換後に、 `npm run build:tokens` を使用し、CSS ファイルを生成する。
+2. pull 後に、 `pnpm token:transform` を使用し、CSS variables を生成する。
+3. 変換後に、 `pnpm build:tokens` を使用し、CSS ファイルを生成する。
 
 ## Web fonts の生成
 
