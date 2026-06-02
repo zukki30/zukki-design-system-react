@@ -1,79 +1,81 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+このファイルは、本リポジトリで作業する際の Claude Code（claude.ai/code）向けガイドです。
 
-## Commands
+## コマンド
 
 ```bash
-# Development (Storybook on port 6006)
+# 開発（Storybook をポート 6006 で起動）
 pnpm dev
 
-# Build (TypeScript compile + Vite bundle)
+# ビルド（TypeScript コンパイル + Vite バンドル）
 pnpm build
 
-# Lint & format
+# Lint & フォーマット
 pnpm lint
 pnpm format
 
-# Tests
-pnpm test           # Single run
-pnpm test:watch     # Watch mode
-pnpm test:coverage  # With coverage report
+# テスト
+pnpm test           # 単発実行
+pnpm test:watch     # ウォッチモード
+pnpm test:coverage  # カバレッジ付き
 
-# Design tokens (Figma → CSS variables → TypeScript)
-pnpm token:transform   # Figma export → JSON
-pnpm build:tokens      # JSON → CSS + TypeScript files
+# デザイントークン（Figma → CSS 変数 → TypeScript）
+pnpm token:transform   # Figma エクスポート → JSON
+pnpm build:tokens      # JSON → CSS + TypeScript ファイル
 ```
 
-## Architecture
+## アーキテクチャ
 
-This is a **React component library** (design system) built with TypeScript and Vanilla Extract CSS-in-JS. Components are documented and developed via Storybook.
+TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポーネントライブラリ**（デザインシステム）です。コンポーネントは Storybook 上でドキュメント化・開発します。
 
-**Tech stack:** React 19, TypeScript 5, Vite 6, Vanilla Extract, Vitest, Storybook 9
+**技術スタック:** React 19 / TypeScript 6 / Vite 8 / Vanilla Extract / Vitest 4 / Storybook 10
 
-**Library entry point:** `src/main.tsx` exports all components. Vite builds to UMD + ES modules (`zukki-design-system.umd.js`, `zukki-design-system.es.js`).
+**パッケージマネージャ:** pnpm（`packageManager` で固定）
 
-**Design token pipeline:** Figma (tokens.json) → `pnpm token:transform` → `style-dictionary/tokens/*.json` → `pnpm build:tokens` → `src/design-tokens/*.ts` + global CSS variables in `src/styles/theme.css.ts`.
+**ライブラリのエントリポイント:** `src/main.tsx` で全コンポーネントを export します。Vite は UMD と ES モジュール（`zukki-design-system.umd.js`、`zukki-design-system.es.js`）の両方を出力します。
 
-All component styles reference CSS variables via the `vars` object exported from `src/styles/theme.css.ts`.
+**デザイントークンのパイプライン:** Figma（tokens.json）→ `pnpm token:transform` → `style-dictionary/tokens/*.json` → `pnpm build:tokens` → `src/design-tokens/*.ts` ＋ `src/styles/theme.css.ts` 内のグローバル CSS 変数。
 
-## Component Structure
+すべてのコンポーネントスタイルは、`src/styles/theme.css.ts` から export される `vars` オブジェクト経由で CSS 変数を参照します。
 
-Each component lives in `src/components/ComponentName/` with this layout:
+## コンポーネント構成
+
+各コンポーネントは `src/components/ComponentName/` 配下に、以下のレイアウトで配置します。
 
 ```
 ComponentName/
-├── hooks/                    # Optional: custom hooks
+├── hooks/                    # 任意: カスタムフック
 │   ├── useComponentName.ts
 │   ├── useComponentName.spec.ts
 │   └── index.ts
-├── ComponentName.tsx         # Component implementation
-├── ComponentName.stories.tsx # Storybook stories
-├── ComponentName.css.ts      # Vanilla Extract styles
-└── index.ts                  # Barrel export
+├── ComponentName.tsx         # コンポーネント実装
+├── ComponentName.stories.tsx # Storybook ストーリー
+├── ComponentName.css.ts      # Vanilla Extract スタイル
+└── index.ts                  # バレルエクスポート
 ```
 
-## Coding Conventions
+## コーディング規約
 
-**TypeScript/React:**
-- Functional components only: `export const ComponentName = ({ ...props }: Props) => { ... }`
-- Use `type` (not `interface`) for all type definitions; never use `any`
-- Use `ComponentPropsWithoutRef<'tag'>` to spread native HTML attributes
-- Use `clsx()` for conditional className merging
-- Minimal `useEffect` usage; prefer declarative patterns
-- Avoid deep `if/else` nesting; use `switch` for multiple conditions
+**TypeScript / React:**
+- 関数コンポーネントのみ: `export const ComponentName = ({ ...props }: Props) => { ... }`
+- 型定義はすべて `interface` ではなく `type` を使用する。`any` は使用しない
+- ネイティブな HTML 属性を展開するには `ComponentPropsWithoutRef<'tag'>` を使用する
+- 条件付き className の結合には `clsx()` を使用する
+- `useEffect` の使用は最小限に抑え、宣言的なパターンを優先する
+- 深い `if/else` のネストを避け、条件が複数ある場合は `switch` を使用する
 
-**Styling (Vanilla Extract):**
-- All styles in `ComponentName.css.ts` using `@vanilla-extract/css`
-- BEM naming for class selectors
-- Use `vars` from `src/styles/theme.css.ts` for all values (no hardcoded colors/spacing)
-- Use `styleVariants()` for component variants
+**スタイリング（Vanilla Extract）:**
+- スタイルはすべて `ComponentName.css.ts` 内に `@vanilla-extract/css` を用いて記述する
+- クラスセレクタは BEM 命名に従う
+- すべての値に `src/styles/theme.css.ts` の `vars` を使用する（色・余白などのハードコード禁止）
+- コンポーネントのバリアントには `styleVariants()` を使用する
 
-**Testing:**
-- Test all exported functions; cover both branches of `if/else` and all cases of `switch`
-- Test files: `*.spec.ts` or `*.test.ts`
+**テスト:**
+- export された関数はすべてテストする。`if/else` は両分岐、`switch` は全 case を網羅する
+- テストファイル: `*.spec.ts` または `*.test.ts`
 
-**Git commits:**
-- English messages with prefix: `feat`, `fix`, `chore`, `refactor`, `test`, `docs`, `style`, `ci`, `perf`, `revert`
+**Git コミット:**
+- 英語のメッセージで、プレフィックスを付ける: `feat`、`fix`、`chore`、`refactor`、`test`、`docs`、`style`、`ci`、`perf`、`revert`
 
-**Path alias:** `@/*` resolves to `src/*`
+**パスエイリアス:** `@/*` は `src/*` に解決される
