@@ -18,3 +18,4 @@ export { IconButton } from './components/IconButton';
 export { Skeleton } from './components/Skeleton';
 export { Steps } from './components/Steps';
 export { Input } from './components/Input';
+export { TextArea } from './components/TextArea';
