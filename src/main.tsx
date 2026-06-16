@@ -19,3 +19,5 @@ export { Skeleton } from './components/Skeleton';
 export { Steps } from './components/Steps';
 export { Input } from './components/Input';
 export { TextArea } from './components/TextArea';
+export { Checkbox } from './components/Checkbox';
+export { Radio } from './components/Radio';
