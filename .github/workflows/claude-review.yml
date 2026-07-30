@@ -7,9 +7,11 @@ on:
 jobs:
   review:
     # Draft PR はスキップ。fork からの PR ではシークレットが読めないため除外する
+    # Dependabot の PR も除外する（secrets が渡らず必ず失敗する上、依存更新に AI レビューは不要）
     if: >-
       github.event.pull_request.draft == false &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
