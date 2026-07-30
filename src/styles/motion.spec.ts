@@ -12,7 +12,7 @@ describe('reducedMotion', () => {
   it('渡したスタイルをモーション低減のメディアクエリで包む', () => {
     expect(reducedMotion({ animation: 'none' })).toEqual({
       '@media': {
-        '(prefers-reduced-motion: reduce)': { animation: 'none' },
+        [REDUCED_MOTION_QUERY]: { animation: 'none' },
       },
     });
   });
