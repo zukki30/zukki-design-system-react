@@ -1,3 +1,4 @@
+import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { globalStyle, style } from '@vanilla-extract/css';
 
@@ -32,6 +33,7 @@ export const selectField = style({
   color: vars.color.textOnLight.default,
   cursor: 'pointer',
   transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
+  ...reducedMotionNone,
 
   selectors: {
     // 値未選択（placeholder option が選択中）はプレースホルダー色

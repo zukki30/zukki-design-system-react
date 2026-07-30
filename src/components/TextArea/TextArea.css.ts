@@ -1,3 +1,4 @@
+import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
@@ -22,6 +23,7 @@ export const textArea = style({
   color: vars.color.textOnLight.default,
   resize: 'vertical',
   transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
+  ...reducedMotionNone,
 
   selectors: {
     '&::placeholder': {
