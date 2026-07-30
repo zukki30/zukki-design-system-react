@@ -1,7 +1,7 @@
 import type { StyleRule } from '@vanilla-extract/css';
 
 /**
- * `@media` 配下に書けるスタイル（`@media` のネストを含まないスタイル）
+ * `@media` 配下に書けるスタイル（`@media` のネストは想定しない）
  */
 export type MediaStyleRule = NonNullable<StyleRule['@media']>[string];
 
