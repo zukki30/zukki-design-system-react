@@ -39,7 +39,7 @@ describe('Select', () => {
     render(
       <Select onChange={handleChange} placeholder="選択してください">
         {options}
-      </Select>,
+      </Select>
     );
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'apple' } });
@@ -51,7 +51,7 @@ describe('Select', () => {
     render(
       <Select defaultValue="orange" placeholder="選択してください">
         {options}
-      </Select>,
+      </Select>
     );
 
     expect(screen.getByRole('combobox')).toHaveValue('orange');
@@ -79,7 +79,7 @@ describe('Select', () => {
     render(
       <Select name="fruit" required>
         {options}
-      </Select>,
+      </Select>
     );
 
     const combobox = screen.getByRole('combobox');

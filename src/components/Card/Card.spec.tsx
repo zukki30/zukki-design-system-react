@@ -20,7 +20,7 @@ describe('Card', () => {
     render(
       <Card action={<span>more</span>} title={undefined}>
         本文
-      </Card>,
+      </Card>
     );
 
     // action はヘッダー内なので title が無ければ描画されない
@@ -31,7 +31,7 @@ describe('Card', () => {
     render(
       <Card title="タイトル" action={<span>more</span>}>
         本文
-      </Card>,
+      </Card>
     );
 
     expect(screen.getByText('more')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('Card', () => {
     render(
       <Card image={<img src="x.png" alt="サムネイル" />} title="タイトル">
         本文
-      </Card>,
+      </Card>
     );
 
     expect(screen.getByAltText('サムネイル')).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe('Card', () => {
     rerender(
       <Card data-testid="card" size="sm">
         本文
-      </Card>,
+      </Card>
     );
 
     expect(screen.getByTestId('card')).toHaveAttribute('data-size', 'sm');
@@ -78,7 +78,7 @@ describe('Card', () => {
     render(
       <Card data-testid="card" aria-label="記事カード">
         本文
-      </Card>,
+      </Card>
     );
 
     expect(screen.getByTestId('card')).toHaveAttribute('aria-label', '記事カード');

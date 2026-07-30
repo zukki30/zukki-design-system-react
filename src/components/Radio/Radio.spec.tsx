@@ -58,7 +58,7 @@ describe('Radio', () => {
         <Radio name="fruit" value="orange">
           みかん
         </Radio>
-      </>,
+      </>
     );
 
     const apple = screen.getByRole('radio', { name: 'りんご' });

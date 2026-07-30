@@ -19,7 +19,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル">
         本文テキスト
-      </Dialog>,
+      </Dialog>
     );
 
     expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
@@ -31,7 +31,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="確認">
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     const heading = screen.getByRole('heading', { level: 2, name: '確認' });
@@ -52,7 +52,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル" onClose={handleClose}>
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     fireEvent.click(screen.getByRole('button', { name: '閉じる' }));
@@ -64,7 +64,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル" showCloseButton={false}>
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     expect(screen.queryByRole('button', { name: '閉じる' })).not.toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル" footer={<button>決定</button>}>
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     expect(screen.getByRole('button', { name: '決定' })).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル">
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     expect(screen.queryByRole('button', { name: '決定' })).not.toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル" onClose={handleClose}>
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     const dialog = document.querySelector('dialog');
@@ -112,7 +112,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル" onClose={handleClose} closeOnOverlayClick={false}>
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     const dialog = document.querySelector('dialog');
@@ -129,7 +129,7 @@ describe('Dialog', () => {
     render(
       <Dialog open title="タイトル" onClose={handleClose}>
         本文テキスト
-      </Dialog>,
+      </Dialog>
     );
 
     fireEvent.click(screen.getByText('本文テキスト'));
@@ -142,7 +142,7 @@ describe('Dialog', () => {
     render(
       <Dialog open={false} title="タイトル">
         本文
-      </Dialog>,
+      </Dialog>
     );
 
     expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();

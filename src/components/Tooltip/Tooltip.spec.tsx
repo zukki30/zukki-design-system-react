@@ -8,7 +8,7 @@ describe('Tooltip', () => {
     render(
       <Tooltip content="説明">
         <button>ターゲット</button>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByRole('button', { name: 'ターゲット' })).toBeInTheDocument();
@@ -18,7 +18,7 @@ describe('Tooltip', () => {
     render(
       <Tooltip content="ツールチップテキスト">
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByRole('tooltip', { hidden: true })).toHaveTextContent('ツールチップテキスト');
@@ -28,7 +28,7 @@ describe('Tooltip', () => {
     render(
       <Tooltip content="説明">
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByRole('tooltip', { hidden: true })).toHaveAttribute('popover', 'manual');
@@ -38,7 +38,7 @@ describe('Tooltip', () => {
     render(
       <Tooltip content="説明">
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     const tooltip = screen.getByRole('tooltip', { hidden: true });
@@ -51,7 +51,7 @@ describe('Tooltip', () => {
     const { rerender } = render(
       <Tooltip content="説明">
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByRole('tooltip', { hidden: true })).toHaveAttribute('data-placement', 'top');
@@ -59,12 +59,12 @@ describe('Tooltip', () => {
     rerender(
       <Tooltip content="説明" placement="bottomRight">
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByRole('tooltip', { hidden: true })).toHaveAttribute(
       'data-placement',
-      'bottomRight',
+      'bottomRight'
     );
   });
 
@@ -72,12 +72,12 @@ describe('Tooltip', () => {
     render(
       <Tooltip content="説明" open>
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByRole('tooltip', { hidden: true }).parentElement).toHaveAttribute(
       'data-open',
-      'true',
+      'true'
     );
   });
 
@@ -85,11 +85,11 @@ describe('Tooltip', () => {
     render(
       <Tooltip content="説明">
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByRole('tooltip', { hidden: true }).parentElement).not.toHaveAttribute(
-      'data-open',
+      'data-open'
     );
   });
 
@@ -97,7 +97,7 @@ describe('Tooltip', () => {
     render(
       <Tooltip content="説明" data-testid="tooltip-wrapper">
         <span>ターゲット</span>
-      </Tooltip>,
+      </Tooltip>
     );
 
     expect(screen.getByTestId('tooltip-wrapper')).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe('Tooltip', () => {
       render(
         <Tooltip content="説明" open>
           <span>ターゲット</span>
-        </Tooltip>,
+        </Tooltip>
       );
 
       expect(showPopover).toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe('Tooltip', () => {
       render(
         <Tooltip content="説明" data-testid="wrapper">
           <span>ターゲット</span>
-        </Tooltip>,
+        </Tooltip>
       );
       const wrapper = screen.getByTestId('wrapper');
 
@@ -153,7 +153,7 @@ describe('Tooltip', () => {
       render(
         <Tooltip content="説明" data-testid="wrapper">
           <button>ターゲット</button>
-        </Tooltip>,
+        </Tooltip>
       );
       const wrapper = screen.getByTestId('wrapper');
 
