@@ -1,3 +1,4 @@
+import { reducedMotion } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { keyframes, style } from '@vanilla-extract/css';
 
@@ -12,6 +13,8 @@ export const skeleton = style({
   borderRadius: vars['border-radius'].xs,
   backgroundColor: vars.color.grey[200],
   animation: `${fade} 3s ease-in-out infinite`,
+  // モーション低減時は点滅を止め、プレースホルダーとしての表示のみ残す
+  ...reducedMotion({ animation: 'none' }),
 
   selectors: {
     '&[data-circle="true"]': {

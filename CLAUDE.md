@@ -61,6 +61,7 @@ ComponentName/
 ## コーディング規約
 
 **TypeScript / React:**
+
 - 関数コンポーネントのみ: `export const ComponentName = ({ ...props }: Props) => { ... }`
 - 型定義はすべて `interface` ではなく `type` を使用する。`any` は使用しない
 - ネイティブな HTML 属性を展開するには `ComponentPropsWithoutRef<'tag'>` を使用する
@@ -69,16 +70,23 @@ ComponentName/
 - 深い `if/else` のネストを避け、条件が複数ある場合は `switch` を使用する
 
 **スタイリング（Vanilla Extract）:**
+
 - スタイルはすべて `ComponentName.css.ts` 内に `@vanilla-extract/css` を用いて記述する
 - クラスセレクタは BEM 命名に従う
 - すべての値に `src/styles/theme.css.ts` の `vars` を使用する（色・余白などのハードコード禁止）
 - コンポーネントのバリアントには `styleVariants()` を使用する
 
 **テスト:**
+
 - export された関数はすべてテストする。`if/else` は両分岐、`switch` は全 case を網羅する
 - テストファイル: `*.spec.ts` または `*.test.ts`
 
 **Git コミット:**
+
 - 英語のメッセージで、プレフィックスを付ける: `feat`、`fix`、`chore`、`refactor`、`test`、`docs`、`style`、`ci`、`perf`、`revert`
 
 **パスエイリアス:** `@/*` は `src/*` に解決される
+
+## ブランチ
+
+作業は `main` ブランチから派生したブランチで行ってください。ブランチ名は `feature/xxx`、`fix/xxx`、`chore/xxx` の形式で作成します。

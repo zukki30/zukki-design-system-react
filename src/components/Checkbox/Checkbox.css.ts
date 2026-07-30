@@ -1,3 +1,4 @@
+import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
@@ -52,6 +53,7 @@ export const checkboxBox = style({
   borderRadius: vars['border-radius'].md,
   color: cb.icon.default,
   transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
+  ...reducedMotionNone,
 
   selectors: {
     [`${checkboxInput}:hover:not(:disabled):not(:checked):not(:indeterminate) + &`]: {

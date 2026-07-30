@@ -1,3 +1,4 @@
+import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
@@ -50,6 +51,7 @@ export const switchTrack = style({
   backgroundColor: sw.background.default,
   borderRadius: vars['border-radius'].full,
   transition: 'background-color 0.2s ease-in-out',
+  ...reducedMotionNone,
 
   selectors: {
     [`${switchInput}:hover:not(:disabled):not(:checked) + &`]: {
@@ -83,6 +85,8 @@ export const switchThumb = style({
   borderRadius: vars['border-radius'].full,
   backgroundColor: sw.icon.default,
   transition: 'transform 0.2s ease-in-out, background-color 0.2s ease-in-out',
+  // モーション低減時はつまみを移動アニメーションなしで切り替える
+  ...reducedMotionNone,
 
   selectors: {
     [`${switchInput}:checked + ${switchTrack} &`]: {

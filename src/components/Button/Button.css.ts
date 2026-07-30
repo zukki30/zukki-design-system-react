@@ -1,3 +1,4 @@
+import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
@@ -206,6 +207,7 @@ export const button = style({
   lineHeight: 0,
   transition:
     'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out',
+  ...reducedMotionNone,
 
   selectors: {
     '&:focus-visible': {

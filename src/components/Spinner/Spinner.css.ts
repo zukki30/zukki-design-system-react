@@ -1,3 +1,4 @@
+import { reducedMotion } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { keyframes, style, styleVariants } from '@vanilla-extract/css';
 
@@ -11,7 +12,11 @@ export const spinner = style({
   fill: 'none',
   strokeWidth: 2,
   strokeLinecap: 'round',
+  // SVG の transform-origin は既定が要素の原点になるため中心を明示する
+  transformOrigin: 'center',
   animation: `${rotate} 1s linear infinite`,
+  // ローディング中であることは伝え続ける必要があるため、停止ではなく回転を十分に遅くする
+  ...reducedMotion({ animationDuration: '3s' }),
 });
 
 export const spinnerVariant = styleVariants({

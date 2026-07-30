@@ -1,3 +1,4 @@
+import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
@@ -12,6 +13,7 @@ export const input = style({
   borderColor: vars.color.input.border.default,
   borderRadius: vars['border-radius'].lg,
   transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
+  ...reducedMotionNone,
 
   selectors: {
     '&:hover:not([data-disabled="true"]):not([data-error="true"])': {
