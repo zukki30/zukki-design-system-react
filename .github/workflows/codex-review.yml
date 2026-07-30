@@ -1,0 +1,98 @@
+name: Codex Auto Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  codex:
+    # Draft PR はスキップ。fork からの PR ではシークレットが読めないため除外する
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      final_message: ${{ steps.run_codex.outputs.final-message }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          persist-credentials: false
+
+      - name: Pre-fetch base and head refs for the PR
+        env:
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          git fetch --no-tags origin \
+            "$PR_BASE_REF" \
+            "+refs/pull/$PR_NUMBER/head"
+
+      - name: Run Codex
+        id: run_codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          prompt: |
+            これは ${{ github.repository }} の PR #${{ github.event.pull_request.number }} です。
+
+            このリポジトリは React / TypeScript / Vanilla Extract で作られたデザインシステムです。
+            リポジトリ直下の AGENTS.md に規約が書かれているので、まず読んでからレビューしてください。
+
+            この PR で導入された差分のみをレビューしてください。差分は次のコマンドで確認できます:
+              git diff ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+              git log --oneline ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+
+            以下の観点で指摘してください。
+
+            - 正確性: 境界値・null/undefined 処理、競合状態、`await` 抜け、バグ
+            - コード品質: 可読性、保守性、DRY、長大関数や深いネストの有無
+            - 規約準拠:
+              - 型定義は `interface` ではなく `type`、`any` 禁止
+              - ネイティブ属性は `ComponentPropsWithoutRef<'tag'>`
+              - 条件付き className は `clsx()`
+              - `useEffect` は最小限、宣言的パターンを優先
+              - 深い if/else を避け、複数条件は `switch`
+              - スタイルは `ComponentName.css.ts` に記述し、クラス名は BEM
+              - 色・余白などのハードコード禁止（`src/styles/theme.css.ts` の `vars` を使う）
+              - バリアントは `styleVariants()`
+              - 生成物（`src/design-tokens/`、`src/styles/` の生成 CSS）を手編集していないか
+            - テスト: export された関数にテストがあるか、if/else の両分岐と switch の全 case を網羅しているか
+            - アクセシビリティ: ARIA、キーボード操作、フォーカス管理、色のみでの情報伝達
+
+            出力ルール:
+            - 日本語の Markdown で、簡潔かつ具体的に書いてください
+            - 指摘には `path/to/file.ts:12` 形式で該当箇所を示してください
+            - 良かった点も必ず 1 つ以上挙げてください
+            - Blocking / Suggestions / Questions に分けてください
+            - 最後に判定を出してください: ✅ Approve / ❌ Request Changes / 💬 Comment Only
+
+            Pull request title and body:
+            ----
+            ${{ github.event.pull_request.title }}
+            ${{ github.event.pull_request.body }}
+
+  post_feedback:
+    runs-on: ubuntu-latest
+    needs: codex
+    if: needs.codex.outputs.final_message != ''
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Report Codex feedback
+        uses: actions/github-script@v9
+        env:
+          CODEX_FINAL_MESSAGE: ${{ needs.codex.outputs.final_message }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `## 🤖 Codex Review\n\n${process.env.CODEX_FINAL_MESSAGE}`,
+            });

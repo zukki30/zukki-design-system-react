@@ -22,14 +22,7 @@ type Props = {
   disabled?: boolean;
 } & Omit<ComponentPropsWithoutRef<'input'>, 'prefix' | 'suffix'>;
 
-export const Input = ({
-  startIcon,
-  endIcon,
-  error,
-  disabled,
-  className,
-  ...props
-}: Props) => {
+export const Input = ({ startIcon, endIcon, error, disabled, className, ...props }: Props) => {
   return (
     <div className={clsx(input, className)} data-error={error} data-disabled={disabled}>
       {startIcon && (

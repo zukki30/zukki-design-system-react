@@ -98,7 +98,12 @@ export const AllVariants: Story = {
       <div style={{ display: 'flex', gap: '24px' }}>
         <div style={columnStyle}>
           <h4>size = md</h4>
-          <Card image={imagePlaceholder} title="Card title" action={<MoreLink />} footer={<MoreLink />}>
+          <Card
+            image={imagePlaceholder}
+            title="Card title"
+            action={<MoreLink />}
+            footer={<MoreLink />}
+          >
             {bodyText}
           </Card>
           <Card title="Card title" action={<MoreLink />} footer={<MoreLink />}>

@@ -12,8 +12,11 @@ pnpm dev
 pnpm build
 
 # Lint & フォーマット
-pnpm lint
-pnpm format
+pnpm lint            # 自動修正あり
+pnpm format          # 自動修正あり
+pnpm lint:check      # 修正せず検査のみ（CI と同じ）
+pnpm format:check    # 修正せず検査のみ（CI と同じ）
+pnpm typecheck       # tsc -b のみ（バンドルなし）
 
 # テスト
 pnpm test           # 単発実行

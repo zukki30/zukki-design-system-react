@@ -8,7 +8,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('ラベル')).toBeInTheDocument();
@@ -19,7 +19,7 @@ describe('FormField', () => {
     render(
       <FormField>
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.queryByText('ラベル')).not.toBeInTheDocument();
@@ -29,7 +29,7 @@ describe('FormField', () => {
     render(
       <FormField label="名前" htmlFor="name">
         <input id="name" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByLabelText('名前')).toHaveAttribute('id', 'name');
@@ -39,23 +39,23 @@ describe('FormField', () => {
     const { rerender } = render(
       <FormField label="ラベル">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('ラベル').closest('[data-orientation]')).toHaveAttribute(
       'data-orientation',
-      'horizontal',
+      'horizontal'
     );
 
     rerender(
       <FormField label="ラベル" orientation="vertical">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('ラベル').closest('[data-orientation]')).toHaveAttribute(
       'data-orientation',
-      'vertical',
+      'vertical'
     );
   });
 
@@ -63,7 +63,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.queryByText('必須')).not.toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" required requiredMark="badge">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('必須')).toBeInTheDocument();
@@ -85,7 +85,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" required requiredMark="asterisk">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('*')).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" required requiredMark="both">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('必須')).toBeInTheDocument();
@@ -107,7 +107,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" required>
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('必須')).toBeInTheDocument();
@@ -118,12 +118,12 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" disabled>
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('ラベル').closest('[data-disabled]')).toHaveAttribute(
       'data-disabled',
-      'true',
+      'true'
     );
   });
 
@@ -131,7 +131,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" helperText="補助テキスト">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('補助テキスト')).toBeInTheDocument();
@@ -141,7 +141,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" errorText="エラーメッセージ">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByText('エラーメッセージ')).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.queryByText('補助テキスト')).not.toBeInTheDocument();
@@ -162,7 +162,7 @@ describe('FormField', () => {
     render(
       <FormField label="ラベル" data-testid="field">
         <input aria-label="入力" />
-      </FormField>,
+      </FormField>
     );
 
     expect(screen.getByTestId('field')).toBeInTheDocument();

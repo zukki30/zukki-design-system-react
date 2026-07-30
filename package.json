@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "pnpm storybook",
     "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
+    "lint:check": "eslint \"src/**/*.{ts,tsx}\"",
     "preview": "vite preview",
     "build:tokens:css-only": "tsx style-dictionary/build-css-only-variables-to-files.ts",
     "build:tokens:css": "tsx style-dictionary/build-css-variables-to-files.ts",
@@ -18,6 +20,7 @@
     "token:transform:other": "token-transformer ./figma/tokens.json ./style-dictionary/tokens/token.json --expandTypography=true --expandShadow=true global,Token/value",
     "token:transform": "pnpm token:transform:light && pnpm token:transform:dark && pnpm token:transform:typography && pnpm token:transform:other",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test": "vitest run",
@@ -28,10 +31,6 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.33.0",
-  "volta": {
-    "node": "20.18.2",
-    "pnpm": "10.33.0"
-  },
   "dependencies": {
     "clsx": "^2.1.1",
     "react": "19.2.7",

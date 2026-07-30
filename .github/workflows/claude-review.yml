@@ -1,0 +1,64 @@
+name: Claude Auto Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  review:
+    # Draft PR はスキップ。fork からの PR ではシークレットが読めないため除外する
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            このリポジトリは React / TypeScript / Vanilla Extract で作られたデザインシステムです。
+            リポジトリ直下の CLAUDE.md と AGENTS.md に規約が書かれているので、まず読んでからレビューしてください。
+
+            この Pull Request の差分をレビューし、以下の観点で指摘してください。
+
+            - 正確性: 要件を満たしているか、境界値・null/undefined 処理、競合状態、`await` 抜け
+            - コード品質: 可読性、保守性、DRY、長大関数や深いネストの有無
+            - 規約準拠:
+              - 型定義は `interface` ではなく `type`、`any` 禁止
+              - ネイティブ属性は `ComponentPropsWithoutRef<'tag'>`
+              - 条件付き className は `clsx()`
+              - `useEffect` は最小限、宣言的パターンを優先
+              - 深い if/else を避け、複数条件は `switch`
+              - スタイルは `ComponentName.css.ts` に記述し、クラス名は BEM
+              - 色・余白などのハードコード禁止（`src/styles/theme.css.ts` の `vars` を使う）
+              - バリアントは `styleVariants()`
+              - 生成物（`src/design-tokens/`、`src/styles/` の生成 CSS）を手編集していないか
+            - テスト: export された関数にテストがあるか、if/else の両分岐と switch の全 case を網羅しているか
+            - アクセシビリティ: ARIA、キーボード操作、フォーカス管理、色のみでの情報伝達
+            - パフォーマンス: 不要な再レンダー
+
+            出力ルール:
+            - コメントは日本語で書いてください
+            - 良かった点も必ず 1 つ以上挙げてください
+            - 命令形ではなく提案形で書いてください（例: 「〜の抽出を検討してみては？」）
+            - 最後に判定を出してください: ✅ Approve / ❌ Request Changes / 💬 Comment Only
+
+            Note: The PR branch is already checked out in the current working directory.
+
+            Use `gh pr comment` for top-level feedback.
+            Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) to highlight specific code issues.
+            Only post GitHub comments - don't submit review text as messages.
+
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

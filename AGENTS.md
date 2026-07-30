@@ -30,12 +30,15 @@ The following skills are checked into the repository so the whole team can use t
 
 ## Build, Test, and Development Commands
 
-Use the pinned toolchain: Node 20.18.2 and pnpm 10.33.0.
+The toolchain is pinned in `.mise.toml`: Node 24.14.1 and pnpm 10.33.0. Run `mise install` to set it up.
 
 - `pnpm dev` — start Storybook on port 6006.
 - `pnpm build` — type-check and create the Vite library bundle.
+- `pnpm typecheck` — run `tsc -b` without bundling.
 - `pnpm lint` — run ESLint with automatic fixes.
+- `pnpm lint:check` — run ESLint without fixing (used by CI).
 - `pnpm format` — format `src/**/*.ts(x)` with Prettier.
+- `pnpm format:check` — verify formatting without writing (used by CI).
 - `pnpm test` / `pnpm test:watch` — run Vitest once or interactively.
 - `pnpm test:coverage` — produce V8 coverage reports.
 - `pnpm token:transform && pnpm build:tokens` — regenerate token JSON, CSS, and TypeScript after updating Figma tokens.

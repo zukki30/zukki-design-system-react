@@ -12,7 +12,12 @@ const meta = {
     placeholder: 'placeholder',
   },
   render: (args) => {
-    const groupStyle = { display: 'flex', flexDirection: 'column' as const, gap: '8px', width: '240px' };
+    const groupStyle = {
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '8px',
+      width: '240px',
+    };
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

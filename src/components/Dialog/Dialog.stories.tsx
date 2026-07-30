@@ -20,6 +20,7 @@ const meta = {
   component: Dialog,
   tags: ['autodocs'],
   args: {
+    open: false,
     title: 'Dialog Title',
     children: bodyText,
   },

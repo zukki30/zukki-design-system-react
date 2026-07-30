@@ -55,10 +55,7 @@ describe('Breadcrumb', () => {
   });
 
   it('href のない中間項目はリンクにしない', () => {
-    const withoutHref: BreadcrumbItem[] = [
-      { label: 'HOME' },
-      { label: '現在のページ' },
-    ];
+    const withoutHref: BreadcrumbItem[] = [{ label: 'HOME' }, { label: '現在のページ' }];
     render(<Breadcrumb items={withoutHref} />);
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
