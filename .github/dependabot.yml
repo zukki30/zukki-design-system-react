@@ -1,0 +1,72 @@
+version: 2
+
+updates:
+  # npm（pnpm-lock.yaml も対象）
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Asia/Tokyo
+    # 同時に開く PR の上限。多すぎると CI が詰まるので絞る
+    open-pull-requests-limit: 5
+    commit-message:
+      # コミット規約に合わせて chore(deps): ... の形にする
+      prefix: chore
+      include: scope
+    # 関連パッケージはまとめて 1 PR にする（上から順にマッチしたグループへ入る）
+    groups:
+      storybook:
+        patterns:
+          - storybook
+          - '@storybook/*'
+          - '@chromatic-com/storybook'
+          - eslint-plugin-storybook
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+      lint-format:
+        patterns:
+          - eslint
+          - 'eslint-*'
+          - '@eslint/*'
+          - typescript-eslint
+          - prettier
+          - 'eslint-config-prettier'
+          - globals
+      vanilla-extract:
+        patterns:
+          - '@vanilla-extract/*'
+      build-test:
+        patterns:
+          - vite
+          - '@vitejs/*'
+          - vitest
+          - '@vitest/*'
+          - jsdom
+          - '@testing-library/*'
+      design-tokens:
+        patterns:
+          - style-dictionary
+          - token-transformer
+
+  # GitHub Actions（.github/workflows/*.yml の action バージョン）
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Asia/Tokyo
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      github-actions:
+        patterns:
+          - '*'
