@@ -60,7 +60,7 @@
     "jsdom": "^29.1.1",
     "prettier": "^3.8.3",
     "storybook": "^10.4.1",
-    "style-dictionary": "^4.4.0",
+    "style-dictionary": "^5.4.4",
     "token-transformer": "^0.0.33",
     "tsx": "^4.22.4",
     "typescript": "~6.0.3",
