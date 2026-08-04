@@ -18,7 +18,8 @@ export const dialog = style({
   borderRadius: vars['border-radius'].xl,
   boxShadow: `${elevation4.x} ${elevation4.y} ${elevation4.blur}px ${elevation4.spread} ${elevation4.color}`,
   color: vars.color.grey['900'],
-  // ダイアログ内でのスクロールが背景ドキュメントへ連鎖しないようにする
+  // モーダル表示中の dialog は UA スタイルで overflow:auto / max-height を持つため、
+  // 本文が長いとダイアログ自体がスクロールする。そのスクロールが背景へ連鎖しないようにする
   overscrollBehavior: 'contain',
 
   selectors: {
