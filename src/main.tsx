@@ -33,3 +33,4 @@ export { Breadcrumb } from './components/Breadcrumb';
 export type { BreadcrumbItem, BreadcrumbVariant } from './components/Breadcrumb';
 export { Tooltip } from './components/Tooltip';
 export type { TooltipPlacement } from './components/Tooltip';
+export { Tag } from './components/Tag';
