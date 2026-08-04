@@ -15,14 +15,7 @@ import { tooltip, tooltipArrow, tooltipPopup } from './Tooltip.css';
  * 吹き出しの表示位置
  */
 export type TooltipPlacement =
-  | 'top'
-  | 'topLeft'
-  | 'topRight'
-  | 'bottom'
-  | 'bottomLeft'
-  | 'bottomRight'
-  | 'left'
-  | 'right';
+  'top' | 'topLeft' | 'topRight' | 'bottom' | 'bottomLeft' | 'bottomRight' | 'left' | 'right';
 
 type Props = {
   /**
