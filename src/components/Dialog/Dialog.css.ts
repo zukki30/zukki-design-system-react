@@ -18,6 +18,8 @@ export const dialog = style({
   borderRadius: vars['border-radius'].xl,
   boxShadow: `${elevation4.x} ${elevation4.y} ${elevation4.blur}px ${elevation4.spread} ${elevation4.color}`,
   color: vars.color.grey['900'],
+  // ダイアログ内でのスクロールが背景ドキュメントへ連鎖しないようにする
+  overscrollBehavior: 'contain',
 
   selectors: {
     // ネイティブ dialog は閉じている間 display:none。開いているときだけ flex にする

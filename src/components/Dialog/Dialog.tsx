@@ -19,6 +19,7 @@ import {
   dialogHeader,
   dialogTitle,
 } from './Dialog.css';
+import { useBodyScrollLock } from './hooks';
 
 const CLOSE_ICON_SIZE = 20;
 
@@ -82,6 +83,9 @@ export const Dialog = ({
       dialogElement.close();
     }
   }, [open]);
+
+  // showModal() では背景ドキュメントのスクロールが止まらないため明示的にロックする
+  useBodyScrollLock(open);
 
   const handleOverlayClick = (event: MouseEvent<HTMLDialogElement>) => {
     // ダイアログ要素自身（＝オーバーレイ領域）がクリックされたときのみ閉じる

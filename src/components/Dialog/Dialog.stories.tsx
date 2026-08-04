@@ -83,6 +83,28 @@ export const NotFooter: Story = {
   },
 };
 
+/**
+ * 背景に十分な高さのコンテンツがある状態。
+ * ダイアログを開いている間は背景がスクロールしないことを確認できる。
+ */
+export const ScrollLock: Story = {
+  render: function Render(args) {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <>
+        <Button variant="primary" onClick={() => setOpen(true)}>
+          ダイアログを開く
+        </Button>
+        <div style={{ height: '200vh', paddingBlockStart: 16 }}>
+          背景のコンテンツ（スクロール可能）
+        </div>
+        <Dialog {...args} open={open} onClose={() => setOpen(false)} footer={undefined} />
+      </>
+    );
+  },
+};
+
 export const Simple: Story = {
   args: {
     title: undefined,

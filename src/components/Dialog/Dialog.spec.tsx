@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from './Dialog';
 
@@ -12,6 +12,11 @@ beforeAll(() => {
     this.removeAttribute('open');
     this.dispatchEvent(new Event('close'));
   });
+});
+
+afterEach(() => {
+  document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
 });
 
 describe('Dialog', () => {
@@ -135,6 +140,34 @@ describe('Dialog', () => {
     fireEvent.click(screen.getByText('本文テキスト'));
 
     expect(handleClose).not.toHaveBeenCalled();
+  });
+
+  it('open=true のとき body のスクロールをロックし、閉じると復帰する', () => {
+    const { rerender } = render(
+      <Dialog open title="タイトル">
+        本文
+      </Dialog>
+    );
+
+    expect(document.body.style.overflow).toBe('hidden');
+
+    rerender(
+      <Dialog open={false} title="タイトル">
+        本文
+      </Dialog>
+    );
+
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('open=false のとき body のスクロールをロックしない', () => {
+    render(
+      <Dialog open={false} title="タイトル">
+        本文
+      </Dialog>
+    );
+
+    expect(document.body.style.overflow).toBe('');
   });
 
   it('open=false のとき showModal を呼ばない', () => {
