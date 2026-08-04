@@ -1,3 +1,4 @@
+import { interactiveTouch } from '@/styles/interactive';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
@@ -69,6 +70,7 @@ export const tagCloseButton = style({
   border: 'none',
   backgroundColor: 'transparent',
   cursor: 'pointer',
+  ...interactiveTouch,
 });
 
 export const tagCloseButtonVariant = styleVariants({
