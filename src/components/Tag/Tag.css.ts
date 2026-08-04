@@ -1,3 +1,4 @@
+import { interactiveTouch } from '@/styles/interactive';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
@@ -69,6 +70,15 @@ export const tagCloseButton = style({
   border: 'none',
   backgroundColor: 'transparent',
   cursor: 'pointer',
+  ...interactiveTouch,
+
+  selectors: {
+    // ネイティブのタップハイライトを消すぶん、フォーカス時の視覚フィードバックを Button / IconButton と揃える
+    '&:focus-visible': {
+      outline: `2px solid ${vars.color.focus}`,
+      outlineOffset: vars.spacing['2xs'],
+    },
+  },
 });
 
 export const tagCloseButtonVariant = styleVariants({
