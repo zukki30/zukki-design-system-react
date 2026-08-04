@@ -71,6 +71,14 @@ export const tagCloseButton = style({
   backgroundColor: 'transparent',
   cursor: 'pointer',
   ...interactiveTouch,
+
+  selectors: {
+    // ネイティブのタップハイライトを消すぶん、フォーカス時の視覚フィードバックを Button / IconButton と揃える
+    '&:focus-visible': {
+      outline: `2px solid ${vars.color.focus}`,
+      outlineOffset: vars.spacing['2xs'],
+    },
+  },
 });
 
 export const tagCloseButtonVariant = styleVariants({

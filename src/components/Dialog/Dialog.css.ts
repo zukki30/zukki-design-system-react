@@ -1,4 +1,3 @@
-import { interactiveTouch } from '@/styles/interactive';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
@@ -19,8 +18,6 @@ export const dialog = style({
   borderRadius: vars['border-radius'].xl,
   boxShadow: `${elevation4.x} ${elevation4.y} ${elevation4.blur}px ${elevation4.spread} ${elevation4.color}`,
   color: vars.color.grey['900'],
-  // オーバーレイ領域のクリックで閉じるため、dialog 要素自体もタップ対象として扱う
-  ...interactiveTouch,
 
   selectors: {
     // ネイティブ dialog は閉じている間 display:none。開いているときだけ flex にする
