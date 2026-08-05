@@ -6,14 +6,15 @@ import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './Ste
 const CHECK_ICON_SIZE = 20;
 
 /**
- * 完了アイコンの代替テキスト
+ * 状態を色・アイコンだけでなくテキストでも伝えるための文言（視覚的には非表示）
+ *
+ * 完了アイコンは装飾（`aria-hidden`）のままにして、完了・現在のどちらもこのテキストで
+ * 伝えることで、読み上げの順序（ラベル → 状態）を状態間で揃えている。
  */
-const FINISHED_STATUS_TEXT = '完了';
-
-/**
- * 現在ステップであることを示す状態テキスト（視覚的には非表示）
- */
-const CURRENT_STATUS_TEXT = '現在のステップ';
+const STATUS_TEXT = {
+  finished: '完了',
+  current: '現在のステップ',
+} as const;
 
 type Props = {
   /**
@@ -57,16 +58,25 @@ export const StepsItem = ({
         onClick: () => onClick(stepNumber),
       };
 
+  const getStatusText = () => {
+    if (finished) {
+      return STATUS_TEXT.finished;
+    }
+    if (current) {
+      return STATUS_TEXT.current;
+    }
+    return undefined;
+  };
+
+  const statusText = getStatusText();
+
   return (
+    // 現在ステップは aria-current と状態テキストが重複して読み上げられるが、
+    // aria-current を読み上げない支援技術のための保険として意図的に併記している
     <Component {...buttonProps} className={stepsItem} aria-current={current ? 'step' : undefined}>
       {finished ? (
         <span className={stepsItemIcon.finished}>
-          <Icon
-            name="outlineCheck"
-            width={CHECK_ICON_SIZE}
-            height={CHECK_ICON_SIZE}
-            aria-label={FINISHED_STATUS_TEXT}
-          />
+          <Icon name="outlineCheck" width={CHECK_ICON_SIZE} height={CHECK_ICON_SIZE} />
         </span>
       ) : (
         <span className={current ? stepsItemIcon.current : stepsItemIcon.default}>
@@ -74,7 +84,7 @@ export const StepsItem = ({
         </span>
       )}
       <span className={stepsItemLabel}>{label}</span>
-      {current && <span className={stepsItemStatus}>{CURRENT_STATUS_TEXT}</span>}
+      {statusText !== undefined && <span className={stepsItemStatus}>{statusText}</span>}
     </Component>
   );
 };
