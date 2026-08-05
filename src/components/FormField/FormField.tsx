@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
+import { useFormField } from './hooks';
+
 import {
   formField,
   formFieldControl,
@@ -28,7 +30,8 @@ type Props = {
    */
   label?: ReactNode;
   /**
-   * ラベルと紐付ける入力要素の id（label の htmlFor）
+   * ラベルと紐付ける入力要素の id（label の htmlFor）。
+   * 省略時は children の id、それもなければ自動生成した id を children に注入する
    */
   htmlFor?: string;
   /**
@@ -79,6 +82,14 @@ export const FormField = ({
   const showAsterisk = required && (requiredMark === 'asterisk' || requiredMark === 'both');
   const showBadge = required && (requiredMark === 'badge' || requiredMark === 'both');
 
+  const { controlId, helperTextId, errorTextId, control } = useFormField({
+    htmlFor,
+    required,
+    hasHelperText: helperText !== undefined,
+    hasErrorText: errorText !== undefined,
+    children,
+  });
+
   return (
     <div
       className={clsx(formField, className)}
@@ -88,7 +99,7 @@ export const FormField = ({
     >
       {label !== undefined && (
         <div className={formFieldLabelContainer}>
-          <label className={formFieldLabel} htmlFor={htmlFor}>
+          <label className={formFieldLabel} htmlFor={controlId}>
             {label}
             {showAsterisk && (
               <span className={formFieldRequiredAsterisk} aria-hidden="true">
@@ -101,9 +112,18 @@ export const FormField = ({
       )}
 
       <div className={formFieldControl}>
-        {children}
-        {helperText !== undefined && <p className={formFieldHelperText}>{helperText}</p>}
-        {errorText !== undefined && <p className={formFieldErrorText}>{errorText}</p>}
+        {control}
+        {helperText !== undefined && (
+          <p className={formFieldHelperText} id={helperTextId}>
+            {helperText}
+          </p>
+        )}
+        {/* エラーは表示された時点で支援技術に通知する必要があるため role="alert" を付与する */}
+        {errorText !== undefined && (
+          <p className={formFieldErrorText} id={errorTextId} role="alert">
+            {errorText}
+          </p>
+        )}
       </div>
     </div>
   );
