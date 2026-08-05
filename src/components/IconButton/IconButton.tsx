@@ -38,7 +38,12 @@ type Props = {
    * ボタンの loading 属性
    */
   loading?: boolean;
-} & Omit<ComponentPropsWithoutRef<'button'>, 'disabled' | 'prefix' | 'suffix'>;
+  /**
+   * ボタンのアクセシブルネーム。
+   * アイコンのみでラベルテキストを持たないため、省略できない
+   */
+  'aria-label': string;
+} & Omit<ComponentPropsWithoutRef<'button'>, 'disabled' | 'prefix' | 'suffix' | 'aria-label'>;
 
 const SPINNER_SIZE = 20;
 
