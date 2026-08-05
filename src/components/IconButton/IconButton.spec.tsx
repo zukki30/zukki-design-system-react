@@ -1,26 +1,29 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { ComponentProps, ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Icon } from '../Icon';
+import { Spinner } from '../Spinner';
 
 import { IconButton } from './IconButton';
 
 const icon = <Icon name="home" width={16} height={16} />;
 
-const renderSpinnerClassName = (
-  variant: 'primary' | 'secondary' | 'primary-exposed' | 'secondary-exposed'
-) => {
-  const { container, unmount } = render(
-    <IconButton aria-label="ホーム" variant={variant} loading>
-      {icon}
-    </IconButton>
-  );
-  const spinner = container.querySelector('[class*="spinner"]');
-  if (spinner === null) {
-    throw new Error('spinner not found');
+type IconButtonProps = ComponentProps<typeof IconButton>;
+
+const SPINNER_LABEL = 'loading';
+
+/**
+ * 描画結果の Spinner のクラス名を取り出す。
+ * IconButton が渡す variant を、Spinner を直接描画した場合と突き合わせるために使う
+ */
+const getSpinnerClassName = (ui: ReactElement) => {
+  const { unmount } = render(ui);
+  // SVG 要素の className は SVGAnimatedString のため属性値で取得する
+  const className = screen.getByRole('img', { name: SPINNER_LABEL }).getAttribute('class');
+  if (className === null) {
+    throw new Error('spinner class not found');
   }
-  // SVG 要素の className は SVGAnimatedString のため属性値で比較する
-  const className = spinner.getAttribute('class');
   unmount();
 
   return className;
@@ -33,9 +36,13 @@ describe('IconButton', () => {
     expect(screen.getByRole('button', { name: 'ホーム' })).toBeInTheDocument();
   });
 
-  it('aria-label を省略すると型エラーになる（実行時は描画される）', () => {
+  it('aria-label なしでも実行時は描画される（型の必須化は tsc が検知する）', () => {
+    // aria-label を省いた Props は型として成立しない。必須化が外れると
+    // 「未使用の @ts-expect-error」として tsc -b が失敗する
     // @ts-expect-error アイコンのみのボタンのため aria-label は必須
-    render(<IconButton>{icon}</IconButton>);
+    const propsWithoutAriaLabel: IconButtonProps = { children: icon };
+
+    render(<IconButton {...propsWithoutAriaLabel} />);
 
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
@@ -68,33 +75,94 @@ describe('IconButton', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it('デフォルトの type は button で、指定すれば上書きできる', () => {
+    const { rerender } = render(<IconButton aria-label="ホーム">{icon}</IconButton>);
+    expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('type', 'button');
+
+    rerender(
+      <IconButton aria-label="ホーム" type="submit">
+        {icon}
+      </IconButton>
+    );
+    expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('type', 'submit');
+  });
+
+  it('selected を data-selected に反映する', () => {
+    const { rerender } = render(<IconButton aria-label="ホーム">{icon}</IconButton>);
+    expect(screen.getByRole('button', { name: 'ホーム' })).not.toHaveAttribute('data-selected');
+
+    rerender(
+      <IconButton aria-label="ホーム" selected>
+        {icon}
+      </IconButton>
+    );
+    expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('data-selected', 'true');
+  });
+
+  it('className をマージする', () => {
+    render(
+      <IconButton aria-label="ホーム" className="custom-class">
+        {icon}
+      </IconButton>
+    );
+
+    expect(screen.getByRole('button', { name: 'ホーム' })).toHaveClass('custom-class');
+  });
+
   it('loading のとき Spinner を描画する', () => {
-    const { container } = render(
+    render(
       <IconButton aria-label="ホーム" loading>
         {icon}
       </IconButton>
     );
 
     expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('data-loading', 'true');
-    expect(container.querySelector('[class*="spinner"]')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: SPINNER_LABEL })).toBeInTheDocument();
   });
 
   it('loading でないとき Spinner を描画しない', () => {
-    const { container } = render(<IconButton aria-label="ホーム">{icon}</IconButton>);
+    render(<IconButton aria-label="ホーム">{icon}</IconButton>);
 
-    expect(container.querySelector('[class*="spinner"]')).not.toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: SPINNER_LABEL })).not.toBeInTheDocument();
   });
 
-  it('variant に応じて Spinner の配色を切り替える', () => {
-    const primary = renderSpinnerClassName('primary');
-    const secondary = renderSpinnerClassName('secondary');
-    const primaryExposed = renderSpinnerClassName('primary-exposed');
-    const secondaryExposed = renderSpinnerClassName('secondary-exposed');
+  it.each([
+    ['primary', 'dark'],
+    ['secondary', 'dark'],
+    ['primary-exposed', 'primary'],
+    ['secondary-exposed', 'light'],
+  ] as const satisfies ReadonlyArray<
+    readonly [NonNullable<IconButtonProps['variant']>, ComponentProps<typeof Spinner>['variant']]
+  >)('variant=%s のとき Spinner は %s の配色になる', (variant, spinnerVariant) => {
+    const actual = getSpinnerClassName(
+      <IconButton aria-label="ホーム" variant={variant} loading>
+        {icon}
+      </IconButton>
+    );
+    const expected = getSpinnerClassName(
+      <Spinner variant={spinnerVariant} aria-label={SPINNER_LABEL} />
+    );
 
-    // primary / secondary はどちらも dark
-    expect(secondary).toBe(primary);
-    expect(primaryExposed).not.toBe(primary);
-    expect(secondaryExposed).not.toBe(primary);
-    expect(secondaryExposed).not.toBe(primaryExposed);
+    expect(actual).toBe(expected);
+  });
+
+  it.each([
+    ['md', 'sm'],
+    ['sm', 'md'],
+  ] as const)('size=%s と size=%s でスタイルが変わる', (size, otherSize) => {
+    const { rerender } = render(
+      <IconButton aria-label="ホーム" size={size}>
+        {icon}
+      </IconButton>
+    );
+    const className = screen.getByRole('button', { name: 'ホーム' }).className;
+
+    rerender(
+      <IconButton aria-label="ホーム" size={otherSize}>
+        {icon}
+      </IconButton>
+    );
+
+    expect(screen.getByRole('button', { name: 'ホーム' }).className).not.toBe(className);
   });
 });
