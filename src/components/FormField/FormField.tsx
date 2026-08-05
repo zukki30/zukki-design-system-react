@@ -1,4 +1,5 @@
 import { clsx } from 'clsx';
+import { Children, cloneElement, isValidElement, useId } from 'react';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import {
@@ -22,13 +23,32 @@ export type FormFieldOrientation = 'horizontal' | 'vertical';
  */
 export type FormFieldRequiredMark = 'badge' | 'asterisk' | 'both';
 
+/**
+ * FormField が入力要素（children）へ注入する属性
+ */
+type ControlAriaProps = {
+  id?: string;
+  'aria-describedby'?: string;
+  'aria-required'?: boolean;
+};
+
+/**
+ * id を半角スペース区切りで結合する。結合結果が空なら undefined を返す
+ */
+const joinIds = (ids: (string | undefined)[]) => {
+  const joined = ids.filter((id) => id !== undefined && id !== '').join(' ');
+
+  return joined === '' ? undefined : joined;
+};
+
 type Props = {
   /**
    * フィールドのラベル
    */
   label?: ReactNode;
   /**
-   * ラベルと紐付ける入力要素の id（label の htmlFor）
+   * ラベルと紐付ける入力要素の id（label の htmlFor）。
+   * 省略時は children の id、それもなければ自動生成した id を children に注入する
    */
   htmlFor?: string;
   /**
@@ -76,8 +96,34 @@ export const FormField = ({
   className,
   ...props
 }: Props) => {
+  const reactId = useId();
+
   const showAsterisk = required && (requiredMark === 'asterisk' || requiredMark === 'both');
   const showBadge = required && (requiredMark === 'badge' || requiredMark === 'both');
+
+  // 入力要素が単一の要素のときだけ id / aria を注入する（複数要素やテキストはそのまま描画）
+  const control =
+    Children.count(children) === 1 && isValidElement<ControlAriaProps>(children)
+      ? children
+      : undefined;
+
+  const controlId = htmlFor ?? control?.props.id ?? `${reactId}-control`;
+  const helperTextId = `${reactId}-helper-text`;
+  const errorTextId = `${reactId}-error-text`;
+
+  const renderedControl =
+    control === undefined
+      ? children
+      : cloneElement(control, {
+          id: controlId,
+          // 入力要素が自身で指定している値は捨てずに結合する
+          'aria-describedby': joinIds([
+            control.props['aria-describedby'],
+            helperText !== undefined ? helperTextId : undefined,
+            errorText !== undefined ? errorTextId : undefined,
+          ]),
+          'aria-required': control.props['aria-required'] ?? (required ? true : undefined),
+        });
 
   return (
     <div
@@ -88,7 +134,7 @@ export const FormField = ({
     >
       {label !== undefined && (
         <div className={formFieldLabelContainer}>
-          <label className={formFieldLabel} htmlFor={htmlFor}>
+          <label className={formFieldLabel} htmlFor={controlId}>
             {label}
             {showAsterisk && (
               <span className={formFieldRequiredAsterisk} aria-hidden="true">
@@ -101,9 +147,18 @@ export const FormField = ({
       )}
 
       <div className={formFieldControl}>
-        {children}
-        {helperText !== undefined && <p className={formFieldHelperText}>{helperText}</p>}
-        {errorText !== undefined && <p className={formFieldErrorText}>{errorText}</p>}
+        {renderedControl}
+        {helperText !== undefined && (
+          <p className={formFieldHelperText} id={helperTextId}>
+            {helperText}
+          </p>
+        )}
+        {/* エラーは表示された時点で支援技術に通知する必要があるため role="alert" を付与する */}
+        {errorText !== undefined && (
+          <p className={formFieldErrorText} id={errorTextId} role="alert">
+            {errorText}
+          </p>
+        )}
       </div>
     </div>
   );

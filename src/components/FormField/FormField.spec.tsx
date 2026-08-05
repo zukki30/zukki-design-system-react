@@ -158,6 +158,145 @@ describe('FormField', () => {
     expect(screen.queryByText('エラーメッセージ')).not.toBeInTheDocument();
   });
 
+  it('htmlFor 未指定でも label と入力要素を紐付ける', () => {
+    render(
+      <FormField label="名前">
+        <input />
+      </FormField>
+    );
+
+    // 紐付いていなければ getByLabelText が失敗する
+    expect(screen.getByLabelText('名前')).toHaveAttribute('id');
+  });
+
+  it('htmlFor 未指定のとき children の id を優先する', () => {
+    render(
+      <FormField label="名前">
+        <input id="custom-id" />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('名前')).toHaveAttribute('id', 'custom-id');
+  });
+
+  it('htmlFor 指定時は children に id を注入する', () => {
+    render(
+      <FormField label="名前" htmlFor="name">
+        <input id="custom-id" />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('名前')).toHaveAttribute('id', 'name');
+  });
+
+  it('children が単一要素でないときは id を注入しない', () => {
+    render(
+      <FormField label="名前" helperText="補助テキスト">
+        <input aria-label="姓" />
+        <input aria-label="名" />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('姓')).not.toHaveAttribute('id');
+    expect(screen.getByLabelText('姓')).not.toHaveAttribute('aria-describedby');
+    expect(screen.getByLabelText('名')).not.toHaveAttribute('id');
+  });
+
+  it('children がテキストのときもそのまま描画する', () => {
+    render(<FormField label="名前">テキスト</FormField>);
+
+    expect(screen.getByText('テキスト')).toBeInTheDocument();
+  });
+
+  it('helperText を aria-describedby で入力要素に紐付ける', () => {
+    render(
+      <FormField label="名前" helperText="全角で入力してください">
+        <input />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('名前')).toHaveAccessibleDescription('全角で入力してください');
+  });
+
+  it('errorText を aria-describedby で紐付け、role="alert" で通知する', () => {
+    render(
+      <FormField label="名前" errorText="必須項目です">
+        <input />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('名前')).toHaveAccessibleDescription('必須項目です');
+    expect(screen.getByRole('alert')).toHaveTextContent('必須項目です');
+  });
+
+  it('helperText と errorText の両方を aria-describedby に含める', () => {
+    render(
+      <FormField label="名前" helperText="全角で入力してください" errorText="必須項目です">
+        <input />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('名前')).toHaveAccessibleDescription(
+      '全角で入力してください 必須項目です'
+    );
+  });
+
+  it('children 側の aria-describedby を残して結合する', () => {
+    render(
+      <>
+        <FormField label="名前" helperText="全角で入力してください">
+          <input aria-describedby="external-description" />
+        </FormField>
+        <p id="external-description">外部の説明</p>
+      </>
+    );
+
+    expect(screen.getByLabelText('名前')).toHaveAccessibleDescription(
+      '外部の説明 全角で入力してください'
+    );
+  });
+
+  it('helperText と errorText が未指定のとき aria-describedby を付与しない', () => {
+    render(
+      <FormField label="名前">
+        <input />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('名前')).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('required のとき aria-required を伝播する', () => {
+    render(
+      <FormField label="名前" required>
+        <input />
+      </FormField>
+    );
+
+    // 必須バッジのぶんラベルのテキストが増えるため role で取得する
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('required でないとき aria-required を付与しない', () => {
+    render(
+      <FormField label="名前">
+        <input />
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('名前')).not.toHaveAttribute('aria-required');
+  });
+
+  it('children 側の aria-required を優先する', () => {
+    render(
+      <FormField label="名前" required>
+        <input aria-required={false} />
+      </FormField>
+    );
+
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-required', 'false');
+  });
+
   it('ネイティブ属性を div に渡す', () => {
     render(
       <FormField label="ラベル" data-testid="field">
