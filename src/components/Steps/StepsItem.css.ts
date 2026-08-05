@@ -78,6 +78,21 @@ export const stepsItemIcon = styleVariants({
   ],
 });
 
+/**
+ * 視覚的には隠しつつ、支援技術には読み上げさせる状態テキスト
+ */
+export const stepsItemStatus = style({
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: vars.spacing.none,
+  margin: -1,
+  overflow: 'hidden',
+  clipPath: 'inset(50%)',
+  whiteSpace: 'nowrap',
+  borderWidth: 0,
+});
+
 export const stepsItemLabel = style({
   color: vars.color.textOnLight.default,
   fontFamily: vars['font-family'].default,

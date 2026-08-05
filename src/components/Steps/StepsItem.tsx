@@ -1,7 +1,19 @@
 // import { clsx } from 'clsx';
 // import type { CSSProperties } from 'react';
 import { Icon } from '../Icon';
-import { stepsItem, stepsItemIcon, stepsItemLabel } from './StepsItem.css';
+import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './StepsItem.css';
+
+const CHECK_ICON_SIZE = 20;
+
+/**
+ * 完了アイコンの代替テキスト
+ */
+const FINISHED_STATUS_TEXT = '完了';
+
+/**
+ * 現在ステップであることを示す状態テキスト（視覚的には非表示）
+ */
+const CURRENT_STATUS_TEXT = '現在のステップ';
 
 type Props = {
   /**
@@ -46,10 +58,15 @@ export const StepsItem = ({
       };
 
   return (
-    <Component {...buttonProps} className={stepsItem}>
+    <Component {...buttonProps} className={stepsItem} aria-current={current ? 'step' : undefined}>
       {finished ? (
         <span className={stepsItemIcon.finished}>
-          <Icon name="outlineCheck" width={20} height={20} />
+          <Icon
+            name="outlineCheck"
+            width={CHECK_ICON_SIZE}
+            height={CHECK_ICON_SIZE}
+            aria-label={FINISHED_STATUS_TEXT}
+          />
         </span>
       ) : (
         <span className={current ? stepsItemIcon.current : stepsItemIcon.default}>
@@ -57,6 +74,7 @@ export const StepsItem = ({
         </span>
       )}
       <span className={stepsItemLabel}>{label}</span>
+      {current && <span className={stepsItemStatus}>{CURRENT_STATUS_TEXT}</span>}
     </Component>
   );
 };
