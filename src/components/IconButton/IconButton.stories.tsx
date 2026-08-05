@@ -47,6 +47,8 @@ type Story = StoryObj<typeof meta>;
 
 const defaultArgs = {
   children: <Icon name="home" width={16} height={16} />,
+  // アイコンのみのボタンのため aria-label は必須
+  'aria-label': 'ホーム',
 };
 
 export const Default: Story = {
