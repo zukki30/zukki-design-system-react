@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { Input } from '../Input';
+
 import { FormField } from './FormField';
 
 describe('FormField', () => {
@@ -189,7 +191,7 @@ describe('FormField', () => {
     expect(screen.getByLabelText('名前')).toHaveAttribute('id', 'name');
   });
 
-  it('children が単一要素でないときは id を注入しない', () => {
+  it('children が単一要素でないときは id を注入せず label も紐付けない', () => {
     render(
       <FormField label="名前" helperText="補助テキスト">
         <input aria-label="姓" />
@@ -200,6 +202,50 @@ describe('FormField', () => {
     expect(screen.getByLabelText('姓')).not.toHaveAttribute('id');
     expect(screen.getByLabelText('姓')).not.toHaveAttribute('aria-describedby');
     expect(screen.getByLabelText('名')).not.toHaveAttribute('id');
+    // 存在しない id を指す label を出力しない
+    expect(screen.getByText('名前')).not.toHaveAttribute('for');
+  });
+
+  it('children が単一要素でなくても htmlFor は label に反映する', () => {
+    render(
+      <FormField label="名前" htmlFor="last-name">
+        <input aria-label="姓" id="last-name" />
+        <input aria-label="名" />
+      </FormField>
+    );
+
+    expect(screen.getByText('名前')).toHaveAttribute('for', 'last-name');
+    expect(screen.getByLabelText('名')).not.toHaveAttribute('id');
+  });
+
+  it('children が単一の Fragment のときは注入しない', () => {
+    render(
+      <FormField label="名前" helperText="補助テキスト">
+        <>
+          <input aria-label="入力" />
+        </>
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('入力')).not.toHaveAttribute('id');
+    expect(screen.getByLabelText('入力')).not.toHaveAttribute('aria-describedby');
+    expect(screen.getByText('名前')).not.toHaveAttribute('for');
+  });
+
+  it('Input のようなラッパーコンポーネントにも配線が届く', () => {
+    render(
+      <FormField label="名前" required helperText="全角で入力してください">
+        <Input />
+      </FormField>
+    );
+
+    const control = screen.getByRole('textbox');
+    expect(control).toHaveAttribute('aria-required', 'true');
+    expect(control).toHaveAccessibleDescription('全角で入力してください');
+    expect(screen.getByText('名前').closest('label')).toHaveAttribute(
+      'for',
+      control.getAttribute('id')
+    );
   });
 
   it('children がテキストのときもそのまま描画する', () => {

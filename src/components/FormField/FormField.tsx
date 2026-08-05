@@ -1,6 +1,7 @@
 import { clsx } from 'clsx';
-import { Children, cloneElement, isValidElement, useId } from 'react';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+
+import { useFormField } from './hooks';
 
 import {
   formField,
@@ -22,24 +23,6 @@ export type FormFieldOrientation = 'horizontal' | 'vertical';
  * 必須を示すマークの種類
  */
 export type FormFieldRequiredMark = 'badge' | 'asterisk' | 'both';
-
-/**
- * FormField が入力要素（children）へ注入する属性
- */
-type ControlAriaProps = {
-  id?: string;
-  'aria-describedby'?: string;
-  'aria-required'?: boolean;
-};
-
-/**
- * id を半角スペース区切りで結合する。結合結果が空なら undefined を返す
- */
-const joinIds = (ids: (string | undefined)[]) => {
-  const joined = ids.filter((id) => id !== undefined && id !== '').join(' ');
-
-  return joined === '' ? undefined : joined;
-};
 
 type Props = {
   /**
@@ -96,34 +79,16 @@ export const FormField = ({
   className,
   ...props
 }: Props) => {
-  const reactId = useId();
-
   const showAsterisk = required && (requiredMark === 'asterisk' || requiredMark === 'both');
   const showBadge = required && (requiredMark === 'badge' || requiredMark === 'both');
 
-  // 入力要素が単一の要素のときだけ id / aria を注入する（複数要素やテキストはそのまま描画）
-  const control =
-    Children.count(children) === 1 && isValidElement<ControlAriaProps>(children)
-      ? children
-      : undefined;
-
-  const controlId = htmlFor ?? control?.props.id ?? `${reactId}-control`;
-  const helperTextId = `${reactId}-helper-text`;
-  const errorTextId = `${reactId}-error-text`;
-
-  const renderedControl =
-    control === undefined
-      ? children
-      : cloneElement(control, {
-          id: controlId,
-          // 入力要素が自身で指定している値は捨てずに結合する
-          'aria-describedby': joinIds([
-            control.props['aria-describedby'],
-            helperText !== undefined ? helperTextId : undefined,
-            errorText !== undefined ? errorTextId : undefined,
-          ]),
-          'aria-required': control.props['aria-required'] ?? (required ? true : undefined),
-        });
+  const { controlId, helperTextId, errorTextId, control } = useFormField({
+    htmlFor,
+    required,
+    hasHelperText: helperText !== undefined,
+    hasErrorText: errorText !== undefined,
+    children,
+  });
 
   return (
     <div
@@ -147,7 +112,7 @@ export const FormField = ({
       )}
 
       <div className={formFieldControl}>
-        {renderedControl}
+        {control}
         {helperText !== undefined && (
           <p className={formFieldHelperText} id={helperTextId}>
             {helperText}
