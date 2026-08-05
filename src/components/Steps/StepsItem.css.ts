@@ -4,6 +4,8 @@ import { style, styleVariants } from '@vanilla-extract/css';
 const ICON_SIZE = '32px';
 
 export const stepsItem = style({
+  // stepsItemStatus（position: absolute）の包含ブロックを固定する
+  position: 'relative',
   flexShrink: 0,
   display: 'grid',
   alignItems: 'center',
@@ -76,6 +78,24 @@ export const stepsItemIcon = styleVariants({
       color: vars.color.blue[500],
     },
   ],
+});
+
+/**
+ * 視覚的には隠しつつ、支援技術には読み上げさせる状態テキスト
+ */
+export const stepsItemStatus = style({
+  position: 'absolute',
+  // 絶対配置でブロック化される挙動を明示する。アクセシブルネーム計算時に
+  // ラベルとの間へ区切りが入り「カート 完了」のように読み上げられる
+  display: 'block',
+  width: 1,
+  height: 1,
+  padding: vars.spacing.none,
+  margin: -1,
+  overflow: 'hidden',
+  clipPath: 'inset(50%)',
+  whiteSpace: 'nowrap',
+  borderWidth: 0,
 });
 
 export const stepsItemLabel = style({
