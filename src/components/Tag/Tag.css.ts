@@ -2,6 +2,11 @@ import { interactiveTouch } from '@/styles/interactive';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
+/** 閉じるボタン（＝閉じるアイコン）の見た目のサイズ */
+export const CLOSE_BUTTON_SIZE = 14;
+/** 閉じるボタンの最小タッチターゲットサイズ */
+const CLOSE_BUTTON_TOUCH_SIZE = 24;
+
 export const tag = style({
   display: 'inline-flex',
   alignItems: 'center',
@@ -60,9 +65,11 @@ export const tagVariant = styleVariants({
 });
 
 export const tagCloseButton = style({
+  // タッチ領域を広げる ::after の包含ブロックにする
+  position: 'relative',
   padding: vars.spacing.none,
-  width: 14,
-  height: 14,
+  width: CLOSE_BUTTON_SIZE,
+  height: CLOSE_BUTTON_SIZE,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -71,6 +78,18 @@ export const tagCloseButton = style({
   backgroundColor: 'transparent',
   cursor: 'pointer',
   ...interactiveTouch,
+
+  // Tag のレイアウトを崩さないよう見た目は 14px のままにして、
+  // タップ判定だけを 24px 四方（WCAG 2.2 Target Size (Minimum)）へ広げる
+  '::after': {
+    content: '""',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: CLOSE_BUTTON_TOUCH_SIZE,
+    height: CLOSE_BUTTON_TOUCH_SIZE,
+    transform: 'translate(-50%, -50%)',
+  },
 
   selectors: {
     // ネイティブのタップハイライトを消すぶん、フォーカス時の視覚フィードバックを Button / IconButton と揃える
