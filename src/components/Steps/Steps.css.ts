@@ -31,6 +31,7 @@ export const steps = styleVariants({
 export const stepsItemContainer = style({
   display: 'flex',
   flex: 1,
+  minWidth: 0,
 
   '::after': {
     backgroundColor: vars.color.grey[100],
@@ -39,7 +40,8 @@ export const stepsItemContainer = style({
 
   selectors: {
     '&:last-child': {
-      flex: 'none',
+      // 末尾は伸ばさないが、ラベルが長いときに縮む余地は残す
+      flex: '0 1 auto',
     },
     '&:last-child::after': {
       display: 'none',

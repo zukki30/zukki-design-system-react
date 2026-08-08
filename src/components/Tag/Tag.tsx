@@ -5,6 +5,7 @@ import type { ZukkiVariantType } from '@/types';
 import { Icon } from '../Icon';
 import {
   tag,
+  tagLabel,
   tagVariant,
   tagCloseButton,
   tagCloseButtonVariant,
@@ -23,7 +24,7 @@ type Props = {
 export const Tag = ({ label, variant = 'default', className, onClose }: Props) => {
   return (
     <span className={clsx(tag, tagVariant[variant], className)}>
-      {label}
+      <span className={tagLabel}>{label}</span>
 
       {onClose && (
         <button

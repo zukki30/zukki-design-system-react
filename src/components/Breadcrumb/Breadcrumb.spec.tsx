@@ -42,7 +42,8 @@ describe('Breadcrumb', () => {
 
     expect(screen.queryByRole('link', { name: '現在のページ' })).not.toBeInTheDocument();
 
-    const current = screen.getByText('現在のページ');
+    // ラベルは省略表示のため span に包まれているので、aria-current は 1 つ外側に付く
+    const current = screen.getByText('現在のページ').parentElement;
     expect(current).toHaveAttribute('aria-current', 'page');
   });
 
@@ -77,6 +78,6 @@ describe('Breadcrumb', () => {
     const { container } = render(<Breadcrumb items={single} />);
 
     expect(container.querySelectorAll('svg')).toHaveLength(0);
-    expect(screen.getByText('HOME')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('HOME').parentElement).toHaveAttribute('aria-current', 'page');
   });
 });

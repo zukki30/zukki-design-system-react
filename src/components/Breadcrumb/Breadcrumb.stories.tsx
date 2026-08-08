@@ -43,6 +43,24 @@ export const Outputs: Story = {
   },
 };
 
+/**
+ * 幅の狭い親に置いたときに、アイコンと区切りを潰さずラベル側が省略されることの確認用
+ */
+export const LongLabel: Story = {
+  args: {
+    items: [
+      { label: 'HOME', href: '#', icon: <Icon name="home" width={20} height={20} /> },
+      { label: '非常に長い中間ページのラベルが指定された場合', href: '#' },
+      { label: '非常に長い現在地のラベルが指定された場合' },
+    ],
+  },
+  render: (args) => (
+    <div style={{ width: '320px', padding: '8px', border: '1px dashed #a6aab3' }}>
+      <Breadcrumb {...args} />
+    </div>
+  ),
+};
+
 export const AllVariants: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

@@ -85,6 +85,20 @@ export const Simple: Story = {
   },
 };
 
+/**
+ * タイトルは 1 行で省略し、本文は分割できない長い語も折り返すことの確認用
+ */
+export const LongContent: Story = {
+  args: {
+    title: '非常に長いカードタイトルが指定された場合の表示確認用テキスト',
+    children: (
+      <p style={{ margin: 0, lineHeight: 1.5 }}>
+        https://example.com/very/long/path/that/cannot/be/broken/1234567890
+      </p>
+    ),
+  },
+};
+
 export const AllVariants: Story = {
   render: () => {
     const columnStyle = {

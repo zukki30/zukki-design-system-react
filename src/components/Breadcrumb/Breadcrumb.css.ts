@@ -19,12 +19,15 @@ export const breadcrumbItem = style({
   display: 'flex',
   alignItems: 'center',
   gap: vars.spacing.xs,
+  // 長いラベルのときに行幅まで縮められるようにする（flexWrap で自身の行に落ちたあと省略される）
+  minWidth: 0,
 });
 
 export const breadcrumbLink = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.spacing.xs,
+  minWidth: 0,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,
@@ -43,6 +46,7 @@ const breadcrumbCurrentBase = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.spacing.xs,
+  minWidth: 0,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size'].sm,
@@ -54,6 +58,20 @@ export const breadcrumbCurrent = styleVariants({
   profile: [breadcrumbCurrentBase, { color: vars.color.profile.default }],
   works: [breadcrumbCurrentBase, { color: vars.color.works.default }],
   outputs: [breadcrumbCurrentBase, { color: vars.color.outputs.default }],
+});
+
+// アイコンは縮めず、あふれはラベル側で吸収する
+export const breadcrumbIcon = style({
+  display: 'inline-flex',
+  flexShrink: 0,
+});
+
+// text-overflow は flex コンテナ自身には効かないため、ラベルを専用の要素に包んで省略する
+export const breadcrumbLabel = style({
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 });
 
 export const breadcrumbSeparator = style({

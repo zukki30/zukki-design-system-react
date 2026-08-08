@@ -6,11 +6,13 @@ const ICON_SIZE = '32px';
 export const stepsItem = style({
   // stepsItemStatus（position: absolute）の包含ブロックを固定する
   position: 'relative',
-  flexShrink: 0,
+  // 長いラベルのときに親の幅まで縮められるようにする（縮んだぶんはラベル側で省略される）
+  minWidth: 0,
   display: 'grid',
   alignItems: 'center',
   justifyContent: 'flex-start',
-  gridTemplateColumns: `${ICON_SIZE} auto`,
+  // ラベル列は auto のままだと min-content 未満に縮まないため minmax(0, auto) にする
+  gridTemplateColumns: `${ICON_SIZE} minmax(0, auto)`,
   gap: vars.spacing.sm,
   lineHeight: 1,
 
@@ -104,6 +106,10 @@ export const stepsItemStatus = style({
 });
 
 export const stepsItemLabel = style({
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
   color: vars.color.textOnLight.default,
   fontFamily: vars['font-family'].default,
   fontSize: vars['font-size'].base,

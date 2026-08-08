@@ -6,7 +6,9 @@ import { Icon } from '../Icon';
 import {
   breadcrumb,
   breadcrumbCurrent,
+  breadcrumbIcon,
   breadcrumbItem,
+  breadcrumbLabel,
   breadcrumbLink,
   breadcrumbList,
   breadcrumbSeparator,
@@ -64,24 +66,25 @@ export const Breadcrumb = ({
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           const key = `${index}-${item.href ?? ''}`;
+          const content = (
+            <>
+              {item.icon !== undefined && <span className={breadcrumbIcon}>{item.icon}</span>}
+              <span className={breadcrumbLabel}>{item.label}</span>
+            </>
+          );
 
           return (
             <li key={key} className={breadcrumbItem}>
               {isLast ? (
                 <span className={breadcrumbCurrent[variant]} aria-current="page">
-                  {item.icon}
-                  {item.label}
+                  {content}
                 </span>
               ) : item.href !== undefined ? (
                 <a className={breadcrumbLink} href={item.href}>
-                  {item.icon}
-                  {item.label}
+                  {content}
                 </a>
               ) : (
-                <span className={breadcrumbLink}>
-                  {item.icon}
-                  {item.label}
-                </span>
+                <span className={breadcrumbLink}>{content}</span>
               )}
 
               {!isLast && (
