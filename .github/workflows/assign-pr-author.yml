@@ -1,0 +1,25 @@
+name: Assign PR Author
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  assign:
+    # fork からの PR では GITHUB_TOKEN が読み取り専用になりアサインできないため除外する
+    # bot（Dependabot など）は assignee に指定できないため除外する
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      !endsWith(github.event.pull_request.user.login, '[bot]')
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      # 既にアサイン済みでも --add-assignee は no-op になるので条件分岐は不要
+      # checkout していないため、対象リポジトリは GH_REPO で指定する
+      - run: gh pr edit "$PR_NUMBER" --add-assignee "$PR_AUTHOR"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
