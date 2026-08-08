@@ -120,6 +120,8 @@ export const iconButtonInner = style({
   justifyContent: 'center',
 
   selectors: {
+    // Button と違い visibility: hidden のままでよい。IconButton のアクセシブルネームは
+    // 必須の aria-label 由来なので、children がツリーから外れても名前は失われない
     '&[data-loading="true"]': {
       visibility: 'hidden',
     },

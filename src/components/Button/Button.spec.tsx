@@ -97,6 +97,20 @@ describe('Button', () => {
     expect(container.querySelector('svg')).not.toBeInTheDocument();
   });
 
+  it('loading のときはキーボード活性化でも onClick を呼ばない', () => {
+    const onClick = vi.fn();
+    render(
+      <Button onClick={onClick} loading>
+        送信
+      </Button>
+    );
+
+    // CSS の pointer-events では Enter / Space 由来の click を止められない
+    fireEvent.click(screen.getByRole('button', { name: '送信' }));
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it.each([
     ['md', 'sm'],
     ['sm', 'md'],

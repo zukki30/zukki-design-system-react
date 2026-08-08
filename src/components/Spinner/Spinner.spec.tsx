@@ -37,9 +37,15 @@ describe('Spinner', () => {
     );
   });
 
-  it('className をマージする', () => {
-    render(<Spinner aria-label="読み込み中" className="custom-class" />);
+  it('className をベースのクラスとマージする', () => {
+    const { rerender } = render(<Spinner aria-label="読み込み中" />);
+    const baseClassName = screen.getByRole('img', { name: '読み込み中' }).getAttribute('class');
 
-    expect(screen.getByRole('img', { name: '読み込み中' })).toHaveClass('custom-class');
+    rerender(<Spinner aria-label="読み込み中" className="custom-class" />);
+
+    // 上書きではなくマージであることを、ベースのクラスが残っているかで確認する
+    const merged = screen.getByRole('img', { name: '読み込み中' }).getAttribute('class');
+    expect(merged).toContain('custom-class');
+    expect(merged).toContain(baseClassName);
   });
 });

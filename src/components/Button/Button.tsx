@@ -1,5 +1,10 @@
 import { clsx } from 'clsx';
-import { type ComponentProps, type ComponentPropsWithoutRef, useMemo } from 'react';
+import {
+  type ComponentProps,
+  type ComponentPropsWithoutRef,
+  type MouseEvent,
+  useMemo,
+} from 'react';
 
 import type { SizeType, ZukkiVariantType } from '@/types';
 
@@ -79,10 +84,20 @@ export const Button = ({
     }
   }, [size]);
 
+  // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
+  // 活性化もここで止める。disabled にはせず、フォーカス位置は保持する
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (loading) {
+      return;
+    }
+
+    onClick?.(event);
+  };
+
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
       className={clsx(buttonSize[size], buttonVariant[variant], button, className)}
       disabled={disabled}
       data-selected={selected}

@@ -108,6 +108,18 @@ describe('InputNumber', () => {
     expect(screen.getByRole('spinbutton')).toHaveAttribute('inputmode', expected);
   });
 
+  // 有効値は step base + step の倍数なので、min が小数なら整数 step でも小数になる
+  it.each([
+    [0, 'numeric'],
+    [-1, 'numeric'],
+    [0.5, 'decimal'],
+    ['1.25', 'decimal'],
+  ] as const)('step 未指定でも min=%s なら inputMode は %s になる', (min, expected) => {
+    render(<InputNumber min={min} />);
+
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('inputmode', expected);
+  });
+
   it('inputMode を利用側から上書きできる', () => {
     render(<InputNumber inputMode="text" />);
 

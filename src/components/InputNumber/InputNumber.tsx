@@ -24,27 +24,45 @@ type Props = {
 
 const ARROW_SIZE = 16;
 
+const isFractional = (value: string | number | undefined): boolean => {
+  if (value === undefined) {
+    return false;
+  }
+
+  const parsed = Number(value);
+
+  // 数値として解釈できない値は整数扱いに倒す
+  return Number.isFinite(parsed) && !Number.isInteger(parsed);
+};
+
 /**
  * モバイルのソフトキーボードを出し分ける。
- * step が小数（または 'any'）を許すときだけ小数点付きのキーパッドにする。
  *
- * numeric / decimal のどちらもマイナス記号を持たない環境があるため、
- * 負値を受け付ける入力では利用側から `inputMode` を上書きすること
+ * 有効な値は「step base + step の倍数」なので、step が整数でも step base（min）が
+ * 小数なら有効値は小数になる。判定には step と min の両方を見る。
+ * value / defaultValue は入力中に変わりキーパッドが切り替わってしまうため見ない
  */
-const resolveInputMode = (step: Props['step']): 'numeric' | 'decimal' => {
-  // step 未指定時の既定値は 1 なので整数のみ
-  if (step === undefined) {
-    return 'numeric';
-  }
-  if (step === 'any') {
+const resolveInputMode = (step: Props['step'], min: Props['min']): 'numeric' | 'decimal' => {
+  // step 未指定時の既定値は 1（整数）
+  if (step === 'any' || isFractional(step)) {
     return 'decimal';
   }
 
-  const parsed = Number(step);
-
-  return Number.isFinite(parsed) && !Number.isInteger(parsed) ? 'decimal' : 'numeric';
+  return isFractional(min) ? 'decimal' : 'numeric';
 };
 
+/**
+ * 数値入力。
+ *
+ * モバイルのソフトキーボードは `step` と `min` から自動で出し分ける
+ * （小数を受け付けるなら `decimal`、それ以外は `numeric`）。
+ *
+ * どちらのキーパッドもマイナス記号を持たない環境があるため、
+ * **負の値を受け付ける場合は `inputMode` を明示的に上書きすること**
+ *
+ * @example
+ * <InputNumber min={-100} max={100} inputMode="text" />
+ */
 export const InputNumber = ({ error, disabled, className, ...props }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -75,7 +93,7 @@ export const InputNumber = ({ error, disabled, className, ...props }: Props) => 
         ref={inputRef}
         type="number"
         // props より前に置いて、利用側から上書きできるようにする
-        inputMode={resolveInputMode(props.step)}
+        inputMode={resolveInputMode(props.step, props.min)}
         className={inputNumberField}
         disabled={disabled}
         aria-invalid={error}
