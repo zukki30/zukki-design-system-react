@@ -14,6 +14,10 @@ export const selectField = style({
   appearance: 'none',
   WebkitAppearance: 'none',
   MozAppearance: 'none',
+  // 入力面のトークンはライト・ダークとも白背景 + 濃色テキストなので light に固定する。
+  // :root の `color-scheme: light dark` のままだと、OS がダークのときに UA が
+  // ネイティブの選択肢リストだけを暗く描画してしまう
+  colorScheme: 'light',
   boxSizing: 'border-box',
   width: '100%',
   margin: 0,
@@ -65,7 +69,9 @@ export const selectField = style({
 });
 
 // ネイティブの選択肢リスト（ブラウザ描画。指定可能な範囲で色を合わせる）
+// background-color を省くと Windows のダークテーマで暗い背景に濃色テキストが載って読めなくなる
 globalStyle(`${selectField} option`, {
+  backgroundColor: vars.color.input.background.default,
   color: vars.color.textOnLight.default,
 });
 
