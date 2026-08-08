@@ -21,6 +21,11 @@ export const stepsItem = style({
       border: 'none',
       cursor: 'pointer',
     },
+    // フォーカス時の視覚フィードバックを Button / IconButton / Tag と揃える
+    '&:is(button):focus-visible': {
+      outline: `2px solid ${vars.color.focus}`,
+      outlineOffset: vars.spacing['2xs'],
+    },
   },
 });
 

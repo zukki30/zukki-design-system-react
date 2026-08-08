@@ -32,7 +32,7 @@ export const textArea = style({
     '&:hover:not(:disabled):not([data-error="true"])': {
       borderColor: vars.color.input.border.hover,
     },
-    '&:focus': {
+    '&:focus-visible': {
       outline: `2px solid ${vars.color.focus}`,
       outlineOffset: vars.spacing.xs,
     },

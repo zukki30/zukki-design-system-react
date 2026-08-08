@@ -3,7 +3,13 @@ import { clsx } from 'clsx';
 import type { ZukkiVariantType } from '@/types';
 
 import { Icon } from '../Icon';
-import { tag, tagVariant, tagCloseButton, tagCloseButtonVariant } from './Tag.css';
+import {
+  tag,
+  tagVariant,
+  tagCloseButton,
+  tagCloseButtonVariant,
+  CLOSE_BUTTON_SIZE,
+} from './Tag.css';
 
 export type TagVariant = 'default' | 'red' | 'blue' | 'green' | 'yellow' | ZukkiVariantType;
 
@@ -13,8 +19,6 @@ type Props = {
   className?: string;
   onClose?: () => void;
 };
-
-const CLOSE_BUTTON_SIZE = 14;
 
 export const Tag = ({ label, variant = 'default', className, onClose }: Props) => {
   return (
