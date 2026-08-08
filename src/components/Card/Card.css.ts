@@ -1,3 +1,4 @@
+import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
@@ -44,10 +45,7 @@ export const cardHeader = style({
 export const cardTitle = style({
   // 長いタイトルは action を押し出さず 1 行で省略する。
   // cardHeaderMeta が flex-shrink: 0 なので、縮む余地はこちらに寄る
-  minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  ...truncate,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size'].base,

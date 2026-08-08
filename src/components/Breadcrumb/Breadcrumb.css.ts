@@ -1,3 +1,4 @@
+import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
@@ -68,10 +69,7 @@ export const breadcrumbIcon = style({
 
 // text-overflow は flex コンテナ自身には効かないため、ラベルを専用の要素に包んで省略する
 export const breadcrumbLabel = style({
-  minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  ...truncate,
 });
 
 export const breadcrumbSeparator = style({

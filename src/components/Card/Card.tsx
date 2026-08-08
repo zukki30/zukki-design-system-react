@@ -27,7 +27,10 @@ type Props = {
    */
   image?: ReactNode;
   /**
-   * ヘッダーのタイトル
+   * ヘッダーのタイトル。
+   *
+   * action を押し出さないよう 1 行に固定され、あふれたぶんは省略記号で表示される。
+   * `overflow: hidden` がかかるため、内部に配置した要素のフォーカスリングは切られうる
    */
   title?: ReactNode;
   /**

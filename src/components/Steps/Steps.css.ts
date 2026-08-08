@@ -40,7 +40,11 @@ export const stepsItemContainer = style({
 
   selectors: {
     '&:last-child': {
-      // 末尾は伸ばさないが、ラベルが長いときに縮む余地は残す
+      flex: 'none',
+    },
+    // 横並びの末尾のみ、伸ばさずに縮む余地だけ残す。
+    // 縦並びで縮ませると高さが潰れる意味になってしまうためスコープを絞る
+    '&[data-vertical="false"]:last-child': {
       flex: '0 1 auto',
     },
     '&:last-child::after': {

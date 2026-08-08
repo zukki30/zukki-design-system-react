@@ -1,3 +1,4 @@
+import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
@@ -17,6 +18,11 @@ export const stepsItem = style({
   lineHeight: 1,
 
   selectors: {
+    // 縦並びの主軸は縦なので、flex-shrink は「高さが縮む」意味になる。
+    // 横幅のあふれ対策は不要なため、縮まない従来の挙動を保つ
+    '[data-vertical="true"] &': {
+      flexShrink: 0,
+    },
     '&:is(button)': {
       padding: vars.spacing.none,
       backgroundColor: 'transparent',
@@ -105,11 +111,9 @@ export const stepsItemStatus = style({
   borderWidth: 0,
 });
 
+// 横並びはステップ同士が幅を奪い合うため 1 行で省略する
 export const stepsItemLabel = style({
-  minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  ...truncate,
   color: vars.color.textOnLight.default,
   fontFamily: vars['font-family'].default,
   fontSize: vars['font-size'].base,
@@ -117,6 +121,11 @@ export const stepsItemLabel = style({
   lineHeight: vars['line-height'].line,
 
   selectors: {
+    // 縦並びは 1 ステップが 1 行を占めて幅に余裕があるため、省略せず折り返して全文を見せる
+    '[data-vertical="true"] &': {
+      whiteSpace: 'normal',
+      overflowWrap: 'anywhere',
+    },
     [`${stepsItem}:is(button):hover &`]: {
       color: vars.color.blue[400],
     },

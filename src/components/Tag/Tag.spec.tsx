@@ -4,9 +4,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { Tag } from './Tag';
 
 describe('Tag', () => {
-  // ラベルは省略表示のため span に包まれているので、className / variant は 1 つ外側に付く
-  const getRoot = () => screen.getByText('タグ名').parentElement;
-
   it('label を描画する', () => {
     render(<Tag label="タグ名" />);
 
@@ -34,18 +31,19 @@ describe('Tag', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  // className / variant はルート要素に付く。内部構造に依存しないよう container 側から辿る
   it('className を付与する', () => {
-    render(<Tag label="タグ名" className="custom-class" />);
+    const { container } = render(<Tag label="タグ名" className="custom-class" />);
 
-    expect(getRoot()).toHaveClass('custom-class');
+    expect(container.firstElementChild).toHaveClass('custom-class');
   });
 
   it('variant によって適用されるクラスが変わる', () => {
-    const { rerender } = render(<Tag label="タグ名" />);
-    const defaultClassName = getRoot()?.className;
+    const { container, rerender } = render(<Tag label="タグ名" />);
+    const defaultClassName = container.firstElementChild?.className;
 
     rerender(<Tag label="タグ名" variant="red" />);
 
-    expect(getRoot()?.className).not.toBe(defaultClassName);
+    expect(container.firstElementChild?.className).not.toBe(defaultClassName);
   });
 });
