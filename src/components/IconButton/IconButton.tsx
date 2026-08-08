@@ -81,6 +81,8 @@ export const IconButton = ({
       disabled={disabled}
       data-selected={selected}
       data-loading={loading}
+      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
+      aria-busy={loading}
       {...props}
     >
       <span className={iconButtonInner} data-loading={loading}>

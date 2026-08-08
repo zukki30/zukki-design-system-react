@@ -109,20 +109,25 @@ describe('IconButton', () => {
     expect(screen.getByRole('button', { name: 'ホーム' })).toHaveClass('custom-class');
   });
 
-  it('loading のとき Spinner を描画する', () => {
+  it('loading のとき Spinner を描画し aria-busy を立てる', () => {
     render(
       <IconButton aria-label="ホーム" loading>
         {icon}
       </IconButton>
     );
 
-    expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('data-loading', 'true');
+    // アクセシブルネームは aria-label 由来なので、loading 中も維持される
+    const button = screen.getByRole('button', { name: 'ホーム' });
+
+    expect(button).toHaveAttribute('data-loading', 'true');
+    expect(button).toHaveAttribute('aria-busy', 'true');
     expect(screen.getByRole('img', { name: SPINNER_LABEL })).toBeInTheDocument();
   });
 
-  it('loading でないとき Spinner を描画しない', () => {
+  it('loading でないとき Spinner を描画せず aria-busy も付けない', () => {
     render(<IconButton aria-label="ホーム">{icon}</IconButton>);
 
+    expect(screen.getByRole('button', { name: 'ホーム' })).not.toHaveAttribute('aria-busy');
     expect(screen.queryByRole('img', { name: SPINNER_LABEL })).not.toBeInTheDocument();
   });
 

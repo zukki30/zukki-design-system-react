@@ -24,7 +24,7 @@ export const Spinner = ({ 'aria-label': ariaLabel, variant = 'light', ...restPro
         aria-hidden={ariaLabel ? undefined : 'true'}
         {...restProps}
       >
-        <title>{ariaLabel ?? 'Loading...'}</title>
+        <title>{ariaLabel ?? 'Loading…'}</title>
         <path
           opacity="0.25"
           d="M12 1C18.0752 1 23 5.92487 23 12C23 18.0752 18.0752 23 12 23C5.92487 23 1 18.0752 1 12C1 5.92487 5.92487 1 12 1Z"

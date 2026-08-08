@@ -24,6 +24,27 @@ type Props = {
 
 const ARROW_SIZE = 16;
 
+/**
+ * モバイルのソフトキーボードを出し分ける。
+ * step が小数（または 'any'）を許すときだけ小数点付きのキーパッドにする。
+ *
+ * numeric / decimal のどちらもマイナス記号を持たない環境があるため、
+ * 負値を受け付ける入力では利用側から `inputMode` を上書きすること
+ */
+const resolveInputMode = (step: Props['step']): 'numeric' | 'decimal' => {
+  // step 未指定時の既定値は 1 なので整数のみ
+  if (step === undefined) {
+    return 'numeric';
+  }
+  if (step === 'any') {
+    return 'decimal';
+  }
+
+  const parsed = Number(step);
+
+  return Number.isFinite(parsed) && !Number.isInteger(parsed) ? 'decimal' : 'numeric';
+};
+
 export const InputNumber = ({ error, disabled, className, ...props }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,6 +74,8 @@ export const InputNumber = ({ error, disabled, className, ...props }: Props) => 
       <input
         ref={inputRef}
         type="number"
+        // props より前に置いて、利用側から上書きできるようにする
+        inputMode={resolveInputMode(props.step)}
         className={inputNumberField}
         disabled={disabled}
         aria-invalid={error}

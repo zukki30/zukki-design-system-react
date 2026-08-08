@@ -91,4 +91,26 @@ describe('InputNumber', () => {
     expect(field).toHaveAttribute('min', '0');
     expect(field).toHaveAttribute('max', '100');
   });
+
+  // 小数を受け付けるかどうかでモバイルのキーパッドを出し分ける
+  it.each([
+    [undefined, 'numeric'],
+    ['any', 'decimal'],
+    [1, 'numeric'],
+    ['2', 'numeric'],
+    [0.1, 'decimal'],
+    ['0.5', 'decimal'],
+    // 数値として解釈できない値は既定の整数扱いに倒す
+    ['invalid', 'numeric'],
+  ] as const)('step=%s のとき inputMode は %s になる', (step, expected) => {
+    render(<InputNumber step={step} />);
+
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('inputmode', expected);
+  });
+
+  it('inputMode を利用側から上書きできる', () => {
+    render(<InputNumber inputMode="text" />);
+
+    expect(screen.getByRole('spinbutton')).toHaveAttribute('inputmode', 'text');
+  });
 });

@@ -237,8 +237,10 @@ export const buttonInner = style({
   gap: vars.spacing.sm,
 
   selectors: {
+    // visibility: hidden だとラベルがアクセシビリティツリーから外れ、loading 中の
+    // アクセシブルネームが Spinner の文言だけになってしまうため opacity で隠す
     '&[data-loading="true"]': {
-      visibility: 'hidden',
+      opacity: 0,
     },
   },
 });

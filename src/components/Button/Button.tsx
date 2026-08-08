@@ -89,6 +89,8 @@ export const Button = ({
       data-has-start-icon={!!startIcon}
       data-has-end-icon={!!endIcon}
       data-loading={loading}
+      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
+      aria-busy={loading}
       {...props}
     >
       <span className={buttonInner} data-loading={loading}>
@@ -99,12 +101,9 @@ export const Button = ({
 
       {loading && (
         <span className={buttonLoading}>
-          <Spinner
-            variant={spinnerVariant}
-            width={spinnerSize}
-            height={spinnerSize}
-            aria-label="loading"
-          />
+          {/* 状態は aria-busy が伝えるため、Spinner は装飾として扱う
+              （aria-label を渡すとアクセシブルネームに混ざってしまう） */}
+          <Spinner variant={spinnerVariant} width={spinnerSize} height={spinnerSize} />
         </span>
       )}
     </button>
