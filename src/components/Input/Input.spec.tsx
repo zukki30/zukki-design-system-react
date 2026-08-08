@@ -34,16 +34,23 @@ describe('Input', () => {
     expect(field.parentElement).toHaveAttribute('data-error', 'true');
   });
 
-  it('startIcon を表示する', () => {
+  it('startIcon を装飾として表示する', () => {
     render(<Input startIcon={<span data-testid="start-icon" />} placeholder="start" />);
 
-    expect(screen.getByTestId('start-icon')).toBeInTheDocument();
+    const icon = screen.getByTestId('start-icon');
+
+    expect(icon).toBeInTheDocument();
+    // 装飾なので支援技術からは隠す
+    expect(icon.parentElement).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('endIcon を表示する', () => {
+  it('endIcon を装飾として表示する', () => {
     render(<Input endIcon={<span data-testid="end-icon" />} placeholder="end" />);
 
-    expect(screen.getByTestId('end-icon')).toBeInTheDocument();
+    const icon = screen.getByTestId('end-icon');
+
+    expect(icon).toBeInTheDocument();
+    expect(icon.parentElement).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('startIcon / endIcon を渡さないときアイコン要素を描画しない', () => {

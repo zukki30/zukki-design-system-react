@@ -5,11 +5,13 @@ import { input, inputField, inputIcon } from './Input.css';
 
 type Props = {
   /**
-   * 入力の前に表示する要素
+   * 入力の前に表示する装飾アイコン。
+   * 支援技術からは隠されるため、操作要素や意味のあるテキストは渡さないこと
    */
   startIcon?: React.ReactNode;
   /**
-   * 入力の後に表示する要素
+   * 入力の後に表示する装飾アイコン。
+   * 支援技術からは隠されるため、操作要素や意味のあるテキストは渡さないこと
    */
   endIcon?: React.ReactNode;
   /**
@@ -26,7 +28,7 @@ export const Input = ({ startIcon, endIcon, error, disabled, className, ...props
   return (
     <div className={clsx(input, className)} data-error={error} data-disabled={disabled}>
       {startIcon && (
-        <span className={inputIcon} data-position="start">
+        <span className={inputIcon} data-position="start" aria-hidden="true">
           {startIcon}
         </span>
       )}
@@ -34,7 +36,7 @@ export const Input = ({ startIcon, endIcon, error, disabled, className, ...props
       <input className={inputField} disabled={disabled} aria-invalid={error} {...props} />
 
       {endIcon && (
-        <span className={inputIcon} data-position="end">
+        <span className={inputIcon} data-position="end" aria-hidden="true">
           {endIcon}
         </span>
       )}

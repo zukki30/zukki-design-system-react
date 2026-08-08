@@ -1,5 +1,10 @@
 import { clsx } from 'clsx';
-import { type ComponentProps, type ComponentPropsWithoutRef, useMemo } from 'react';
+import {
+  type ComponentProps,
+  type ComponentPropsWithoutRef,
+  type MouseEvent,
+  useMemo,
+} from 'react';
 
 import type { SizeType, ZukkiVariantType } from '@/types';
 
@@ -79,16 +84,28 @@ export const Button = ({
     }
   }, [size]);
 
+  // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
+  // 活性化もここで止める。disabled にはせず、フォーカス位置は保持する
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (loading) {
+      return;
+    }
+
+    onClick?.(event);
+  };
+
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
       className={clsx(buttonSize[size], buttonVariant[variant], button, className)}
       disabled={disabled}
       data-selected={selected}
       data-has-start-icon={!!startIcon}
       data-has-end-icon={!!endIcon}
       data-loading={loading}
+      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
+      aria-busy={loading}
       {...props}
     >
       <span className={buttonInner} data-loading={loading}>
@@ -99,12 +116,9 @@ export const Button = ({
 
       {loading && (
         <span className={buttonLoading}>
-          <Spinner
-            variant={spinnerVariant}
-            width={spinnerSize}
-            height={spinnerSize}
-            aria-label="loading"
-          />
+          {/* 状態は aria-busy が伝えるため、Spinner は装飾として扱う
+              （aria-label を渡すとアクセシブルネームに混ざってしまう） */}
+          <Spinner variant={spinnerVariant} width={spinnerSize} height={spinnerSize} />
         </span>
       )}
     </button>

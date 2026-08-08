@@ -11,16 +11,17 @@ const icon = <Icon name="home" width={16} height={16} />;
 
 type IconButtonProps = ComponentProps<typeof IconButton>;
 
-const SPINNER_LABEL = 'loading';
-
 /**
  * 描画結果の Spinner のクラス名を取り出す。
- * IconButton が渡す variant を、Spinner を直接描画した場合と突き合わせるために使う
+ * IconButton が渡す variant を、Spinner を直接描画した場合と突き合わせるために使う。
+ *
+ * Spinner は装飾（aria-hidden）でロールから引けないため DOM を辿る。
+ * children に svg を渡さないことで、含まれる svg は Spinner だけになる
  */
 const getSpinnerClassName = (ui: ReactElement) => {
-  const { unmount } = render(ui);
+  const { container, unmount } = render(ui);
   // SVG 要素の className は SVGAnimatedString のため属性値で取得する
-  const className = screen.getByRole('img', { name: SPINNER_LABEL }).getAttribute('class');
+  const className = container.querySelector('svg')?.getAttribute('class') ?? null;
   if (className === null) {
     throw new Error('spinner class not found');
   }
@@ -109,21 +110,45 @@ describe('IconButton', () => {
     expect(screen.getByRole('button', { name: 'ホーム' })).toHaveClass('custom-class');
   });
 
-  it('loading のとき Spinner を描画する', () => {
-    render(
+  it('loading のとき Spinner を描画し aria-busy を立てる', () => {
+    const { container } = render(
       <IconButton aria-label="ホーム" loading>
+        <span data-testid="icon" />
+      </IconButton>
+    );
+
+    // アクセシブルネームは aria-label 由来なので、loading 中も維持される
+    const button = screen.getByRole('button', { name: 'ホーム' });
+
+    expect(button).toHaveAttribute('data-loading', 'true');
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    // 状態は aria-busy が伝えるため、Spinner は支援技術から隠す
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('loading でないとき Spinner を描画せず aria-busy も付けない', () => {
+    const { container } = render(
+      <IconButton aria-label="ホーム">
+        <span data-testid="icon" />
+      </IconButton>
+    );
+
+    expect(screen.getByRole('button', { name: 'ホーム' })).not.toHaveAttribute('aria-busy');
+    expect(container.querySelector('svg')).not.toBeInTheDocument();
+  });
+
+  it('loading のときはキーボード活性化でも onClick を呼ばない', () => {
+    const onClick = vi.fn();
+    render(
+      <IconButton aria-label="ホーム" onClick={onClick} loading>
         {icon}
       </IconButton>
     );
 
-    expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('data-loading', 'true');
-    expect(screen.getByRole('img', { name: SPINNER_LABEL })).toBeInTheDocument();
-  });
+    // CSS の pointer-events では Enter / Space 由来の click を止められない
+    fireEvent.click(screen.getByRole('button', { name: 'ホーム' }));
 
-  it('loading でないとき Spinner を描画しない', () => {
-    render(<IconButton aria-label="ホーム">{icon}</IconButton>);
-
-    expect(screen.queryByRole('img', { name: SPINNER_LABEL })).not.toBeInTheDocument();
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -136,12 +161,10 @@ describe('IconButton', () => {
   >)('variant=%s のとき Spinner は %s の配色になる', (variant, spinnerVariant) => {
     const actual = getSpinnerClassName(
       <IconButton aria-label="ホーム" variant={variant} loading>
-        {icon}
+        <span data-testid="icon" />
       </IconButton>
     );
-    const expected = getSpinnerClassName(
-      <Spinner variant={spinnerVariant} aria-label={SPINNER_LABEL} />
-    );
+    const expected = getSpinnerClassName(<Spinner variant={spinnerVariant} />);
 
     expect(actual).toBe(expected);
   });

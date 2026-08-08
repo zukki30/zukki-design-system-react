@@ -1,5 +1,10 @@
 import { clsx } from 'clsx';
-import { type ComponentProps, type ComponentPropsWithoutRef, useMemo } from 'react';
+import {
+  type ComponentProps,
+  type ComponentPropsWithoutRef,
+  type MouseEvent,
+  useMemo,
+} from 'react';
 
 import type { SizeType } from '@/types';
 
@@ -73,14 +78,26 @@ export const IconButton = ({
     }
   }, [variant]);
 
+  // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
+  // 活性化もここで止める。disabled にはせず、フォーカス位置は保持する
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (loading) {
+      return;
+    }
+
+    onClick?.(event);
+  };
+
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
       className={clsx(iconButtonSize[size], iconButtonVariant[variant], iconButton, className)}
       disabled={disabled}
       data-selected={selected}
       data-loading={loading}
+      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
+      aria-busy={loading}
       {...props}
     >
       <span className={iconButtonInner} data-loading={loading}>
@@ -89,12 +106,8 @@ export const IconButton = ({
 
       {loading && (
         <span className={iconButtonLoading}>
-          <Spinner
-            variant={spinnerVariant}
-            width={SPINNER_SIZE}
-            height={SPINNER_SIZE}
-            aria-label="loading"
-          />
+          {/* 状態は aria-busy が伝えるため、Spinner は装飾として扱う */}
+          <Spinner variant={spinnerVariant} width={SPINNER_SIZE} height={SPINNER_SIZE} />
         </span>
       )}
     </button>

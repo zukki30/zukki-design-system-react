@@ -53,6 +53,8 @@ export const inputNumberField = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].base,
   lineHeight: vars['line-height'].line,
+  // 桁を等幅にして、スピンボタンでの増減時に数値が横揺れしないようにする
+  fontVariantNumeric: 'tabular-nums',
   color: vars.color.textOnLight.default,
 
   selectors: {

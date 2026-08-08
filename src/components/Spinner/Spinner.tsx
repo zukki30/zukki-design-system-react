@@ -20,11 +20,13 @@ export const Spinner = ({ 'aria-label': ariaLabel, variant = 'light', ...restPro
         width="24"
         height="24"
         role="img"
-        className={clsx(spinner, spinnerVariant[variant], restProps.className)}
         aria-hidden={ariaLabel ? undefined : 'true'}
         {...restProps}
+        // restProps より後ろに置く。前に置くとスプレッドの className に丸ごと
+        // 上書きされ、ベースと variant のクラスが失われる
+        className={clsx(spinner, spinnerVariant[variant], restProps.className)}
       >
-        <title>{ariaLabel ?? 'Loading...'}</title>
+        <title>{ariaLabel ?? 'Loading…'}</title>
         <path
           opacity="0.25"
           d="M12 1C18.0752 1 23 5.92487 23 12C23 18.0752 18.0752 23 12 23C5.92487 23 1 18.0752 1 12C1 5.92487 5.92487 1 12 1Z"
