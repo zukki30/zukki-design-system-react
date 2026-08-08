@@ -8,16 +8,18 @@ export const select = style({
   position: 'relative',
   display: 'inline-flex',
   width: '100%',
+  // 入力面のトークンはライト・ダークとも白背景 + 濃色テキストなので light に固定する。
+  // :root の `color-scheme: light dark` のままだと、OS がダークのときに UA が
+  // ネイティブの選択肢リストだけを暗く描画してしまう。
+  // 継承プロパティなのでラッパーに置き、フィールドとシェブロンアイコンで解決を揃える
+  // （副作用として、このコンポーネント内で参照する light-dark() はすべてライト側に固定される）
+  colorScheme: 'light',
 });
 
 export const selectField = style({
   appearance: 'none',
   WebkitAppearance: 'none',
   MozAppearance: 'none',
-  // 入力面のトークンはライト・ダークとも白背景 + 濃色テキストなので light に固定する。
-  // :root の `color-scheme: light dark` のままだと、OS がダークのときに UA が
-  // ネイティブの選択肢リストだけを暗く描画してしまう
-  colorScheme: 'light',
   boxSizing: 'border-box',
   width: '100%',
   margin: 0,
@@ -73,6 +75,13 @@ export const selectField = style({
 globalStyle(`${selectField} option`, {
   backgroundColor: vars.color.input.background.default,
   color: vars.color.textOnLight.default,
+});
+
+// エラー時はフィールドと選択肢リストの背景を揃える。
+// Chrome / Windows は折りたたみ時の描画にも選択中 option の背景を使うことがあり、
+// 白のままだとエラーの薄赤が消えて見える
+globalStyle(`${select}[data-error="true"] ${selectField} option`, {
+  backgroundColor: vars.color.input.background.error,
 });
 
 globalStyle(`${selectField} option:disabled`, {
