@@ -31,18 +31,19 @@ describe('Tag', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  // className / variant はルート要素に付く。内部構造に依存しないよう container 側から辿る
   it('className を付与する', () => {
-    render(<Tag label="タグ名" className="custom-class" />);
+    const { container } = render(<Tag label="タグ名" className="custom-class" />);
 
-    expect(screen.getByText('タグ名')).toHaveClass('custom-class');
+    expect(container.firstElementChild).toHaveClass('custom-class');
   });
 
   it('variant によって適用されるクラスが変わる', () => {
-    const { rerender } = render(<Tag label="タグ名" />);
-    const defaultClassName = screen.getByText('タグ名').className;
+    const { container, rerender } = render(<Tag label="タグ名" />);
+    const defaultClassName = container.firstElementChild?.className;
 
     rerender(<Tag label="タグ名" variant="red" />);
 
-    expect(screen.getByText('タグ名').className).not.toBe(defaultClassName);
+    expect(container.firstElementChild?.className).not.toBe(defaultClassName);
   });
 });

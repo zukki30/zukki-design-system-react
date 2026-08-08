@@ -1,3 +1,4 @@
+import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
@@ -42,7 +43,9 @@ export const cardHeader = style({
 });
 
 export const cardTitle = style({
-  flexShrink: 0,
+  // 長いタイトルは action を押し出さず 1 行で省略する。
+  // cardHeaderMeta が flex-shrink: 0 なので、縮む余地はこちらに寄る
+  ...truncate,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size'].base,
@@ -63,6 +66,10 @@ export const cardBody = style({
   display: 'flex',
   width: '100%',
   flexShrink: 0,
+  // 本文は省略せず折り返す。URL のような分割できない長い語も
+  // カード幅で折り返して card の overflow: hidden で切られないようにする
+  minWidth: 0,
+  overflowWrap: 'anywhere',
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,

@@ -73,3 +73,18 @@ export const CloseButton: Story = {
     onClose: fn(),
   },
 };
+
+/**
+ * 幅の狭い親に置いたときに、閉じるボタンを潰さずラベル側が省略されることの確認用
+ */
+export const LongLabel: Story = {
+  args: {
+    label: '非常に長いタグラベルが指定された場合の表示確認用テキスト',
+    onClose: fn(),
+  },
+  render: (args) => (
+    <div style={{ width: '200px', padding: '8px', border: '1px dashed #a6aab3' }}>
+      <Tag {...args} />
+    </div>
+  ),
+};

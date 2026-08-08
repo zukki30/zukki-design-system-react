@@ -31,6 +31,7 @@ export const steps = styleVariants({
 export const stepsItemContainer = style({
   display: 'flex',
   flex: 1,
+  minWidth: 0,
 
   '::after': {
     backgroundColor: vars.color.grey[100],
@@ -40,6 +41,11 @@ export const stepsItemContainer = style({
   selectors: {
     '&:last-child': {
       flex: 'none',
+    },
+    // 横並びの末尾のみ、伸ばさずに縮む余地だけ残す。
+    // 縦並びで縮ませると高さが潰れる意味になってしまうためスコープを絞る
+    '&[data-vertical="false"]:last-child': {
+      flex: '0 1 auto',
     },
     '&:last-child::after': {
       display: 'none',

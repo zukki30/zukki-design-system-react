@@ -1,4 +1,5 @@
 import { interactiveTouch } from '@/styles/interactive';
+import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
@@ -9,6 +10,8 @@ const CLOSE_BUTTON_TOUCH_SIZE = 24;
 
 export const tag = style({
   display: 'inline-flex',
+  // 親からはみ出さずに、あふれるぶんはラベル側で省略する
+  maxWidth: '100%',
   alignItems: 'center',
   gap: vars.spacing.xs,
   padding: vars.spacing.xs,
@@ -19,6 +22,11 @@ export const tag = style({
   fontSize: vars['font-size'].xs,
   fontWeight: vars['font-weight'].normal,
   lineHeight: vars['line-height'].line,
+});
+
+// text-overflow は flex コンテナ自身には効かないため、ラベルを専用の要素に包んで省略する
+export const tagLabel = style({
+  ...truncate,
 });
 
 export const tagVariant = styleVariants({
@@ -67,6 +75,8 @@ export const tagVariant = styleVariants({
 export const tagCloseButton = style({
   // タッチ領域を広げる ::after の包含ブロックにする
   position: 'relative',
+  // ラベルが長くても閉じるボタンは 14px を保つ
+  flexShrink: 0,
   padding: vars.spacing.none,
   width: CLOSE_BUTTON_SIZE,
   height: CLOSE_BUTTON_SIZE,

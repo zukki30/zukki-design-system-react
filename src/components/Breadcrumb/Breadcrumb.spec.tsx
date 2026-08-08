@@ -42,8 +42,8 @@ describe('Breadcrumb', () => {
 
     expect(screen.queryByRole('link', { name: '現在のページ' })).not.toBeInTheDocument();
 
-    const current = screen.getByText('現在のページ');
-    expect(current).toHaveAttribute('aria-current', 'page');
+    // ラベルはラッパー要素に包まれるため、内部構造に依存しないよう祖先まで遡って確認する
+    expect(screen.getByText('現在のページ').closest('[aria-current="page"]')).toBeInTheDocument();
   });
 
   it('項目数 - 1 個の区切りアイコンを描画する', () => {
@@ -77,6 +77,6 @@ describe('Breadcrumb', () => {
     const { container } = render(<Breadcrumb items={single} />);
 
     expect(container.querySelectorAll('svg')).toHaveLength(0);
-    expect(screen.getByText('HOME')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('HOME').closest('[aria-current="page"]')).toBeInTheDocument();
   });
 });
