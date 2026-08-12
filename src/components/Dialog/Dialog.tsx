@@ -1,12 +1,14 @@
 import { clsx } from 'clsx';
 import {
-  type ComponentPropsWithoutRef,
+  type ComponentPropsWithRef,
   type MouseEvent,
   type ReactNode,
   useEffect,
   useId,
   useRef,
 } from 'react';
+
+import { useMergedRef } from '@/hooks/useMergedRef';
 
 import { Icon } from '../Icon/Icon';
 import { IconButton } from '../IconButton/IconButton';
@@ -56,7 +58,7 @@ type Props = {
    * ダイアログの本文
    */
   children?: ReactNode;
-} & Omit<ComponentPropsWithoutRef<'dialog'>, 'open' | 'title' | 'children'>;
+} & Omit<ComponentPropsWithRef<'dialog'>, 'open' | 'title' | 'children'>;
 
 export const Dialog = ({
   open,
@@ -67,9 +69,12 @@ export const Dialog = ({
   closeOnOverlayClick = true,
   children,
   className,
+  ref,
   ...props
 }: Props) => {
+  // showModal / close の呼び出しに DOM 要素が必要なため、内部で保持しつつ利用側の ref にも転送する
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const mergedRef = useMergedRef(ref, dialogRef);
   const titleId = useId();
 
   // open の変化をネイティブ dialog の showModal/close に同期する
@@ -95,7 +100,7 @@ export const Dialog = ({
 
   return (
     <dialog
-      ref={dialogRef}
+      ref={mergedRef}
       className={clsx(dialog, className)}
       aria-labelledby={title !== undefined ? titleId : undefined}
       onClose={onClose}

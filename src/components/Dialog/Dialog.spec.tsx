@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from './Dialog';
@@ -146,5 +147,42 @@ describe('Dialog', () => {
     );
 
     expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();
+  });
+
+  it('ref を dialog に転送する', () => {
+    const ref = createRef<HTMLDialogElement>();
+    render(
+      <Dialog ref={ref} open title="タイトル">
+        本文
+      </Dialog>
+    );
+
+    expect(ref.current).toBe(document.querySelector('dialog'));
+  });
+
+  it('ref を渡しても open の変化が showModal / close に同期される', () => {
+    vi.clearAllMocks();
+    const ref = createRef<HTMLDialogElement>();
+    const { rerender } = render(
+      <Dialog ref={ref} open={false} title="タイトル">
+        本文
+      </Dialog>
+    );
+
+    rerender(
+      <Dialog ref={ref} open title="タイトル">
+        本文
+      </Dialog>
+    );
+
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <Dialog ref={ref} open={false} title="タイトル">
+        本文
+      </Dialog>
+    );
+
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalledTimes(1);
   });
 });

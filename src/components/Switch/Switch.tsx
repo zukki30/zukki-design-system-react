@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 import {
   switchControl,
@@ -19,7 +19,7 @@ type Props = {
    * スイッチの disabled 属性
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'children' | 'size' | 'role'>;
+} & Omit<ComponentPropsWithRef<'input'>, 'type' | 'children' | 'size' | 'role'>;
 
 export const Switch = ({ children, disabled, className, ...props }: Props) => {
   return (

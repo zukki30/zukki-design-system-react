@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 import { Icon } from '../Icon/Icon';
 
@@ -22,7 +22,7 @@ type Props = {
    * option 要素
    */
   children?: React.ReactNode;
-} & Omit<ComponentPropsWithoutRef<'select'>, 'prefix' | 'suffix'>;
+} & Omit<ComponentPropsWithRef<'select'>, 'prefix' | 'suffix'>;
 
 const ICON_SIZE = 20;
 

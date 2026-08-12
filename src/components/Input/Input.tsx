@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 import { input, inputField, inputIcon } from './Input.css';
 
@@ -24,7 +24,7 @@ type Props = {
    * 入力の disabled 属性
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithoutRef<'input'>, 'prefix' | 'suffix'>;
+} & Omit<ComponentPropsWithRef<'input'>, 'prefix' | 'suffix'>;
 
 export const Input = ({ startIcon, endIcon, error, disabled, className, ...props }: Props) => {
   return (

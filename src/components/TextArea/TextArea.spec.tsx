@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { TextArea } from './TextArea';
@@ -50,5 +51,12 @@ describe('TextArea', () => {
     render(<TextArea className="custom-class" placeholder="custom" />);
 
     expect(screen.getByPlaceholderText('custom')).toHaveClass('custom-class');
+  });
+
+  it('ref を textarea に転送する', () => {
+    const ref = createRef<HTMLTextAreaElement>();
+    render(<TextArea ref={ref} placeholder="ref" />);
+
+    expect(ref.current).toBe(screen.getByPlaceholderText('ref'));
   });
 });

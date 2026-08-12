@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Switch } from './Switch';
@@ -68,5 +69,12 @@ describe('Switch', () => {
 
     expect(switchEl).toHaveAttribute('name', 'notify');
     expect(switchEl).toHaveAttribute('value', 'on');
+  });
+
+  it('ref を input に転送する', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Switch ref={ref}>通知を受け取る</Switch>);
+
+    expect(ref.current).toBe(screen.getByRole('switch'));
   });
 });

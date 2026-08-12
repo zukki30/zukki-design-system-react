@@ -1,5 +1,7 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithRef, useCallback } from 'react';
+
+import { useMergedRef } from '@/hooks/useMergedRef';
 
 import { Icon } from '../Icon/Icon';
 
@@ -26,7 +28,7 @@ type Props = {
    * チェックボックスの disabled 属性
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'children' | 'size'>;
+} & Omit<ComponentPropsWithRef<'input'>, 'type' | 'children' | 'size'>;
 
 const ICON_SIZE = 24;
 
@@ -35,20 +37,27 @@ export const Checkbox = ({
   indeterminate = false,
   disabled,
   className,
+  ref,
   ...props
 }: Props) => {
-  // indeterminate は DOM プロパティのため ref callback 経由で設定する（HTML 属性では表現できない）
-  const setInputRef = (input: HTMLInputElement | null) => {
-    if (input !== null) {
-      input.indeterminate = indeterminate;
-    }
-  };
+  // indeterminate は DOM プロパティのため ref callback 経由で設定する（HTML 属性では表現できない）。
+  // indeterminate が変わったときだけ ref が付け替わり、その際に再設定される
+  const setIndeterminate = useCallback(
+    (input: HTMLInputElement | null) => {
+      if (input !== null) {
+        input.indeterminate = indeterminate;
+      }
+    },
+    [indeterminate]
+  );
+
+  const inputRef = useMergedRef(ref, setIndeterminate);
 
   return (
     <label className={clsx(checkbox, className)} data-disabled={disabled}>
       <span className={checkboxControl}>
         <input
-          ref={setInputRef}
+          ref={inputRef}
           type="checkbox"
           className={checkboxInput}
           disabled={disabled}

@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 import { textArea } from './TextArea.css';
 
@@ -12,7 +12,7 @@ type Props = {
    * テキストエリアの disabled 属性
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithoutRef<'textarea'>, 'prefix' | 'suffix'>;
+} & Omit<ComponentPropsWithRef<'textarea'>, 'prefix' | 'suffix'>;
 
 export const TextArea = ({ error, disabled, className, ...props }: Props) => {
   return (

@@ -1,5 +1,7 @@
 import { clsx } from 'clsx';
-import { type ComponentPropsWithoutRef, type MouseEvent, useRef } from 'react';
+import { type ComponentPropsWithRef, type MouseEvent, useRef } from 'react';
+
+import { useMergedRef } from '@/hooks/useMergedRef';
 
 import { Icon } from '../Icon/Icon';
 
@@ -20,7 +22,7 @@ type Props = {
    * 数値入力の disabled 属性
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'prefix' | 'suffix'>;
+} & Omit<ComponentPropsWithRef<'input'>, 'type' | 'prefix' | 'suffix'>;
 
 const ARROW_SIZE = 16;
 
@@ -63,8 +65,10 @@ const resolveInputMode = (step: Props['step'], min: Props['min']): 'numeric' | '
  * @example
  * <InputNumber min={-100} max={100} inputMode="text" />
  */
-export const InputNumber = ({ error, disabled, className, ...props }: Props) => {
+export const InputNumber = ({ error, disabled, className, ref, ...props }: Props) => {
+  // スピンボタンの操作には DOM 要素が必要なため、内部で保持しつつ利用側の ref にも転送する
   const inputRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergedRef(ref, inputRef);
 
   const handleStep = (direction: 'up' | 'down') => {
     const el = inputRef.current;
@@ -90,7 +94,7 @@ export const InputNumber = ({ error, disabled, className, ...props }: Props) => 
   return (
     <div className={clsx(inputNumber, className)} data-error={error} data-disabled={disabled}>
       <input
-        ref={inputRef}
+        ref={mergedRef}
         type="number"
         // props より前に置いて、利用側から上書きできるようにする
         inputMode={resolveInputMode(props.step, props.min)}

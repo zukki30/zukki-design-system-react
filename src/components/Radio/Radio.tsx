@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 import { radio, radioBox, radioControl, radioDot, radioInput, radioLabel } from './Radio.css';
 
@@ -12,7 +12,7 @@ type Props = {
    * ラジオボタンの disabled 属性
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithoutRef<'input'>, 'type' | 'children' | 'size'>;
+} & Omit<ComponentPropsWithRef<'input'>, 'type' | 'children' | 'size'>;
 
 export const Radio = ({ children, disabled, className, ...props }: Props) => {
   return (
