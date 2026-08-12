@@ -47,7 +47,7 @@ type Props = {
 
 const SPINNER_SIZE = 20;
 
-const SPINNER_VARIANT = {
+const SPINNER_VARIANTS = {
   primary: 'dark',
   secondary: 'dark',
   'primary-exposed': 'primary',
@@ -69,7 +69,7 @@ export const IconButton = ({
   onClick,
   ...props
 }: Props) => {
-  const spinnerVariant = SPINNER_VARIANT[variant];
+  const spinnerVariant = SPINNER_VARIANTS[variant];
 
   // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
   // 活性化もここで止める。disabled にはせず、フォーカス位置は保持する

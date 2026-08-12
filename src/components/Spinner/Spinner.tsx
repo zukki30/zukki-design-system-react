@@ -3,7 +3,7 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { spinner, spinnerVariant } from './Spinner.css';
 
-// props に依存しない静的な図形はモジュールスコープへ巻き上げ、再レンダーのたびに作り直さない
+// 静的な要素は巻き上げる
 const TRACK_PATH = (
   <path
     opacity="0.25"

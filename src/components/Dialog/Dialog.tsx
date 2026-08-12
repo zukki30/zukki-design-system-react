@@ -22,7 +22,7 @@ import {
 
 const CLOSE_ICON_SIZE = 20;
 
-// props に依存しない静的な要素はモジュールスコープへ巻き上げ、再レンダーのたびに作り直さない
+// 静的な要素は巻き上げる
 const CLOSE_ICON = <Icon name="close" width={CLOSE_ICON_SIZE} height={CLOSE_ICON_SIZE} />;
 
 type Props = {

@@ -16,7 +16,7 @@ import {
 
 const SEPARATOR_ICON_SIZE = 20;
 
-// props に依存しない静的な要素はモジュールスコープへ巻き上げ、項目ごとに作り直さない
+// 静的な要素は巻き上げる。ここは items.map() の中なので項目数ぶん生成を減らせる
 const SEPARATOR_ICON = (
   <Icon
     className={breadcrumbSeparator}

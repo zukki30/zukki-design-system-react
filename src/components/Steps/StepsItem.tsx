@@ -3,7 +3,7 @@ import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './Ste
 
 const CHECK_ICON_SIZE = 20;
 
-// props に依存しない静的な要素はモジュールスコープへ巻き上げ、再レンダーのたびに作り直さない
+// 静的な要素は巻き上げる
 const FINISHED_ICON = (
   <span className={stepsItemIcon.finished}>
     <Icon name="outlineCheck" width={CHECK_ICON_SIZE} height={CHECK_ICON_SIZE} />

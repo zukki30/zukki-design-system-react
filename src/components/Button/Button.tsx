@@ -49,10 +49,10 @@ type Props = {
   loading?: boolean;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'disabled' | 'prefix' | 'suffix'>;
 
-const SPINNER_SIZE = {
+const SPINNER_SIZES = {
   sm: '14px',
   md: '24px',
-} as const satisfies Record<Exclude<SizeType, 'lg'>, string>;
+} as const satisfies Record<NonNullable<Props['size']>, ComponentProps<typeof Spinner>['width']>;
 
 export const Button = ({
   children,
@@ -70,7 +70,7 @@ export const Button = ({
 }: Props) => {
   const spinnerVariant: ComponentProps<typeof Spinner>['variant'] =
     variant === 'default' ? 'light' : 'dark';
-  const spinnerSize = SPINNER_SIZE[size];
+  const spinnerSize = SPINNER_SIZES[size];
 
   // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
   // 活性化もここで止める。disabled にはせず、フォーカス位置は保持する
