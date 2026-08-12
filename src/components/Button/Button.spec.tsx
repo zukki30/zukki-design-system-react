@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { ComponentProps } from 'react';
+import { createRef, type ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from './Button';
@@ -161,5 +161,12 @@ describe('Button', () => {
     rerender(<Button variant={otherVariant}>送信</Button>);
 
     expect(screen.getByRole('button', { name: '送信' }).className).not.toBe(className);
+  });
+
+  it('ref を button に転送する', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(<Button ref={ref}>送信</Button>);
+
+    expect(ref.current).toBe(screen.getByRole('button', { name: '送信' }));
   });
 });

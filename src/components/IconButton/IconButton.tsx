@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentProps, ComponentPropsWithoutRef, MouseEvent } from 'react';
+import type { ComponentProps, ComponentPropsWithRef, MouseEvent } from 'react';
 
 import type { SizeType } from '@/types';
 
@@ -43,7 +43,7 @@ type Props = {
    * アイコンのみでラベルテキストを持たないため、省略できない
    */
   'aria-label': string;
-} & Omit<ComponentPropsWithoutRef<'button'>, 'disabled' | 'prefix' | 'suffix' | 'aria-label'>;
+} & Omit<ComponentPropsWithRef<'button'>, 'disabled' | 'prefix' | 'suffix' | 'aria-label'>;
 
 const SPINNER_SIZE = 20;
 

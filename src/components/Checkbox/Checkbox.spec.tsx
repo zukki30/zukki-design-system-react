@@ -72,6 +72,33 @@ describe('Checkbox', () => {
     expect(screen.getByRole<HTMLInputElement>('checkbox').indeterminate).toBe(true);
   });
 
+  it('クリックで DOM の indeterminate が落ちても再レンダーで復元される', () => {
+    const handleChange = vi.fn();
+    const { rerender } = render(
+      <Checkbox indeterminate checked={false} onChange={handleChange}>
+        label
+      </Checkbox>
+    );
+
+    const checkbox = screen.getByRole<HTMLInputElement>('checkbox');
+
+    expect(checkbox.indeterminate).toBe(true);
+
+    // ブラウザはクリック時に DOM の indeterminate を false へ落とす
+    fireEvent.click(checkbox);
+
+    expect(checkbox.indeterminate).toBe(false);
+
+    // indeterminate prop は変わらないまま checked だけが更新されるケース
+    rerender(
+      <Checkbox indeterminate checked onChange={handleChange}>
+        label
+      </Checkbox>
+    );
+
+    expect(checkbox.indeterminate).toBe(true);
+  });
+
   it('ラベルなしでも aria-label でアクセシブルな名前を持てる', () => {
     render(<Checkbox aria-label="単独チェックボックス" />);
 

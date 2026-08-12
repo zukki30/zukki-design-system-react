@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { type ComponentPropsWithRef, useCallback } from 'react';
+import { type ComponentPropsWithRef, useEffect, useRef } from 'react';
 
 import { useMergedRef } from '@/hooks/useMergedRef';
 
@@ -40,24 +40,23 @@ export const Checkbox = ({
   ref,
   ...props
 }: Props) => {
-  // indeterminate は DOM プロパティのため ref callback 経由で設定する（HTML 属性では表現できない）。
-  // indeterminate が変わったときだけ ref が付け替わり、その際に再設定される
-  const setIndeterminate = useCallback(
-    (input: HTMLInputElement | null) => {
-      if (input !== null) {
-        input.indeterminate = indeterminate;
-      }
-    },
-    [indeterminate]
-  );
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergedRef(ref, inputRef);
 
-  const inputRef = useMergedRef(ref, setIndeterminate);
+  // indeterminate は DOM プロパティのため HTML 属性では表現できない。
+  // ブラウザはクリック時に indeterminate を false へ落とすため、
+  // prop の変化だけでなく毎コミット同期する（依存配列を持たせない）
+  useEffect(() => {
+    if (inputRef.current !== null) {
+      inputRef.current.indeterminate = indeterminate;
+    }
+  });
 
   return (
     <label className={clsx(checkbox, className)} data-disabled={disabled}>
       <span className={checkboxControl}>
         <input
-          ref={inputRef}
+          ref={mergedRef}
           type="checkbox"
           className={checkboxInput}
           disabled={disabled}

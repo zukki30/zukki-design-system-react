@@ -58,6 +58,16 @@ ComponentName/
 └── index.ts                  # バレルエクスポート
 ```
 
+複数のコンポーネントで共有するフックは `src/hooks/` 直下に置きます（例: `src/hooks/useMergedRef.ts`）。単一コンポーネントでしか使わないフックは、上記のとおりそのコンポーネント配下の `hooks/` に置きます。
+
+```
+src/hooks/
+├── useMergedRef.ts      # 実装
+└── useMergedRef.spec.tsx # テスト
+```
+
+共有フックはライブラリ内部専用です。`src/main.tsx` からは export せず、barrel（`index.ts`）も置かずに実装ファイルを直接 import します（内部では barrel を経由しない規約に合わせる）。
+
 ## コーディング規約
 
 **TypeScript / React:**
@@ -81,6 +91,8 @@ ComponentName/
 
   return <input ref={mergedRef} {...props} />;
   ```
+
+- DOM プロパティの同期を ref callback の付け替えに頼らない。`ref` を外に出した以上、callback の identity が変わるたびに利用側の ref も付け外しされてしまう。属性で表現できない DOM プロパティ（`indeterminate` など）は `useMergedRef` で ref の identity を固定したうえで、`useEffect` で同期する
 
 **import の使い分け:**
 

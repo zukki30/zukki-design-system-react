@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Card } from './Card';
@@ -82,5 +83,16 @@ describe('Card', () => {
     );
 
     expect(screen.getByTestId('card')).toHaveAttribute('aria-label', '記事カード');
+  });
+
+  it('ref を div に転送する', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Card ref={ref} data-testid="card">
+        本文
+      </Card>
+    );
+
+    expect(ref.current).toBe(screen.getByTestId('card'));
   });
 });

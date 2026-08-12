@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 import { spinner, spinnerVariant } from './Spinner.css';
 
@@ -18,7 +18,7 @@ type Props = {
    * The aria-label attribute providing the accessible name of the icon.
    */
   'aria-label'?: string;
-} & Omit<ComponentPropsWithoutRef<'svg'>, 'role' | 'name' | 'aria-label'>;
+} & Omit<ComponentPropsWithRef<'svg'>, 'role' | 'name' | 'aria-label'>;
 
 export const Spinner = ({ 'aria-label': ariaLabel, variant = 'light', ...restProps }: Props) => {
   return (

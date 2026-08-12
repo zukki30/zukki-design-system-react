@@ -70,6 +70,28 @@ describe('useMergedRef', () => {
     expect(functionRef).toHaveBeenCalledTimes(1);
   });
 
+  it('片方の cleanup が例外を投げてももう片方の ref を解除する', () => {
+    const objectRef = createRef<HTMLInputElement>();
+    const throwingRef = () => () => {
+      throw new Error('cleanup failed');
+    };
+
+    const { result } = renderHook(() => useMergedRef(throwingRef, objectRef));
+    const element = document.createElement('input');
+    const cleanup = result.current(element);
+
+    expect(objectRef.current).toBe(element);
+    expect(typeof cleanup).toBe('function');
+
+    // 直前の assert で関数であることを保証済み（型を絞り込むための分岐）
+    if (typeof cleanup !== 'function') {
+      return;
+    }
+
+    expect(() => cleanup()).toThrow('cleanup failed');
+    expect(objectRef.current).toBeNull();
+  });
+
   it('同じ ref を渡している間は同一の callback を返す', () => {
     const objectRef = createRef<HTMLInputElement>();
     const functionRef = vi.fn();

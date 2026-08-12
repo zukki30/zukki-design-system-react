@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Input } from '../Input';
@@ -351,5 +352,16 @@ describe('FormField', () => {
     );
 
     expect(screen.getByTestId('field')).toBeInTheDocument();
+  });
+
+  it('ref を div に転送する', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <FormField ref={ref} label="ラベル" data-testid="field">
+        <input aria-label="入力" />
+      </FormField>
+    );
+
+    expect(ref.current).toBe(screen.getByTestId('field'));
   });
 });

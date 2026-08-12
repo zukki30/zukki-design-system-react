@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { ComponentProps, ReactElement } from 'react';
+import { createRef, type ComponentProps, type ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Icon } from '../Icon';
@@ -187,5 +187,16 @@ describe('IconButton', () => {
     );
 
     expect(screen.getByRole('button', { name: 'ホーム' }).className).not.toBe(className);
+  });
+
+  it('ref を button に転送する', () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(
+      <IconButton ref={ref} aria-label="ホーム">
+        {icon}
+      </IconButton>
+    );
+
+    expect(ref.current).toBe(screen.getByRole('button', { name: 'ホーム' }));
   });
 });

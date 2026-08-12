@@ -58,9 +58,13 @@ export const useMergedRef = <T>(
       const cleanupA = attachRef(refA, node);
       const cleanupB = attachRef(refB, node);
 
+      // 片方の解除が例外を投げても、もう片方は必ず解除する
       return () => {
-        detachRef(refA, cleanupA);
-        detachRef(refB, cleanupB);
+        try {
+          detachRef(refA, cleanupA);
+        } finally {
+          detachRef(refB, cleanupB);
+        }
       };
     },
     [refA, refB]

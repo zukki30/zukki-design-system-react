@@ -60,6 +60,14 @@ type Props = {
   children?: ReactNode;
 } & Omit<ComponentPropsWithRef<'dialog'>, 'open' | 'title' | 'children'>;
 
+/**
+ * モーダルダイアログ。
+ *
+ * **開閉は必ず `open` prop で制御すること。**
+ * 転送された `ref` から `showModal()` / `close()` を直接呼ぶと、`open` prop と実際の
+ * 表示状態が食い違い、以降の `open` の変化が同期されなくなる。
+ * `ref` はフォーカス制御など、開閉以外の用途に使う
+ */
 export const Dialog = ({
   open,
   onClose,

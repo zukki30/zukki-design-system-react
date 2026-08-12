@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 import {
-  type ComponentPropsWithoutRef,
+  type ComponentPropsWithRef,
   type CSSProperties,
   type ReactNode,
   useEffect,
@@ -41,7 +41,7 @@ type Props = {
    * ツールチップを付与する対象要素
    */
   children: ReactNode;
-} & Omit<ComponentPropsWithoutRef<'span'>, 'content'>;
+} & Omit<ComponentPropsWithRef<'span'>, 'content'>;
 
 export const Tooltip = ({
   content,
