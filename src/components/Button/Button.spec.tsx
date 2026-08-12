@@ -112,6 +112,22 @@ describe('Button', () => {
   });
 
   it.each([
+    ['sm', '14px'],
+    ['md', '24px'],
+  ] as const)('size=%s のとき Spinner を %s で描画する', (size, spinnerSize) => {
+    const { container } = render(
+      <Button size={size} loading>
+        送信
+      </Button>
+    );
+
+    const spinner = container.querySelector('svg');
+
+    expect(spinner).toHaveAttribute('width', spinnerSize);
+    expect(spinner).toHaveAttribute('height', spinnerSize);
+  });
+
+  it.each([
     ['md', 'sm'],
     ['sm', 'md'],
   ] as const)('size=%s と size=%s でスタイルが変わる', (size, otherSize) => {

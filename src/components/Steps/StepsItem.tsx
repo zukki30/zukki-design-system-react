@@ -5,6 +5,13 @@ import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './Ste
 
 const CHECK_ICON_SIZE = 20;
 
+// props に依存しない静的な要素はモジュールスコープへ巻き上げ、再レンダーのたびに作り直さない
+const FINISHED_ICON = (
+  <span className={stepsItemIcon.finished}>
+    <Icon name="outlineCheck" width={CHECK_ICON_SIZE} height={CHECK_ICON_SIZE} />
+  </span>
+);
+
 /**
  * 状態を色・アイコンだけでなくテキストでも伝えるための文言（視覚的には非表示）
  *
@@ -75,9 +82,7 @@ export const StepsItem = ({
     // aria-current を読み上げない支援技術のための保険として意図的に併記している
     <Component {...buttonProps} className={stepsItem} aria-current={current ? 'step' : undefined}>
       {finished ? (
-        <span className={stepsItemIcon.finished}>
-          <Icon name="outlineCheck" width={CHECK_ICON_SIZE} height={CHECK_ICON_SIZE} />
-        </span>
+        FINISHED_ICON
       ) : (
         <span className={current ? stepsItemIcon.current : stepsItemIcon.default}>
           {stepNumber}

@@ -12,6 +12,12 @@ import {
 import { tooltip, tooltipArrow, tooltipPopup } from './Tooltip.css';
 
 /**
+ * CSS カスタム識別子に使えない文字。
+ * レンダーごとに生成しないようモジュールスコープへ置く（`replace` は lastIndex を持ち越さない）
+ */
+const INVALID_CUSTOM_IDENT_CHARS = /[^a-zA-Z0-9_-]/g;
+
+/**
  * 吹き出しの表示位置
  */
 export type TooltipPlacement =
@@ -48,7 +54,7 @@ export const Tooltip = ({
 }: Props) => {
   const rawId = useId();
   // useId が返す文字列には CSS カスタム識別子として使えない文字（`:` など）が含まれるため除去する
-  const anchorName = `--tooltip-anchor-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const anchorName = `--tooltip-anchor-${rawId.replace(INVALID_CUSTOM_IDENT_CHARS, '')}`;
 
   const popupRef = useRef<HTMLSpanElement>(null);
   const [hovered, setHovered] = useState(false);

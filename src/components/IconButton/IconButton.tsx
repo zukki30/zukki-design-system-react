@@ -1,10 +1,5 @@
 import { clsx } from 'clsx';
-import {
-  type ComponentProps,
-  type ComponentPropsWithoutRef,
-  type MouseEvent,
-  useMemo,
-} from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef, MouseEvent } from 'react';
 
 import type { SizeType } from '@/types';
 
@@ -52,6 +47,16 @@ type Props = {
 
 const SPINNER_SIZE = 20;
 
+const SPINNER_VARIANT = {
+  primary: 'dark',
+  secondary: 'dark',
+  'primary-exposed': 'primary',
+  'secondary-exposed': 'light',
+} as const satisfies Record<
+  NonNullable<Props['variant']>,
+  ComponentProps<typeof Spinner>['variant']
+>;
+
 export const IconButton = ({
   children,
   variant = 'primary',
@@ -64,19 +69,7 @@ export const IconButton = ({
   onClick,
   ...props
 }: Props) => {
-  const spinnerVariant: ComponentProps<typeof Spinner>['variant'] = useMemo(() => {
-    switch (variant) {
-      case 'primary':
-      case 'secondary':
-        return 'dark';
-      case 'primary-exposed':
-        return 'primary';
-      case 'secondary-exposed':
-        return 'light';
-      default:
-        return 'light';
-    }
-  }, [variant]);
+  const spinnerVariant = SPINNER_VARIANT[variant];
 
   // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
   // 活性化もここで止める。disabled にはせず、フォーカス位置は保持する
