@@ -1,10 +1,5 @@
 import { clsx } from 'clsx';
-import {
-  type ComponentProps,
-  type ComponentPropsWithoutRef,
-  type MouseEvent,
-  useMemo,
-} from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef, MouseEvent } from 'react';
 
 import type { SizeType, ZukkiVariantType } from '@/types';
 
@@ -54,8 +49,10 @@ type Props = {
   loading?: boolean;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'disabled' | 'prefix' | 'suffix'>;
 
-const SPINNER_SIZE_SM = 14;
-const SPINNER_SIZE_MD = 24;
+const SPINNER_SIZES = {
+  sm: '14px',
+  md: '24px',
+} as const satisfies Record<NonNullable<Props['size']>, ComponentProps<typeof Spinner>['width']>;
 
 export const Button = ({
   children,
@@ -73,16 +70,7 @@ export const Button = ({
 }: Props) => {
   const spinnerVariant: ComponentProps<typeof Spinner>['variant'] =
     variant === 'default' ? 'light' : 'dark';
-  const spinnerSize = useMemo(() => {
-    switch (size) {
-      case 'sm':
-        return `${SPINNER_SIZE_SM}px`;
-      case 'md':
-        return `${SPINNER_SIZE_MD}px`;
-      default:
-        return `${SPINNER_SIZE_MD}px`;
-    }
-  }, [size]);
+  const spinnerSize = SPINNER_SIZES[size];
 
   // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
   // 活性化もここで止める。disabled にはせず、フォーカス位置は保持する

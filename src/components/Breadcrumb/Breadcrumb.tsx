@@ -16,6 +16,16 @@ import {
 
 const SEPARATOR_ICON_SIZE = 20;
 
+// 静的な要素は巻き上げる。ここは items.map() の中なので項目数ぶん生成を減らせる
+const SEPARATOR_ICON = (
+  <Icon
+    className={breadcrumbSeparator}
+    name="chevronRight"
+    width={SEPARATOR_ICON_SIZE}
+    height={SEPARATOR_ICON_SIZE}
+  />
+);
+
 /**
  * 現在地（末尾項目）の色テーマ
  */
@@ -87,14 +97,7 @@ export const Breadcrumb = ({
                 <span className={breadcrumbLink}>{content}</span>
               )}
 
-              {!isLast && (
-                <Icon
-                  className={breadcrumbSeparator}
-                  name="chevronRight"
-                  width={SEPARATOR_ICON_SIZE}
-                  height={SEPARATOR_ICON_SIZE}
-                />
-              )}
+              {!isLast && SEPARATOR_ICON}
             </li>
           );
         })}

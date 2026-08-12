@@ -1,7 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from './Button';
+import { buttonLoading } from './Button.css';
+
+type ButtonProps = ComponentProps<typeof Button>;
 
 describe('Button', () => {
   it('children をアクセシブルネームとして描画する', () => {
@@ -110,6 +114,27 @@ describe('Button', () => {
 
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ['sm', '14px'],
+    ['md', '24px'],
+  ] as const satisfies ReadonlyArray<readonly [NonNullable<ButtonProps['size']>, string]>)(
+    'size=%s のとき Spinner を %s で描画する',
+    (size, spinnerSize) => {
+      const { container } = render(
+        <Button size={size} loading>
+          送信
+        </Button>
+      );
+
+      // startIcon などを渡すケースを足したときにアイコン側の svg を掴まないよう、
+      // Spinner のラッパー配下に絞る
+      const spinner = container.querySelector(`.${buttonLoading} svg`);
+
+      expect(spinner).toHaveAttribute('width', spinnerSize);
+      expect(spinner).toHaveAttribute('height', spinnerSize);
+    }
+  );
 
   it.each([
     ['md', 'sm'],

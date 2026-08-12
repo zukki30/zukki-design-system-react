@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { type ComponentPropsWithoutRef, useEffect, useRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import { Icon } from '../Icon';
 
@@ -37,20 +37,18 @@ export const Checkbox = ({
   className,
   ...props
 }: Props) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // indeterminate は DOM プロパティのため ref 経由で同期する（HTML 属性では表現できない）
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.indeterminate = indeterminate;
+  // indeterminate は DOM プロパティのため ref callback 経由で設定する（HTML 属性では表現できない）
+  const setInputRef = (input: HTMLInputElement | null) => {
+    if (input !== null) {
+      input.indeterminate = indeterminate;
     }
-  }, [indeterminate]);
+  };
 
   return (
     <label className={clsx(checkbox, className)} data-disabled={disabled}>
       <span className={checkboxControl}>
         <input
-          ref={inputRef}
+          ref={setInputRef}
           type="checkbox"
           className={checkboxInput}
           disabled={disabled}

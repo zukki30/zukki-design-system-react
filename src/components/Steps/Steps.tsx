@@ -1,6 +1,3 @@
-// import { clsx } from 'clsx';
-// import type { CSSProperties } from 'react';
-
 import { steps, stepsItemContainer } from './Steps.css';
 import { StepsItem } from './StepsItem';
 
@@ -23,7 +20,7 @@ export const Steps = ({ labels, current, vertical = false, onClick }: Props) => 
   return (
     <ol className={vertical ? steps.vertical : steps.horizontal}>
       {labels.map((label, index) => (
-        <li data-vertical={vertical} className={stepsItemContainer} key={index}>
+        <li data-vertical={vertical} className={stepsItemContainer} key={label}>
           <StepsItem
             stepNumber={index + 1}
             label={label}

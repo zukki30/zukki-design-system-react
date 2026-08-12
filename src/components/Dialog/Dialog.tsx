@@ -22,6 +22,9 @@ import {
 
 const CLOSE_ICON_SIZE = 20;
 
+// 静的な要素は巻き上げる
+const CLOSE_ICON = <Icon name="close" width={CLOSE_ICON_SIZE} height={CLOSE_ICON_SIZE} />;
+
 type Props = {
   /**
    * ダイアログの開閉状態
@@ -115,7 +118,7 @@ export const Dialog = ({
               aria-label="閉じる"
               onClick={() => onClose?.()}
             >
-              <Icon name="close" width={CLOSE_ICON_SIZE} height={CLOSE_ICON_SIZE} />
+              {CLOSE_ICON}
             </IconButton>
           )}
         </div>
