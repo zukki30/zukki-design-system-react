@@ -3,7 +3,7 @@ import type { ComponentProps, ComponentPropsWithoutRef, MouseEvent } from 'react
 
 import type { SizeType, ZukkiVariantType } from '@/types';
 
-import { Spinner } from '../Spinner';
+import { Spinner } from '../Spinner/Spinner';
 
 import {
   button,

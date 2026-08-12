@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { type ComponentPropsWithoutRef, type MouseEvent, useRef } from 'react';
 
-import { Icon } from '../Icon';
+import { Icon } from '../Icon/Icon';
 
 import {
   inputNumber,

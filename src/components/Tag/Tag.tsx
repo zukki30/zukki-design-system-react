@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 
 import type { ZukkiVariantType } from '@/types';
 
-import { Icon } from '../Icon';
+import { Icon } from '../Icon/Icon';
 import {
   tag,
   tagLabel,
