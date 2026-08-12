@@ -1,5 +1,3 @@
-// import { clsx } from 'clsx';
-// import type { CSSProperties } from 'react';
 import { Icon } from '../Icon';
 import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './StepsItem.css';
 
@@ -56,9 +54,9 @@ export const StepsItem = ({
   finished = false,
   onClick,
 }: Props) => {
-  const isClickable = !onClick;
-  const Component = isClickable ? 'span' : 'button';
-  const buttonProps = isClickable
+  const isNonInteractive = !onClick;
+  const Component = isNonInteractive ? 'span' : 'button';
+  const buttonProps = isNonInteractive
     ? {}
     : {
         type: 'button' as const,

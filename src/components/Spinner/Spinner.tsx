@@ -22,23 +22,21 @@ type Props = {
 
 export const Spinner = ({ 'aria-label': ariaLabel, variant = 'light', ...restProps }: Props) => {
   return (
-    <>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="24"
-        height="24"
-        role="img"
-        aria-hidden={ariaLabel ? undefined : 'true'}
-        {...restProps}
-        // restProps より後ろに置く。前に置くとスプレッドの className に丸ごと
-        // 上書きされ、ベースと variant のクラスが失われる
-        className={clsx(spinner, spinnerVariant[variant], restProps.className)}
-      >
-        <title>{ariaLabel ?? 'Loading…'}</title>
-        {TRACK_PATH}
-        {ARC_PATH}
-      </svg>
-    </>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      role="img"
+      aria-hidden={ariaLabel ? undefined : 'true'}
+      {...restProps}
+      // restProps より後ろに置く。前に置くとスプレッドの className に丸ごと
+      // 上書きされ、ベースと variant のクラスが失われる
+      className={clsx(spinner, spinnerVariant[variant], restProps.className)}
+    >
+      <title>{ariaLabel ?? 'Loading…'}</title>
+      {TRACK_PATH}
+      {ARC_PATH}
+    </svg>
   );
 };
