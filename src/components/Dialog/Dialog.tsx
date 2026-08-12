@@ -8,8 +8,8 @@ import {
   useRef,
 } from 'react';
 
-import { Icon } from '../Icon';
-import { IconButton } from '../IconButton';
+import { Icon } from '../Icon/Icon';
+import { IconButton } from '../IconButton/IconButton';
 
 import {
   dialog,

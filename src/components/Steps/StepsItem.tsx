@@ -1,4 +1,4 @@
-import { Icon } from '../Icon';
+import { Icon } from '../Icon/Icon';
 import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './StepsItem.css';
 
 const CHECK_ICON_SIZE = 20;

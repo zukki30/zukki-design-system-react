@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithoutRef } from 'react';
 
-import { Icon } from '../Icon';
+import { Icon } from '../Icon/Icon';
 
 import {
   checkbox,

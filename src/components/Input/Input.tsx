@@ -27,19 +27,19 @@ type Props = {
 export const Input = ({ startIcon, endIcon, error, disabled, className, ...props }: Props) => {
   return (
     <div className={clsx(input, className)} data-error={error} data-disabled={disabled}>
-      {startIcon && (
+      {startIcon ? (
         <span className={inputIcon} data-position="start" aria-hidden="true">
           {startIcon}
         </span>
-      )}
+      ) : null}
 
       <input className={inputField} disabled={disabled} aria-invalid={error} {...props} />
 
-      {endIcon && (
+      {endIcon ? (
         <span className={inputIcon} data-position="end" aria-hidden="true">
           {endIcon}
         </span>
-      )}
+      ) : null}
     </div>
   );
 };

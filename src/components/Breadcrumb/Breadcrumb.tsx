@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import { Icon } from '../Icon';
+import { Icon } from '../Icon/Icon';
 
 import {
   breadcrumb,
