@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Select } from './Select';
@@ -86,5 +87,12 @@ describe('Select', () => {
 
     expect(combobox).toHaveAttribute('name', 'fruit');
     expect(combobox).toBeRequired();
+  });
+
+  it('ref を select に転送する', () => {
+    const ref = createRef<HTMLSelectElement>();
+    render(<Select ref={ref}>{options}</Select>);
+
+    expect(ref.current).toBe(screen.getByRole('combobox'));
   });
 });

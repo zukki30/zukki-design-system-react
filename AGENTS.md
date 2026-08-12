@@ -9,6 +9,7 @@ Respond in Japanese. Keep code, command names, and commit messages in their esta
 This is a React/TypeScript component library built with Vite and Storybook:
 
 - `src/components/ComponentName/` contains implementation, Vanilla Extract styles, stories, tests, and a barrel export.
+- `src/hooks/` holds hooks shared across components (e.g. `useMergedRef`). Hooks used by a single component stay in `src/components/ComponentName/hooks/`. Shared hooks are internal: they are not exported from `src/main.tsx`.
 - `src/styles/theme.css.ts` exports shared theme variables; generated CSS variables live in `src/styles/`.
 - `src/design-tokens/` contains generated TypeScript token objects. Do not hand-edit generated output.
 - `figma/tokens.json` is the Tokens Studio export; `style-dictionary/` transforms it.
@@ -47,7 +48,9 @@ The toolchain is pinned in `.mise.toml`: Node 24.14.1 and pnpm 10.33.0. Run `mis
 
 ## Coding Style & Naming Conventions
 
-Use TypeScript function components and `type` aliases, never `interface` or `any`. Name components in PascalCase; use `ComponentName.tsx`, `ComponentName.css.ts`, `ComponentName.stories.tsx`, and `ComponentName.spec.tsx`. Use `ComponentPropsWithoutRef<'tag'>` for native props and `clsx()` for conditional classes.
+Use TypeScript function components and `type` aliases, never `interface` or `any`. Name components in PascalCase; use `ComponentName.tsx`, `ComponentName.css.ts`, `ComponentName.stories.tsx`, and `ComponentName.spec.tsx`. Use `ComponentPropsWithRef<'tag'>` for native props and `clsx()` for conditional classes.
+
+Follow React 19 ref-as-prop: accept `ref` as a regular prop and forward it to the component's main DOM element; never use `forwardRef`. `ComponentPropsWithRef` plus `{...props}` covers most components. When the component also needs the element itself, destructure `ref` and merge it with the internal ref via `useMergedRef`.
 
 Write styles in Vanilla Extract with BEM-like class names, `styleVariants()`, and theme `vars`; do not hard-code design values. Format changed source before submitting.
 

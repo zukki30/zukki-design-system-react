@@ -58,16 +58,41 @@ ComponentName/
 └── index.ts                  # バレルエクスポート
 ```
 
+複数のコンポーネントで共有するフックは `src/hooks/` 直下に置きます（例: `src/hooks/useMergedRef.ts`）。単一コンポーネントでしか使わないフックは、上記のとおりそのコンポーネント配下の `hooks/` に置きます。
+
+```
+src/hooks/
+├── useMergedRef.ts      # 実装
+└── useMergedRef.spec.tsx # テスト
+```
+
+共有フックはライブラリ内部専用です。`src/main.tsx` からは export せず、barrel（`index.ts`）も置かずに実装ファイルを直接 import します（内部では barrel を経由しない規約に合わせる）。
+
 ## コーディング規約
 
 **TypeScript / React:**
 
 - 関数コンポーネントのみ: `export const ComponentName = ({ ...props }: Props) => { ... }`
 - 型定義はすべて `interface` ではなく `type` を使用する。`any` は使用しない
-- ネイティブな HTML 属性を展開するには `ComponentPropsWithoutRef<'tag'>` を使用する
+- ネイティブな HTML 属性を展開するには `ComponentPropsWithRef<'tag'>` を使用する
 - 条件付き className の結合には `clsx()` を使用する
 - `useEffect` の使用は最小限に抑え、宣言的なパターンを優先する
 - 深い `if/else` のネストを避け、条件が複数ある場合は `switch` を使用する
+
+**ref の扱い（React 19 の ref-as-prop）:**
+
+- `ref` は通常の prop として受け取り、内部の DOM 要素へ転送する。`forwardRef` は使用しない
+- 主となる DOM 要素をそのまま描画するコンポーネントは、`ComponentPropsWithRef<'tag'>` を使って `{...props}` で `ref` ごと転送する
+- コンポーネント自身も DOM 要素を参照する場合は、`ref` を分割代入で取り出し `@/hooks/useMergedRef` で内部 ref とまとめる
+
+  ```tsx
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergedRef(ref, inputRef);
+
+  return <input ref={mergedRef} {...props} />;
+  ```
+
+- DOM プロパティの同期を ref callback の付け替えに頼らない。`ref` を外に出した以上、callback の identity が変わるたびに利用側の ref も付け外しされてしまう。属性で表現できない DOM プロパティ（`indeterminate` など）は `useMergedRef` で ref の identity を固定したうえで、`useEffect` で同期する
 
 **import の使い分け:**
 

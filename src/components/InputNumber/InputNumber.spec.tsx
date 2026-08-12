@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { InputNumber } from './InputNumber';
@@ -124,5 +125,21 @@ describe('InputNumber', () => {
     render(<InputNumber inputMode="text" />);
 
     expect(screen.getByRole('spinbutton')).toHaveAttribute('inputmode', 'text');
+  });
+
+  it('ref を input に転送する', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<InputNumber ref={ref} />);
+
+    expect(ref.current).toBe(screen.getByRole('spinbutton'));
+  });
+
+  it('ref を渡してもスピンボタンで値を増減できる', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<InputNumber ref={ref} defaultValue={5} />);
+
+    fireEvent.click(screen.getByLabelText('増やす'));
+
+    expect(screen.getByRole('spinbutton')).toHaveValue(6);
   });
 });

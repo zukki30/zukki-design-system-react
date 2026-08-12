@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Radio } from './Radio';
@@ -85,5 +86,12 @@ describe('Radio', () => {
 
     expect(radio).toHaveAttribute('name', 'fruit');
     expect(radio).toHaveAttribute('value', 'apple');
+  });
+
+  it('ref を input に転送する', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Radio ref={ref}>りんご</Radio>);
+
+    expect(ref.current).toBe(screen.getByRole('radio'));
   });
 });

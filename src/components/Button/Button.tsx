@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentProps, ComponentPropsWithoutRef, MouseEvent } from 'react';
+import type { ComponentProps, ComponentPropsWithRef, MouseEvent } from 'react';
 
 import type { SizeType, ZukkiVariantType } from '@/types';
 
@@ -47,7 +47,7 @@ type Props = {
    * ボタンの loading 属性
    */
   loading?: boolean;
-} & Omit<ComponentPropsWithoutRef<'button'>, 'disabled' | 'prefix' | 'suffix'>;
+} & Omit<ComponentPropsWithRef<'button'>, 'disabled' | 'prefix' | 'suffix'>;
 
 const SPINNER_SIZES = {
   sm: '14px',

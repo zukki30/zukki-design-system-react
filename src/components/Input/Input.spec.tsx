@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Input } from './Input';
@@ -81,5 +82,21 @@ describe('Input', () => {
 
     expect(field).toHaveAttribute('type', 'email');
     expect(field).toHaveAttribute('name', 'mail');
+  });
+
+  it('ref を input に転送する', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Input ref={ref} placeholder="ref" />);
+
+    expect(ref.current).toBe(screen.getByPlaceholderText('ref'));
+  });
+
+  it('転送された ref からフォーカスできる', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Input ref={ref} placeholder="focus" />);
+
+    ref.current?.focus();
+
+    expect(screen.getByPlaceholderText('focus')).toHaveFocus();
   });
 });

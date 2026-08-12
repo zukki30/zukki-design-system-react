@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Checkbox } from './Checkbox';
@@ -61,6 +62,43 @@ describe('Checkbox', () => {
     expect(screen.getByRole<HTMLInputElement>('checkbox').indeterminate).toBe(false);
   });
 
+  it('indeterminate の変化に追従する', () => {
+    const { rerender } = render(<Checkbox>label</Checkbox>);
+
+    expect(screen.getByRole<HTMLInputElement>('checkbox').indeterminate).toBe(false);
+
+    rerender(<Checkbox indeterminate>label</Checkbox>);
+
+    expect(screen.getByRole<HTMLInputElement>('checkbox').indeterminate).toBe(true);
+  });
+
+  it('クリックで DOM の indeterminate が落ちても再レンダーで復元される', () => {
+    const handleChange = vi.fn();
+    const { rerender } = render(
+      <Checkbox indeterminate checked={false} onChange={handleChange}>
+        label
+      </Checkbox>
+    );
+
+    const checkbox = screen.getByRole<HTMLInputElement>('checkbox');
+
+    expect(checkbox.indeterminate).toBe(true);
+
+    // ブラウザはクリック時に DOM の indeterminate を false へ落とす
+    fireEvent.click(checkbox);
+
+    expect(checkbox.indeterminate).toBe(false);
+
+    // indeterminate prop は変わらないまま checked だけが更新されるケース
+    rerender(
+      <Checkbox indeterminate checked onChange={handleChange}>
+        label
+      </Checkbox>
+    );
+
+    expect(checkbox.indeterminate).toBe(true);
+  });
+
   it('ラベルなしでも aria-label でアクセシブルな名前を持てる', () => {
     render(<Checkbox aria-label="単独チェックボックス" />);
 
@@ -74,5 +112,23 @@ describe('Checkbox', () => {
 
     expect(checkbox).toHaveAttribute('name', 'agree');
     expect(checkbox).toHaveAttribute('value', 'yes');
+  });
+
+  it('ref を input に転送する', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Checkbox ref={ref}>label</Checkbox>);
+
+    expect(ref.current).toBe(screen.getByRole('checkbox'));
+  });
+
+  it('ref を渡しても indeterminate が設定される', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(
+      <Checkbox ref={ref} indeterminate>
+        label
+      </Checkbox>
+    );
+
+    expect(ref.current?.indeterminate).toBe(true);
   });
 });

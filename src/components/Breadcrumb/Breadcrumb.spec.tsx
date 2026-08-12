@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Breadcrumb, type BreadcrumbItem } from './Breadcrumb';
@@ -78,5 +79,12 @@ describe('Breadcrumb', () => {
 
     expect(container.querySelectorAll('svg')).toHaveLength(0);
     expect(screen.getByText('HOME').closest('[aria-current="page"]')).toBeInTheDocument();
+  });
+
+  it('ref を nav に転送する', () => {
+    const ref = createRef<HTMLElement>();
+    render(<Breadcrumb ref={ref} items={items} />);
+
+    expect(ref.current).toBe(screen.getByRole('navigation'));
   });
 });

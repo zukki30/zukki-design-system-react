@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { useFormField } from './hooks';
 
@@ -64,7 +64,7 @@ type Props = {
    * 入力欄本体（Input・Select など）
    */
   children: ReactNode;
-} & Omit<ComponentPropsWithoutRef<'div'>, 'children'>;
+} & Omit<ComponentPropsWithRef<'div'>, 'children'>;
 
 export const FormField = ({
   label,

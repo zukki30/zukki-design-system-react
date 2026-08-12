@@ -1,9 +1,21 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Tooltip } from './Tooltip';
 
 describe('Tooltip', () => {
+  it('ref を外側の span に転送する', () => {
+    const ref = createRef<HTMLSpanElement>();
+    render(
+      <Tooltip ref={ref} content="説明" data-testid="tooltip">
+        <button>ターゲット</button>
+      </Tooltip>
+    );
+
+    expect(ref.current).toBe(screen.getByTestId('tooltip'));
+  });
+
   it('対象要素（children）を描画する', () => {
     render(
       <Tooltip content="説明">

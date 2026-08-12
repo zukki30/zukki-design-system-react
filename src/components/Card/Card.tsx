@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import {
   card,
@@ -45,7 +45,7 @@ type Props = {
    * カード本文
    */
   children?: ReactNode;
-} & ComponentPropsWithoutRef<'div'>;
+} & ComponentPropsWithRef<'div'>;
 
 export const Card = ({
   size = 'md',

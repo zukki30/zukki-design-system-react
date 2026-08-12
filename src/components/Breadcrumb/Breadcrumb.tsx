@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { Icon } from '../Icon/Icon';
 
@@ -61,7 +61,7 @@ type Props = {
    * @default 'パンくずリスト'
    */
   'aria-label'?: string;
-} & Omit<ComponentPropsWithoutRef<'nav'>, 'children'>;
+} & Omit<ComponentPropsWithRef<'nav'>, 'children'>;
 
 export const Breadcrumb = ({
   items,

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Spinner } from './Spinner';
@@ -47,5 +48,12 @@ describe('Spinner', () => {
     const merged = screen.getByRole('img', { name: '読み込み中' }).getAttribute('class');
     expect(merged).toContain('custom-class');
     expect(merged).toContain(baseClassName);
+  });
+
+  it('ref を svg に転送する', () => {
+    const ref = createRef<SVGSVGElement>();
+    render(<Spinner ref={ref} aria-label="読み込み中" />);
+
+    expect(ref.current).toBe(screen.getByRole('img', { name: '読み込み中' }));
   });
 });
