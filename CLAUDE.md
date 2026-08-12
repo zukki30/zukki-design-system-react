@@ -69,6 +69,15 @@ ComponentName/
 - `useEffect` の使用は最小限に抑え、宣言的なパターンを優先する
 - 深い `if/else` のネストを避け、条件が複数ある場合は `switch` を使用する
 
+**import の使い分け:**
+
+- `index.ts`（barrel）は **公開 API の境界** として使う。`src/main.tsx` からの再 export と、型の再 export の集約がその役割
+- **ライブラリ内部**のコンポーネント間参照は、barrel ではなく実装ファイルを直接 import する（例: `import { Icon } from '../Icon/Icon'`）
+  - barrel 同士が参照し合うと循環参照になりやすく、実行時に一方が `undefined` になる事故が起きる
+  - barrel 経由では、必要のない兄弟 export までモジュールグラフに入る
+  - ESLint の `no-restricted-imports` で機械的に担保している
+- `*.stories.tsx` / `*.spec.tsx` は例外として barrel 経由を許容する。配布物に含まれず、利用者と同じ経路で import するほうがドキュメント・テストとして妥当なため
+
 **スタイリング（Vanilla Extract）:**
 
 - スタイルはすべて `ComponentName.css.ts` 内に `@vanilla-extract/css` を用いて記述する

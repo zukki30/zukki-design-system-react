@@ -30,5 +30,27 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
+  {
+    // コンポーネント間の参照は barrel（index.ts）ではなく実装ファイルを直接 import する。
+    // stories / spec は配布物に含まれないため、利用者と同じ barrel 経由を許容する。
+    files: ['src/components/**/*.{ts,tsx}'],
+    ignores: ['src/components/**/*.{stories,spec}.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              // 末尾が PascalCase の 1 セグメントで終わるパス（= コンポーネントの barrel）だけを対象にする。
+              // group では barrel をディレクトリとして扱ってしまい ../Icon/Icon も巻き込むため regex を使う。
+              regex: '^(\\.\\./)+[A-Z][A-Za-z0-9]*$|^@/components/[A-Z][A-Za-z0-9]*$',
+              message:
+                'コンポーネント間は barrel ではなく実装ファイルを直接 import してください（例: ../Icon/Icon）',
+            },
+          ],
+        },
+      ],
+    },
+  },
   eslintConfigPrettier
 );

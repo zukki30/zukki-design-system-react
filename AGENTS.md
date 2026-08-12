@@ -16,6 +16,8 @@ This is a React/TypeScript component library built with Vite and Storybook:
 
 Export public APIs through component `index.ts` files and `src/main.tsx`.
 
+Barrels are the public boundary only. Inside the library, import a sibling component from its implementation file (`../Icon/Icon`), not its barrel (`../Icon`), to avoid circular barrel references and pulling unrelated exports into the module graph. Stories and specs are exempt and may use the barrels. ESLint's `no-restricted-imports` enforces this.
+
 ## Available Agent Skills
 
 The following skills are checked into the repository so the whole team can use them. Real files live in `.codex/skills/`; `.claude/skills/` holds relative symlinks to the same directories, so both Codex and Claude Code discover them. Apply them when their purpose matches the task.

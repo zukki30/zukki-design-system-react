@@ -60,14 +60,19 @@ describe('Input', () => {
     expect(screen.queryByTestId('end-icon')).not.toBeInTheDocument();
   });
 
-  it('startIcon / endIcon に 0 を渡してもアイコン要素を描画しない', () => {
-    const { container } = render(<Input startIcon={0} endIcon={0} placeholder="falsy" />);
+  it.each([0, '', false, NaN])(
+    'startIcon / endIcon に falsy な値（%s）を渡してもアイコンを描画しない',
+    (icon) => {
+      render(<Input startIcon={icon} endIcon={icon} placeholder="falsy" />);
 
-    expect(container.querySelector('[data-position="start"]')).toBeNull();
-    expect(container.querySelector('[data-position="end"]')).toBeNull();
-    // && だと 0 がそのままテキストとして描画されてしまう
-    expect(screen.queryByText('0')).not.toBeInTheDocument();
-  });
+      const wrapper = screen.getByPlaceholderText('falsy').parentElement;
+
+      // && だと 0 や NaN がそのままテキストとして描画されてしまう
+      expect(wrapper?.textContent).toBe('');
+      // アイコン用の span も描画されないため、子要素は input だけ
+      expect(wrapper?.childElementCount).toBe(1);
+    }
+  );
 
   it('ネイティブ属性とイベントを input に渡す', () => {
     render(<Input type="email" name="mail" placeholder="native" />);
