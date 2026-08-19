@@ -130,6 +130,25 @@ describe('FormField', () => {
     );
   });
 
+  // data-disabled は Input など他コンポーネントも使う共有属性のため、
+  // FormField の disabled が子コンポーネントの内部要素に漏れないことを担保する
+  it('disabled でも子の Input のアドーンメントの色を変えない', () => {
+    const { container } = render(
+      <FormField label="ラベル" disabled>
+        <Input startIcon={<span>icon</span>} aria-label="入力" />
+      </FormField>
+    );
+    const nested = container.querySelector('[data-position="start"]');
+
+    const standalone = render(<Input startIcon={<span>icon</span>} aria-label="単体" />);
+    const expected = standalone.container.querySelector('[data-position="start"]');
+
+    expect(nested).not.toBeNull();
+    expect(getComputedStyle(nested as Element).color).toBe(
+      getComputedStyle(expected as Element).color
+    );
+  });
+
   it('helperText を描画する', () => {
     render(
       <FormField label="ラベル" helperText="補助テキスト">

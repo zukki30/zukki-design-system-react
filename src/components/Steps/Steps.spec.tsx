@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Steps } from './Steps';
+import { steps } from './Steps.css';
+import { stepsItem } from './StepsItem.css';
 
 const labels = ['カート', '配送先', '確認'];
 
@@ -75,15 +77,65 @@ describe('Steps', () => {
     render(<Steps labels={labels} current={1} />);
 
     screen.getAllByRole('listitem').forEach((item) => {
-      expect(item).toHaveAttribute('data-vertical', 'false');
+      expect(item).toHaveAttribute('data-orientation', 'horizontal');
     });
   });
 
-  it('vertical のとき縦並びとして描画する', () => {
-    render(<Steps labels={labels} current={1} vertical />);
+  it('orientation="horizontal" のとき横並びとして描画する', () => {
+    render(<Steps labels={labels} current={1} orientation="horizontal" />);
 
     screen.getAllByRole('listitem').forEach((item) => {
-      expect(item).toHaveAttribute('data-vertical', 'true');
+      expect(item).toHaveAttribute('data-orientation', 'horizontal');
     });
+  });
+
+  it('orientation="vertical" のとき縦並びとして描画する', () => {
+    render(<Steps labels={labels} current={1} orientation="vertical" />);
+
+    screen.getAllByRole('listitem').forEach((item) => {
+      expect(item).toHaveAttribute('data-orientation', 'vertical');
+    });
+  });
+
+  it('orientation ごとに対応する styleVariants のクラスを適用する', () => {
+    const { container, rerender } = render(<Steps labels={labels} current={1} />);
+
+    expect(container.querySelector('ol')).toHaveClass(steps.horizontal);
+
+    rerender(<Steps labels={labels} current={1} orientation="vertical" />);
+
+    expect(container.querySelector('ol')).toHaveClass(steps.vertical);
+  });
+
+  it('ラベルが重複していても描画できる', () => {
+    const duplicated = ['確認', '入力', '確認'];
+    render(<Steps labels={duplicated} current={1} />);
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.getAllByText('確認')).toHaveLength(2);
+  });
+
+  // data-orientation は FormField など他コンポーネントも使うため、
+  // 祖先の同名属性でスタイルが漏れないことを担保する
+  it('外側の要素の data-orientation にスタイルが反応しない', () => {
+    const { container } = render(
+      <div data-orientation="vertical">
+        <Steps labels={labels} current={1} />
+      </div>
+    );
+
+    const item = container.querySelector(`.${stepsItem}`);
+
+    expect(item).not.toBeNull();
+    // 縦並びのときだけ flex-shrink: 0 になる
+    expect(getComputedStyle(item as Element).flexShrink).toBe('1');
+  });
+
+  it('自身が orientation="vertical" のときは縦並びのスタイルが適用される', () => {
+    const { container } = render(<Steps labels={labels} current={1} orientation="vertical" />);
+
+    const item = container.querySelector(`.${stepsItem}`);
+
+    expect(getComputedStyle(item as Element).flexShrink).toBe('0');
   });
 });

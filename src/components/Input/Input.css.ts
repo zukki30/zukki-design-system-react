@@ -79,7 +79,9 @@ export const inputIcon = style({
     '&[data-position="end"]': {
       paddingInlineEnd: vars.spacing.sm,
     },
-    '[data-disabled="true"] &': {
+    // 祖先を限定しないと、data-disabled を持つ他コンポーネント（FormField など）の
+    // 内側に置いたときにアドーンメントだけが disabled 色になる
+    [`${input}[data-disabled="true"] &`]: {
       color: vars.color.textOnLight.disabled,
     },
   },

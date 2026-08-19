@@ -2,6 +2,8 @@ import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
+import { stepsItemContainer } from './Steps.css';
+
 const ICON_SIZE = '32px';
 
 export const stepsItem = style({
@@ -19,8 +21,10 @@ export const stepsItem = style({
 
   selectors: {
     // 縦並びの主軸は縦なので、flex-shrink は「高さが縮む」意味になる。
-    // 横幅のあふれ対策は不要なため、縮まない従来の挙動を保つ
-    '[data-vertical="true"] &': {
+    // 横幅のあふれ対策は不要なため、縮まない従来の挙動を保つ。
+    // data-orientation は FormField など他コンポーネントも使うため、
+    // 祖先セレクタは Steps のコンテナに限定する
+    [`${stepsItemContainer}[data-orientation="vertical"] &`]: {
       flexShrink: 0,
     },
     '&:is(button)': {
@@ -122,7 +126,7 @@ export const stepsItemLabel = style({
 
   selectors: {
     // 縦並びは 1 ステップが 1 行を占めて幅に余裕があるため、省略せず折り返して全文を見せる
-    '[data-vertical="true"] &': {
+    [`${stepsItemContainer}[data-orientation="vertical"] &`]: {
       whiteSpace: 'normal',
       overflowWrap: 'anywhere',
     },

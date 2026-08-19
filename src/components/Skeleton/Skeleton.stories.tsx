@@ -23,6 +23,6 @@ export const Circle: Story = {
   args: {
     width: '100px',
     height: '100px',
-    circle: true,
+    shape: 'circle',
   },
 };
