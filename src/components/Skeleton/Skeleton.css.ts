@@ -17,7 +17,7 @@ export const skeleton = style({
   ...reducedMotion({ animation: 'none' }),
 
   selectors: {
-    '&[data-circle="true"]': {
+    '&[data-shape="circle"]': {
       borderRadius: vars['border-radius'].full,
     },
   },

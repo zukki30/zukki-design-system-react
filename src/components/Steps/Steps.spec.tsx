@@ -75,15 +75,32 @@ describe('Steps', () => {
     render(<Steps labels={labels} current={1} />);
 
     screen.getAllByRole('listitem').forEach((item) => {
-      expect(item).toHaveAttribute('data-vertical', 'false');
+      expect(item).toHaveAttribute('data-orientation', 'horizontal');
     });
   });
 
-  it('vertical のとき縦並びとして描画する', () => {
-    render(<Steps labels={labels} current={1} vertical />);
+  it('orientation="horizontal" のとき横並びとして描画する', () => {
+    render(<Steps labels={labels} current={1} orientation="horizontal" />);
 
     screen.getAllByRole('listitem').forEach((item) => {
-      expect(item).toHaveAttribute('data-vertical', 'true');
+      expect(item).toHaveAttribute('data-orientation', 'horizontal');
     });
+  });
+
+  it('orientation="vertical" のとき縦並びとして描画する', () => {
+    render(<Steps labels={labels} current={1} orientation="vertical" />);
+
+    screen.getAllByRole('listitem').forEach((item) => {
+      expect(item).toHaveAttribute('data-orientation', 'vertical');
+    });
+  });
+
+  it('orientation ごとに ol のクラスが変わる', () => {
+    const { container, rerender } = render(<Steps labels={labels} current={1} />);
+    const horizontalClassName = container.querySelector('ol')?.className;
+
+    rerender(<Steps labels={labels} current={1} orientation="vertical" />);
+
+    expect(container.querySelector('ol')?.className).not.toBe(horizontalClassName);
   });
 });

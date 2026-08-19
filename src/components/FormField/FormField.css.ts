@@ -20,7 +20,9 @@ export const formFieldLabelContainer = style({
   flexShrink: 0,
 
   selectors: {
-    '[data-orientation="horizontal"] &': {
+    // data-orientation は Steps など他コンポーネントも使うため、
+    // 祖先セレクタは FormField のルートに限定する
+    [`${formField}[data-orientation="horizontal"] &`]: {
       width: 100,
     },
   },
@@ -38,7 +40,7 @@ export const formFieldLabel = style({
 
   selectors: {
     // 横並びのときは入力欄の上下パディングに合わせてラベルを下げる
-    '[data-orientation="horizontal"] &': {
+    [`${formField}[data-orientation="horizontal"] &`]: {
       paddingTop: vars.spacing.md,
     },
     '[data-disabled="true"] &': {

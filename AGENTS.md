@@ -50,6 +50,8 @@ The toolchain is pinned in `.mise.toml`: Node 24.14.1 and pnpm 10.33.0. Run `mis
 
 Use TypeScript function components and `type` aliases, never `interface` or `any`. Name components in PascalCase; use `ComponentName.tsx`, `ComponentName.css.ts`, `ComponentName.stories.tsx`, and `ComponentName.spec.tsx`. Use `ComponentPropsWithRef<'tag'>` for native props and `clsx()` for conditional classes.
 
+Model mutually exclusive visual options as a named string union, not a boolean: `shape?: SkeletonShape` (`'rect' | 'circle'`) rather than `circle?: boolean`. Adding a third option then stays non-breaking, and the value maps directly onto `data-*` attributes and `styleVariants()` keys. Export the union type from the component and `src/main.tsx`. States that are genuinely binary (`disabled`, `loading`, `error`, `required`) stay boolean.
+
 Follow React 19 ref-as-prop: accept `ref` as a regular prop and forward it to the component's main DOM element; never use `forwardRef`. `ComponentPropsWithRef` plus `{...props}` covers most components. When the component also needs the element itself, destructure `ref` and merge it with the internal ref via `useMergedRef`.
 
 Write styles in Vanilla Extract with BEM-like class names, `styleVariants()`, and theme `vars`; do not hard-code design values. Format changed source before submitting.

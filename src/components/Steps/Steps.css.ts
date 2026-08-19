@@ -44,25 +44,25 @@ export const stepsItemContainer = style({
     },
     // 横並びの末尾のみ、伸ばさずに縮む余地だけ残す。
     // 縦並びで縮ませると高さが潰れる意味になってしまうためスコープを絞る
-    '&[data-vertical="false"]:last-child': {
+    '&[data-orientation="horizontal"]:last-child': {
       flex: '0 1 auto',
     },
     '&:last-child::after': {
       display: 'none',
     },
-    '&[data-vertical=false]': {
+    '&[data-orientation="horizontal"]': {
       gap: vars.spacing.md,
       alignItems: 'center',
     },
-    '&[data-vertical=false]::after': {
+    '&[data-orientation="horizontal"]::after': {
       flex: 1,
       height: STEP_ITEM_BAR_MIN_SIZE,
     },
-    '&[data-vertical=true]': {
+    '&[data-orientation="vertical"]': {
       gap: vars.spacing.sm,
       flexDirection: 'column',
     },
-    '&[data-vertical=true]::after': {
+    '&[data-orientation="vertical"]::after': {
       width: STEP_ITEM_BAR_MIN_SIZE,
       height: 20,
       marginInlineStart: `calc(${vars.spacing['xl']} - ${STEP_ITEM_BAR_MIN_SIZE}px)`,
