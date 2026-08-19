@@ -1,14 +1,23 @@
 import { steps, stepsItemContainer } from './Steps.css';
 import { StepsItem } from './StepsItem';
 
+/**
+ * ステップの並び方向
+ */
+export type StepsOrientation = 'horizontal' | 'vertical';
+
 type Props = {
   labels: string[];
   current: number;
-  vertical?: boolean;
+  /**
+   * ステップの並び方向
+   * @default 'horizontal'
+   */
+  orientation?: StepsOrientation;
   onClick?: (stepNumber: number) => void;
 };
 
-export const Steps = ({ labels, current, vertical = false, onClick }: Props) => {
+export const Steps = ({ labels, current, orientation = 'horizontal', onClick }: Props) => {
   const isCurrent = (stepNumber: number) => {
     return stepNumber === current;
   };
@@ -18,9 +27,10 @@ export const Steps = ({ labels, current, vertical = false, onClick }: Props) => 
   };
 
   return (
-    <ol className={vertical ? steps.vertical : steps.horizontal}>
+    <ol className={steps[orientation]}>
+      {/* ラベルは重複しうるため key にできない。ステップの同一性は並び順そのものなので index を使う */}
       {labels.map((label, index) => (
-        <li data-vertical={vertical} className={stepsItemContainer} key={label}>
+        <li data-orientation={orientation} className={stepsItemContainer} key={index}>
           <StepsItem
             stepNumber={index + 1}
             label={label}

@@ -78,6 +78,8 @@ src/hooks/
 - 条件付き className の結合には `clsx()` を使用する
 - `useEffect` の使用は最小限に抑え、宣言的なパターンを優先する
 - 深い `if/else` のネストを避け、条件が複数ある場合は `switch` を使用する
+- **相互排他な見た目の選択肢は boolean ではなく文字列 union で表す**（`circle?: boolean` ではなく `shape?: 'rect' | 'circle'`）。選択肢が 3 つ目に増えても破壊的変更にならず、`data-*` 属性や `styleVariants()` のキーにそのまま使える。union は `SkeletonShape` のように名前付きで export する
+  - ただし真偽で意味が完結する状態（`disabled` / `loading` / `error` / `required` など）は boolean のままでよい
 
 **ref の扱い（React 19 の ref-as-prop）:**
 

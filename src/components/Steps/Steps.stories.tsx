@@ -23,7 +23,7 @@ export const Vertical: Story = {
   args: {
     labels: ['入力', '確認', '完了'],
     current: 2,
-    vertical: true,
+    orientation: 'vertical',
   },
 };
 
@@ -48,7 +48,7 @@ export const LongLabel: Story = {
 
         <div style={{ ...boxStyle, width: '180px' }}>
           <h4>vertical（折り返し）</h4>
-          <Steps {...args} vertical />
+          <Steps {...args} orientation="vertical" />
         </div>
       </div>
     );
