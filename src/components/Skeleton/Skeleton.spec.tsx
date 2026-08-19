@@ -2,6 +2,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { Skeleton } from './Skeleton';
+import { skeleton as skeletonClass } from './Skeleton.css';
 
 const renderSkeleton = (ui: React.ReactElement) => {
   const { container } = render(ui);
@@ -43,11 +44,10 @@ describe('Skeleton', () => {
     expect(skeleton).toHaveStyle({ width: '100px', height: '100px' });
   });
 
-  it('className を結合して付与する', () => {
+  it('className をベースのクラスに結合して付与する', () => {
     const skeleton = renderSkeleton(<Skeleton className="custom-class" />);
 
-    expect(skeleton).toHaveClass('custom-class');
-    // ベースのクラスが上書きされていないことも確認する
-    expect(skeleton.className.split(' ').length).toBeGreaterThan(1);
+    // 上書きではなくマージであることを、ベースのクラスが残っているかで確認する
+    expect(skeleton).toHaveClass(skeletonClass, 'custom-class');
   });
 });

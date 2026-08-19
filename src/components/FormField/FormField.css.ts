@@ -43,7 +43,8 @@ export const formFieldLabel = style({
     [`${formField}[data-orientation="horizontal"] &`]: {
       paddingTop: vars.spacing.md,
     },
-    '[data-disabled="true"] &': {
+    // data-disabled も複数コンポーネントが使う共有属性のため、同様にルートへ限定する
+    [`${formField}[data-disabled="true"] &`]: {
       color: vars.color.textOnLight.disabled,
     },
   },

@@ -28,8 +28,9 @@ export const Steps = ({ labels, current, orientation = 'horizontal', onClick }: 
 
   return (
     <ol className={steps[orientation]}>
+      {/* ラベルは重複しうるため key にできない。ステップの同一性は並び順そのものなので index を使う */}
       {labels.map((label, index) => (
-        <li data-orientation={orientation} className={stepsItemContainer} key={label}>
+        <li data-orientation={orientation} className={stepsItemContainer} key={index}>
           <StepsItem
             stepNumber={index + 1}
             label={label}
