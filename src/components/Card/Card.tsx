@@ -1,4 +1,5 @@
 import { clsx } from 'clsx';
+import { useMemo } from 'react';
 import type { ComponentPropsWithRef } from 'react';
 
 import { card } from './Card.css';
@@ -9,11 +10,16 @@ import { CardHeader } from './CardHeader';
 import { CardImage } from './CardImage';
 import { CardTitle } from './CardTitle';
 import { CardContext } from './hooks';
-import type { CardSize } from './hooks';
+import type { CardContextValue, CardSize } from './hooks';
 
 export type CardProps = {
   /**
-   * カードのサイズ
+   * カードのサイズ。サブコンポーネントの余白は context 経由でこの値から決まる。
+   *
+   * ルート要素には `data-size` 属性としても出力される。スタイルはすべて
+   * `styleVariants()` 側で解決しているため CSS からは参照していないが、
+   * 利用側がカード全体を size 別にスタイリングするためのフックとして残している
+   *
    * @default 'md'
    */
   size?: CardSize;
@@ -41,9 +47,14 @@ export type CardProps = {
  * ```
  */
 export const Card = ({ size = 'md', className, children, ...props }: CardProps) => {
+  // context の value が毎レンダー新しい参照になると、children が変わっていなくても
+  // サブコンポーネントの再レンダーが走るため、size が変わったときだけ更新する
+  const contextValue = useMemo<CardContextValue>(() => ({ size }), [size]);
+
   return (
-    <div className={clsx(card, className)} data-size={size} {...props}>
-      <CardContext value={{ size }}>{children}</CardContext>
+    // data-size は size と常に一致させたいので、利用側の props より後に指定する
+    <div {...props} className={clsx(card, className)} data-size={size}>
+      <CardContext value={contextValue}>{children}</CardContext>
     </div>
   );
 };
