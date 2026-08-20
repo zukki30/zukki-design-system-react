@@ -37,6 +37,38 @@ describe('useIdRegistry', () => {
     expect(result.current[0]).toEqual(['second']);
   });
 
+  it('同じ id が複数登録されていても解除は 1 件だけ取り除く', () => {
+    const { result } = renderHook(() => useIdRegistry());
+    let unregister: () => void = () => {};
+
+    act(() => {
+      unregister = result.current[1]('duplicated');
+      result.current[1]('duplicated');
+    });
+
+    act(() => {
+      unregister();
+    });
+
+    expect(result.current[0]).toEqual(['duplicated']);
+  });
+
+  it('登録されていない id の解除では何も変わらない', () => {
+    const { result } = renderHook(() => useIdRegistry());
+    let unregister: () => void = () => {};
+
+    act(() => {
+      unregister = result.current[1]('first');
+    });
+
+    act(() => {
+      unregister();
+      unregister();
+    });
+
+    expect(result.current[0]).toEqual([]);
+  });
+
   it('register の参照は再レンダーしても変わらない', () => {
     const { result, rerender } = renderHook(() => useIdRegistry());
     const register = result.current[1];

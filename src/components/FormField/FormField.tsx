@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, useEffect, useId, useMemo } from 'react';
 
+import { useIdRegistry } from '@/hooks/useIdRegistry';
+
 import {
   formField,
   formFieldControl,
@@ -17,7 +19,7 @@ import {
   type FormFieldRequiredMark,
   useFormFieldContext,
 } from './FormFieldContext';
-import { useFormFieldControl, useIdRegistry } from './hooks';
+import { useFormFieldControl } from './hooks';
 
 export type FormFieldProps = {
   /**
@@ -60,7 +62,14 @@ export type FormFieldProps = {
  *
  * **パーツはルートの直下に置くこと。**
  * 横並びのレイアウトはルートの grid で組んでいるため、
- * パーツを別の要素で囲むと列の割り当てが崩れる
+ * パーツを別の要素で囲むと列の割り当てが崩れる。
+ *
+ * **id を使う紐付けはマウント後に確定する。**
+ * ルートからは子孫の描画有無を検査できないため、パーツ側から id を登録してもらっている。
+ * 登録は `useEffect` で行うため、`htmlFor` / `aria-describedby` と
+ * `FormField.ErrorText` 由来のエラー状態は初回のコミットでは未反映で、直後の再レンダーで付く。
+ * 初回描画からエラー表示を確定させたい場合は `error` を明示する。
+ * サーバー描画では effect が走らないため、ハイドレーション前の HTML にこれらは含まれない
  *
  * @example
  * <FormField required>
@@ -82,9 +91,12 @@ export function FormField({
   error,
   className,
   children,
+  // グループとしての名前付けは利用側から上書きできるようにする
+  role,
+  'aria-labelledby': ariaLabelledBy,
   ...props
 }: FormFieldProps) {
-  const controlId = useId();
+  const [labelIds, registerLabel] = useIdRegistry();
   const [controlIds, registerControl] = useIdRegistry();
   const [helperTextIds, registerHelperText] = useIdRegistry();
   const [errorTextIds, registerErrorText] = useIdRegistry();
@@ -93,26 +105,33 @@ export function FormField({
   const hasError = error ?? errorTextIds.length > 0;
   // 補助テキスト → エラーメッセージの順に読み上げてほしいので、登録順ではなく種類の順で並べる
   const describedBy = [...helperTextIds, ...errorTextIds].join(' ') || undefined;
-  // htmlFor に指定できる id は 1 つだけのため、最初に登録された入力要素と紐付ける
+  // htmlFor / aria-labelledby に指定できる id は 1 つだけのため、最初に登録されたものを使う
   const labelledControlId = controlIds.length > 0 ? controlIds[0] : undefined;
+  const labelId = labelIds.length > 0 ? labelIds[0] : undefined;
+
+  // 入力要素と紐付けられないとき（複数のコントロールを並べたときなど）、ラベルは
+  // for を持たないただの <label> になり支援技術から何とも結び付かない。
+  // グループとして名前を持てるよう、このときだけルートを role="group" にする
+  const isLabelledGroup = labelledControlId === undefined && labelId !== undefined;
 
   // context の値は全パーツの再レンダー要因になるため memo 化する。
   // register 系はいずれも参照が安定しているので、実質は状態と id の変化でのみ作り直される
   const contextValue = useMemo<FormFieldContextValue>(
     () => ({
       state: { required, requiredMark, disabled, error: hasError },
-      actions: { registerControl, registerHelperText, registerErrorText },
-      meta: { controlId, labelledControlId, describedBy },
+      actions: { registerLabel, registerControl, registerHelperText, registerErrorText },
+      meta: { labelId, labelledControlId, describedBy },
     }),
     [
       required,
       requiredMark,
       disabled,
       hasError,
+      registerLabel,
       registerControl,
       registerHelperText,
       registerErrorText,
-      controlId,
+      labelId,
       labelledControlId,
       describedBy,
     ]
@@ -124,6 +143,8 @@ export function FormField({
       <div
         {...props}
         className={clsx(formField, className)}
+        role={role ?? (isLabelledGroup ? 'group' : undefined)}
+        aria-labelledby={ariaLabelledBy ?? (isLabelledGroup ? labelId : undefined)}
         data-orientation={orientation}
         data-disabled={disabled}
         data-error={hasError}
@@ -134,16 +155,27 @@ export function FormField({
   );
 }
 
-export type FormFieldLabelProps = Omit<ComponentPropsWithRef<'label'>, 'htmlFor'>;
+export type FormFieldLabelProps = Omit<ComponentPropsWithRef<'label'>, 'htmlFor' | 'id'>;
 
 /**
  * フィールドのラベル。
  *
  * `htmlFor` は `FormField.Control` が描画した入力要素と自動で紐付くため受け付けない。
+ * 紐付けられる入力要素が無いときは、代わりにルートがこのラベルで名前を持つ
+ * （`role="group"` + `aria-labelledby`）。
+ *
  * ルートの `required` に応じて必須マークも描画する
  */
 const FormFieldLabel = ({ className, children, ...props }: FormFieldLabelProps) => {
-  const { state, meta } = useFormFieldContext();
+  const {
+    state,
+    actions: { registerLabel },
+    meta,
+  } = useFormFieldContext();
+  // id はインスタンスごとに採番する。context で共有すると複数描画時に DOM で id が重複する
+  const labelId = useId();
+
+  useEffect(() => registerLabel(labelId), [registerLabel, labelId]);
 
   const showAsterisk =
     state.required && (state.requiredMark === 'asterisk' || state.requiredMark === 'both');
@@ -152,7 +184,12 @@ const FormFieldLabel = ({ className, children, ...props }: FormFieldLabelProps) 
 
   return (
     // 紐付け先が描画されているときだけ htmlFor を出力する（存在しない id を指さないため）
-    <label {...props} className={clsx(formFieldLabel, className)} htmlFor={meta.labelledControlId}>
+    <label
+      {...props}
+      id={labelId}
+      className={clsx(formFieldLabel, className)}
+      htmlFor={meta.labelledControlId}
+    >
       {children}
       {showAsterisk && (
         <span className={formFieldRequiredAsterisk} aria-hidden="true">
@@ -170,17 +207,18 @@ export type FormFieldControlProps = ComponentPropsWithRef<'div'>;
  * 入力欄（Input・Select など）を置く領域。
  *
  * 子が単一の要素のとき、`id` / `aria-describedby` / `aria-required` / `aria-invalid` /
- * `disabled` を自動で注入する。子が自身で指定している値は上書きしない。
+ * `disabled` を自動で注入する。子が自身で指定している値は上書きしない
+ * （`disabled` は、その属性を持てる素の HTML 要素とコンポーネントにのみ注入する）。
  *
- * 複数の入力要素を並べるときは注入されないため、`id` と ARIA 属性を利用側で指定すること
- * （エラー状態と `disabled` は context 経由で伝わるため、指定は不要）
+ * 複数の入力要素を並べるときは注入されないため、`id` と `aria-required` は
+ * 利用側で指定すること。エラー状態と `disabled` は context 経由で伝わるため指定は不要で、
+ * ラベルは `FormField.Label` がグループ名として紐付く
  */
 const FormFieldControl = ({ className, children, ...props }: FormFieldControlProps) => {
   const { state, actions, meta } = useFormFieldContext();
 
   const control = useFormFieldControl({
     children,
-    controlId: meta.controlId,
     describedBy: meta.describedBy,
     required: state.required,
     error: state.error,

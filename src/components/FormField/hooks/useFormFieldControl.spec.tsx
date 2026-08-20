@@ -6,7 +6,6 @@ import { useFormFieldControl } from './useFormFieldControl';
 
 type ControlProps = {
   children: ReactNode;
-  controlId?: string;
   describedBy?: string;
   required?: boolean;
   error?: boolean;
@@ -16,7 +15,6 @@ type ControlProps = {
 
 const Control = ({
   children,
-  controlId = 'generated-id',
   describedBy,
   required = false,
   error = false,
@@ -26,7 +24,6 @@ const Control = ({
   <>
     {useFormFieldControl({
       children,
-      controlId,
       describedBy,
       required,
       error,
@@ -44,7 +41,26 @@ describe('useFormFieldControl', () => {
       </Control>
     );
 
-    expect(screen.getByLabelText('入力')).toHaveAttribute('id', 'generated-id');
+    expect(screen.getByLabelText('入力')).toHaveAttribute('id');
+  });
+
+  it('Control ごとに別の id を採番する', () => {
+    render(
+      <>
+        <Control>
+          <input aria-label="開始" />
+        </Control>
+        <Control>
+          <input aria-label="終了" />
+        </Control>
+      </>
+    );
+
+    const from = screen.getByLabelText('開始').getAttribute('id');
+    const to = screen.getByLabelText('終了').getAttribute('id');
+
+    expect(from).not.toBeNull();
+    expect(from).not.toBe(to);
   });
 
   it('要素が自前の id を持つときはそちらを尊重する', () => {
@@ -67,7 +83,7 @@ describe('useFormFieldControl', () => {
       </Control>
     );
 
-    expect(registerControl).toHaveBeenCalledWith('generated-id');
+    expect(registerControl).toHaveBeenCalledWith(screen.getByLabelText('入力').getAttribute('id'));
 
     unmount();
 
@@ -131,6 +147,19 @@ describe('useFormFieldControl', () => {
     expect(control).toHaveAttribute('aria-required', 'false');
     expect(control).toHaveAttribute('aria-invalid', 'false');
     expect(control).toBeEnabled();
+  });
+
+  it('disabled を持てない素の HTML 要素には disabled を注入しない', () => {
+    render(
+      <Control disabled error>
+        <div data-testid="wrapper" />
+      </Control>
+    );
+
+    const wrapper = screen.getByTestId('wrapper');
+    expect(wrapper).not.toHaveAttribute('disabled');
+    // 属性として妥当な ARIA は注入する
+    expect(wrapper).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('子が複数要素のときは注入も登録もしない', () => {

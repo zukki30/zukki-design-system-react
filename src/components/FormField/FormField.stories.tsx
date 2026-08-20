@@ -50,12 +50,26 @@ const docsDescription = [
   '| `aria-describedby` | 補助テキスト・エラーメッセージの id。子が指定済みの値があれば結合する |',
   '| `aria-required` / `aria-invalid` / `disabled` | ルートの状態。子が指定済みならそちらを優先する |',
   '',
+  '`disabled` は、その属性を持てる素の HTML 要素（`<input>` など）とコンポーネントにのみ注入します。',
+  '`<div>` のような要素に不正な属性が付くことはありません。',
+  '',
   '`FormField.Label` の `htmlFor` は、実際に描画された入力要素の id と自動で紐付きます',
   '（入力要素が無いときは出力しません）。',
   '',
   '子が複数要素・テキスト・単一の Fragment の場合は注入しません（Fragment は props を',
-  '受け取れないため）。この場合は入力要素の `id` と ARIA 属性を利用側で指定してください。',
+  '受け取れないため）。この場合は入力要素の `id` と `aria-required` を利用側で指定してください。',
   'エラー状態と `disabled` は context 経由で伝わるため、指定は不要です。',
+  '',
+  'また、ラベルと紐付く入力要素が無いときは、ルートが `role="group"` と `aria-labelledby` を持ち、',
+  '`FormField.Label` がグループの名前になります（チェックボックス群など）。',
+  '',
+  '### id を使う紐付けのタイミング',
+  '',
+  'ルートからは子孫の描画有無を検査できないため、パーツ側から id を登録してもらっています。',
+  '登録は `useEffect` で行うため、`htmlFor` / `aria-describedby` と `FormField.ErrorText` 由来の',
+  'エラー状態は初回のコミットでは未反映で、直後の再レンダーで付きます。',
+  '初回描画からエラー表示を確定させたい場合は `error` を明示してください。',
+  'サーバー描画では effect が走らないため、ハイドレーション前の HTML にこれらは含まれません。',
   '',
   '### レイアウト',
   '',
@@ -193,7 +207,10 @@ export const HelperAndError: Story = {
 
 /**
  * 複数の入力要素を並べる例。
- * この場合は id が自動注入されないため、それぞれにラベルを持たせる
+ *
+ * この場合は id が自動注入されないため、それぞれにラベルを持たせる。
+ * `FormField.Label` は個々の入力要素ではなくグループ（`role="group"`）の名前になり、
+ * `disabled` は context 経由で全ての入力要素に伝わる
  */
 export const MultipleControls: Story = {
   args: {

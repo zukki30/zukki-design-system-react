@@ -246,6 +246,56 @@ describe('FormField', () => {
       expect(screen.getByText('名前')).not.toHaveAttribute('for');
     });
 
+    it('Control を複数置いても id が重複しない', () => {
+      render(
+        <FormField>
+          <FormField.Label>期間</FormField.Label>
+          <FormField.Control>
+            <input aria-label="開始日" />
+          </FormField.Control>
+          <FormField.Control>
+            <input aria-label="終了日" />
+          </FormField.Control>
+        </FormField>
+      );
+
+      const from = screen.getByLabelText('開始日').getAttribute('id');
+      const to = screen.getByLabelText('終了日').getAttribute('id');
+
+      expect(from).not.toBeNull();
+      expect(from).not.toBe(to);
+      // ラベルは最初に登録された入力要素と紐付く
+      expect(screen.getByText('期間').closest('label')).toHaveAttribute('for', from);
+    });
+
+    it('Control を複数置いた状態で 1 つ外してもラベルの紐付けが残る', () => {
+      const { rerender } = render(
+        <FormField>
+          <FormField.Label>期間</FormField.Label>
+          <FormField.Control>
+            <input aria-label="開始日" />
+          </FormField.Control>
+          <FormField.Control>
+            <input aria-label="終了日" />
+          </FormField.Control>
+        </FormField>
+      );
+
+      rerender(
+        <FormField>
+          <FormField.Label>期間</FormField.Label>
+          <FormField.Control>
+            <input aria-label="開始日" />
+          </FormField.Control>
+        </FormField>
+      );
+
+      expect(screen.getByText('期間').closest('label')).toHaveAttribute(
+        'for',
+        screen.getByLabelText('開始日').getAttribute('id')
+      );
+    });
+
     it('入力要素が外れるとラベルの for も外れる', () => {
       const { rerender } = render(
         <FormField>
@@ -265,6 +315,65 @@ describe('FormField', () => {
       );
 
       expect(screen.getByText('名前')).not.toHaveAttribute('for');
+    });
+  });
+
+  describe('グループとしての名前付け', () => {
+    it('入力要素と紐付けられないときはルートをラベル付きのグループにする', () => {
+      render(
+        <FormField disabled>
+          <FormField.Label>受け取る通知</FormField.Label>
+          <FormField.Control>
+            <Checkbox>メール</Checkbox>
+            <Checkbox>SMS</Checkbox>
+          </FormField.Control>
+        </FormField>
+      );
+
+      expect(screen.getByRole('group', { name: '受け取る通知' })).toBeInTheDocument();
+    });
+
+    it('入力要素と紐付くときはグループにしない（ラベルの for で足りるため）', () => {
+      render(
+        <FormField>
+          <FormField.Label>名前</FormField.Label>
+          <FormField.Control>
+            <input />
+          </FormField.Control>
+        </FormField>
+      );
+
+      expect(screen.queryByRole('group')).not.toBeInTheDocument();
+    });
+
+    it('ラベルが無いときはグループにしない', () => {
+      render(
+        <FormField data-testid="field">
+          <FormField.Control>
+            <input aria-label="姓" />
+            <input aria-label="名" />
+          </FormField.Control>
+        </FormField>
+      );
+
+      expect(screen.getByTestId('field')).not.toHaveAttribute('role');
+    });
+
+    it('role と aria-labelledby は利用側から上書きできる', () => {
+      render(
+        <>
+          <FormField data-testid="field" role="radiogroup" aria-labelledby="external-label">
+            <FormField.Label>通知</FormField.Label>
+            <FormField.Control>
+              <Checkbox>メール</Checkbox>
+              <Checkbox>SMS</Checkbox>
+            </FormField.Control>
+          </FormField>
+          <span id="external-label">外部のラベル</span>
+        </>
+      );
+
+      expect(screen.getByRole('radiogroup', { name: '外部のラベル' })).toBeInTheDocument();
     });
   });
 

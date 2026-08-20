@@ -38,11 +38,18 @@ export type FormFieldContextValue = {
   };
   actions: {
     /**
+     * ラベルの id をルートへ登録する。
+     *
+     * 入力要素と紐付けられないとき（複数のコントロールを並べたときなど）に、
+     * ルートを `role="group"` にしてこの id で名前を付けるために使う。
+     * 戻り値は登録解除用の関数で、`useEffect` のクリーンアップにそのまま渡せる
+     */
+    registerLabel: (id: string) => () => void;
+    /**
      * 入力要素の id をルートへ登録する。
      *
      * 登録された id は `FormField.Label` の `htmlFor` に反映される。
-     * 入力要素が無いときにラベルの参照先が宙に浮くのを防ぐために使う。
-     * 戻り値は登録解除用の関数で、`useEffect` のクリーンアップにそのまま渡せる
+     * 入力要素が無いときにラベルの参照先が宙に浮くのを防ぐために使う
      */
     registerControl: (id: string) => () => void;
     /**
@@ -58,9 +65,9 @@ export type FormFieldContextValue = {
   };
   meta: {
     /**
-     * 入力要素が自前の `id` を持たないときに割り当てる id
+     * 実際に描画されたラベルの id。ラベルが無いときは undefined
      */
-    controlId: string;
+    labelId: string | undefined;
     /**
      * 実際に描画された入力要素の id。入力要素が無いときは undefined
      */

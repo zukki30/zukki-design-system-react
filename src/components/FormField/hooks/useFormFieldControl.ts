@@ -1,4 +1,4 @@
-import { Children, Fragment, cloneElement, isValidElement, useEffect } from 'react';
+import { Children, Fragment, cloneElement, isValidElement, useEffect, useId } from 'react';
 import type { ReactNode } from 'react';
 
 /**
@@ -18,10 +18,6 @@ type UseFormFieldControlParams = {
    * 入力欄として描画する子
    */
   children: ReactNode;
-  /**
-   * 子が自前の id を持たないときに割り当てる id
-   */
-  controlId: string;
   /**
    * 説明テキスト（補助テキスト・エラーメッセージ）の id
    */
@@ -45,6 +41,27 @@ type UseFormFieldControlParams = {
 };
 
 /**
+ * `disabled` を持てる素の HTML 要素。
+ * これ以外（`<div>` など）へ注入すると不正な属性になるため対象から外す
+ */
+const DISABLEABLE_TAGS = new Set([
+  'button',
+  'fieldset',
+  'input',
+  'optgroup',
+  'option',
+  'select',
+  'textarea',
+]);
+
+/**
+ * 子要素へ `disabled` を注入してよいか。
+ * コンポーネントは自身で受け取り方を決められるため、素の HTML 要素だけを判定する
+ */
+const acceptsDisabled = (type: unknown): boolean =>
+  typeof type === 'string' ? DISABLEABLE_TAGS.has(type) : true;
+
+/**
  * id を半角スペース区切りで結合する。結合結果が空なら undefined を返す
  */
 const joinIds = (ids: (string | undefined)[]) => {
@@ -60,17 +77,20 @@ const joinIds = (ids: (string | undefined)[]) => {
  * （Fragment は props を受け取れないため対象外）。
  * その場合は入力要素の `id` と ARIA 属性を利用側で指定する必要がある。
  *
- * 注入した id はルートへ登録され、`FormField.Label` の `htmlFor` に反映される
+ * 注入した id はルートへ登録され、`FormField.Label` の `htmlFor` に反映される。
+ * id は `FormField.Control` のインスタンスごとに採番するため、
+ * 1 つの FormField に複数の Control を置いても DOM の id は重複しない
  */
 export const useFormFieldControl = ({
   children,
-  controlId: fallbackControlId,
   describedBy,
   required,
   error,
   disabled,
   registerControl,
 }: UseFormFieldControlParams): ReactNode => {
+  const fallbackControlId = useId();
+
   // Fragment は props を受け取れないため注入対象から除外する
   const control =
     Children.count(children) === 1 &&
@@ -102,6 +122,7 @@ export const useFormFieldControl = ({
     // 明示された値があればそれを優先し、無いときだけ FormField の状態を反映する
     'aria-required': control.props['aria-required'] ?? (required ? true : undefined),
     'aria-invalid': control.props['aria-invalid'] ?? (error ? true : undefined),
-    disabled: control.props.disabled ?? (disabled ? true : undefined),
+    disabled:
+      control.props.disabled ?? (disabled && acceptsDisabled(control.type) ? true : undefined),
   });
 };

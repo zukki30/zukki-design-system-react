@@ -15,8 +15,13 @@ const createContextValue = (
   state?: Partial<FormFieldContextValue['state']>
 ): FormFieldContextValue => ({
   state: { required: false, requiredMark: 'badge', disabled: false, error: false, ...state },
-  actions: { registerControl: noop, registerHelperText: noop, registerErrorText: noop },
-  meta: { controlId: 'generated-id', labelledControlId: undefined, describedBy: undefined },
+  actions: {
+    registerLabel: noop,
+    registerControl: noop,
+    registerHelperText: noop,
+    registerErrorText: noop,
+  },
+  meta: { labelId: 'label-id', labelledControlId: undefined, describedBy: undefined },
 });
 
 const createWrapper = (state?: Partial<FormFieldContextValue['state']>) => {
@@ -38,7 +43,7 @@ describe('useFormFieldContext', () => {
     });
 
     expect(result.current.state.required).toBe(true);
-    expect(result.current.meta.controlId).toBe('generated-id');
+    expect(result.current.meta.labelId).toBe('label-id');
   });
 
   it('FormField の外側では例外を投げる', () => {
