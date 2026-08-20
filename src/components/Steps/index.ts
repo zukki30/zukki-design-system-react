@@ -1,4 +1,5 @@
-import { Steps } from './Steps';
-
-export { Steps };
-export type { StepsOrientation } from './Steps';
+export { Steps } from './Steps';
+export type { StepsProps } from './Steps';
+export type { StepsItemProps } from './StepsItem';
+export { useStepsContext, useStepsItemNumber } from './hooks';
+export type { StepsContextValue, StepsOrientation } from './hooks';
