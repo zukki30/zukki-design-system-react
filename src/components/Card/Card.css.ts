@@ -53,7 +53,6 @@ export const cardTitle = style({
   // cardAction が flex-shrink: 0 なので、縮む余地はこちらに寄る
   ...truncate,
   flex: '1 1 auto',
-  minWidth: 0,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size'].base,

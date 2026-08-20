@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ReactNode } from 'react';
 
 import { Card } from './Card';
 
@@ -15,15 +16,41 @@ const MoreLink = () => (
   </a>
 );
 
-const ImagePlaceholder = () => (
-  <div style={{ height: '140px', width: '100%', backgroundColor: '#d9d9d9' }} />
+/**
+ * カードの表示幅を固定するラッパー
+ */
+const Frame = ({ children }: { children: ReactNode }) => (
+  <div style={{ width: '300px' }}>{children}</div>
 );
 
-const BodyText = () => (
-  <div>
-    <p style={{ margin: 0, lineHeight: 1.5 }}>Card simple text</p>
-    <p style={{ margin: 0, lineHeight: 1.5 }}>Card simple</p>
-  </div>
+const Image = () => (
+  <Card.Image>
+    <div style={{ height: '140px', width: '100%', backgroundColor: '#d9d9d9' }} />
+  </Card.Image>
+);
+
+const Header = () => (
+  <Card.Header>
+    <Card.Title>Card title</Card.Title>
+    <Card.Action>
+      <MoreLink />
+    </Card.Action>
+  </Card.Header>
+);
+
+const Body = () => (
+  <Card.Body>
+    <div>
+      <p style={{ margin: 0, lineHeight: 1.5 }}>Card simple text</p>
+      <p style={{ margin: 0, lineHeight: 1.5 }}>Card simple</p>
+    </div>
+  </Card.Body>
+);
+
+const Footer = () => (
+  <Card.Footer>
+    <MoreLink />
+  </Card.Footer>
 );
 
 const meta = {
@@ -34,25 +61,14 @@ const meta = {
     size: 'md',
   },
   render: (args) => (
-    <div style={{ width: '300px' }}>
+    <Frame>
       <Card {...args}>
-        <Card.Image>
-          <ImagePlaceholder />
-        </Card.Image>
-        <Card.Header>
-          <Card.Title>Card title</Card.Title>
-          <Card.Action>
-            <MoreLink />
-          </Card.Action>
-        </Card.Header>
-        <Card.Body>
-          <BodyText />
-        </Card.Body>
-        <Card.Footer>
-          <MoreLink />
-        </Card.Footer>
+        <Image />
+        <Header />
+        <Body />
+        <Footer />
       </Card>
-    </div>
+    </Frame>
   ),
 } satisfies Meta<typeof Card>;
 
@@ -69,40 +85,27 @@ export const SizeSm: Story = {
 
 export const NotImage: Story = {
   render: (args) => (
-    <div style={{ width: '300px' }}>
+    <Frame>
       <Card {...args}>
-        <Card.Header>
-          <Card.Title>Card title</Card.Title>
-          <Card.Action>
-            <MoreLink />
-          </Card.Action>
-        </Card.Header>
-        <Card.Body>
-          <BodyText />
-        </Card.Body>
-        <Card.Footer>
-          <MoreLink />
-        </Card.Footer>
+        <Header />
+        <Body />
+        <Footer />
       </Card>
-    </div>
+    </Frame>
   ),
 };
 
 export const NotAction: Story = {
   render: (args) => (
-    <div style={{ width: '300px' }}>
+    <Frame>
       <Card {...args}>
         <Card.Header>
           <Card.Title>Card title</Card.Title>
         </Card.Header>
-        <Card.Body>
-          <BodyText />
-        </Card.Body>
-        <Card.Footer>
-          <MoreLink />
-        </Card.Footer>
+        <Body />
+        <Footer />
       </Card>
-    </div>
+    </Frame>
   ),
 };
 
@@ -112,45 +115,37 @@ export const NotAction: Story = {
  */
 export const ActionOnly: Story = {
   render: (args) => (
-    <div style={{ width: '300px' }}>
+    <Frame>
       <Card {...args}>
         <Card.Header>
           <Card.Action>
             <MoreLink />
           </Card.Action>
         </Card.Header>
-        <Card.Body>
-          <BodyText />
-        </Card.Body>
+        <Body />
       </Card>
-    </div>
+    </Frame>
   ),
 };
 
 export const NotHeader: Story = {
   render: (args) => (
-    <div style={{ width: '300px' }}>
+    <Frame>
       <Card {...args}>
-        <Card.Body>
-          <BodyText />
-        </Card.Body>
-        <Card.Footer>
-          <MoreLink />
-        </Card.Footer>
+        <Body />
+        <Footer />
       </Card>
-    </div>
+    </Frame>
   ),
 };
 
 export const Simple: Story = {
   render: (args) => (
-    <div style={{ width: '300px' }}>
+    <Frame>
       <Card {...args}>
-        <Card.Body>
-          <BodyText />
-        </Card.Body>
+        <Body />
       </Card>
-    </div>
+    </Frame>
   ),
 };
 
@@ -159,7 +154,7 @@ export const Simple: Story = {
  */
 export const LongContent: Story = {
   render: (args) => (
-    <div style={{ width: '300px' }}>
+    <Frame>
       <Card {...args}>
         <Card.Header>
           <Card.Title>非常に長いカードタイトルが指定された場合の表示確認用テキスト</Card.Title>
@@ -173,7 +168,7 @@ export const LongContent: Story = {
           </p>
         </Card.Body>
       </Card>
-    </div>
+    </Frame>
   ),
 };
 
@@ -195,63 +190,33 @@ export const AllVariants: Story = {
             <h4>size = {size}</h4>
 
             <Card size={size}>
-              <Card.Image>
-                <ImagePlaceholder />
-              </Card.Image>
-              <Card.Header>
-                <Card.Title>Card title</Card.Title>
-                <Card.Action>
-                  <MoreLink />
-                </Card.Action>
-              </Card.Header>
-              <Card.Body>
-                <BodyText />
-              </Card.Body>
-              <Card.Footer>
-                <MoreLink />
-              </Card.Footer>
+              <Image />
+              <Header />
+              <Body />
+              <Footer />
             </Card>
 
             <Card size={size}>
-              <Card.Header>
-                <Card.Title>Card title</Card.Title>
-                <Card.Action>
-                  <MoreLink />
-                </Card.Action>
-              </Card.Header>
-              <Card.Body>
-                <BodyText />
-              </Card.Body>
-              <Card.Footer>
-                <MoreLink />
-              </Card.Footer>
+              <Header />
+              <Body />
+              <Footer />
             </Card>
 
             <Card size={size}>
               <Card.Header>
                 <Card.Title>Card title</Card.Title>
               </Card.Header>
-              <Card.Body>
-                <BodyText />
-              </Card.Body>
-              <Card.Footer>
-                <MoreLink />
-              </Card.Footer>
+              <Body />
+              <Footer />
             </Card>
 
             <Card size={size}>
-              <Card.Body>
-                <BodyText />
-              </Card.Body>
-              <Card.Footer>
-                <MoreLink />
-              </Card.Footer>
+              <Body />
+              <Footer />
             </Card>
 
             <Card size={size}>
-              <Card.Body>
-                <BodyText />
-              </Card.Body>
+              <Body />
             </Card>
           </div>
         ))}

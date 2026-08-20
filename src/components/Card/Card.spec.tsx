@@ -1,8 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Card } from './Card';
+import { cardBody, cardFooter, cardHeader } from './Card.css';
+
+// styleVariants の合成結果はスペース区切りの複数クラスになるため、個別のクラスへ分解する
+const classesOf = (className: string) => className.split(' ');
 
 describe('Card', () => {
   it('children を描画する', () => {
@@ -87,14 +91,14 @@ describe('Card', () => {
       expect(header).toHaveClass('custom');
     });
 
-    it('size に応じてクラスを切り替える', () => {
+    it('size に応じたクラスを適用する', () => {
       const { rerender } = render(
         <Card>
           <Card.Header data-testid="header">ヘッダー</Card.Header>
         </Card>
       );
 
-      const mdClassName = screen.getByTestId('header').className;
+      expect(screen.getByTestId('header')).toHaveClass(...classesOf(cardHeader.md));
 
       rerender(
         <Card size="sm">
@@ -102,7 +106,7 @@ describe('Card', () => {
         </Card>
       );
 
-      expect(screen.getByTestId('header').className).not.toBe(mdClassName);
+      expect(screen.getByTestId('header')).toHaveClass(...classesOf(cardHeader.sm));
     });
   });
 
@@ -162,14 +166,14 @@ describe('Card', () => {
       expect(body).toHaveClass('custom');
     });
 
-    it('size に応じてクラスを切り替える', () => {
+    it('size に応じたクラスを適用する', () => {
       const { rerender } = render(
         <Card>
           <Card.Body data-testid="body">本文</Card.Body>
         </Card>
       );
 
-      const mdClassName = screen.getByTestId('body').className;
+      expect(screen.getByTestId('body')).toHaveClass(...classesOf(cardBody.md));
 
       rerender(
         <Card size="sm">
@@ -177,7 +181,7 @@ describe('Card', () => {
         </Card>
       );
 
-      expect(screen.getByTestId('body').className).not.toBe(mdClassName);
+      expect(screen.getByTestId('body')).toHaveClass(...classesOf(cardBody.sm));
     });
   });
 
@@ -199,14 +203,14 @@ describe('Card', () => {
       expect(footer).toHaveClass('custom');
     });
 
-    it('size に応じてクラスを切り替える', () => {
+    it('size に応じたクラスを適用する', () => {
       const { rerender } = render(
         <Card>
           <Card.Footer data-testid="footer">フッター</Card.Footer>
         </Card>
       );
 
-      const mdClassName = screen.getByTestId('footer').className;
+      expect(screen.getByTestId('footer')).toHaveClass(...classesOf(cardFooter.md));
 
       rerender(
         <Card size="sm">
@@ -214,7 +218,45 @@ describe('Card', () => {
         </Card>
       );
 
-      expect(screen.getByTestId('footer').className).not.toBe(mdClassName);
+      expect(screen.getByTestId('footer')).toHaveClass(...classesOf(cardFooter.sm));
+    });
+  });
+  describe('ネストした Card', () => {
+    it('内側の Card の size が外側の size に影響されない', () => {
+      render(
+        <Card size="sm">
+          <Card.Body data-testid="outer-body">
+            <Card size="md">
+              <Card.Body data-testid="inner-body">本文</Card.Body>
+            </Card>
+          </Card.Body>
+        </Card>
+      );
+
+      expect(screen.getByTestId('outer-body')).toHaveClass(...classesOf(cardBody.sm));
+      expect(screen.getByTestId('inner-body')).toHaveClass(...classesOf(cardBody.md));
+    });
+  });
+
+  describe('Card の外での使用', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    const subComponents = [
+      ['Card.Image', <Card.Image key="image" />],
+      ['Card.Header', <Card.Header key="header" />],
+      ['Card.Title', <Card.Title key="title" />],
+      ['Card.Action', <Card.Action key="action" />],
+      ['Card.Body', <Card.Body key="body" />],
+      ['Card.Footer', <Card.Footer key="footer" />],
+    ] as const;
+
+    it.each(subComponents)('%s は Card の外で使うと例外を投げる', (name, element) => {
+      // React が投げられたエラーをコンソールへ出力するため、テスト出力を汚さないよう抑制する
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      expect(() => render(element)).toThrow(`${name} は Card の内側でのみ使用できます。`);
     });
   });
 });
