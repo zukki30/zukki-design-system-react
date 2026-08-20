@@ -39,7 +39,16 @@ export type {
   CardSize,
   CardTitleProps,
 } from './components/Card';
-export { Dialog } from './components/Dialog';
+export { Dialog, useDialogContext } from './components/Dialog';
+export type {
+  DialogBodyProps,
+  DialogCloseProps,
+  DialogContextValue,
+  DialogFooterProps,
+  DialogHeaderProps,
+  DialogProps,
+  DialogTitleProps,
+} from './components/Dialog';
 export { Breadcrumb } from './components/Breadcrumb';
 export type { BreadcrumbItem, BreadcrumbVariant } from './components/Breadcrumb';
 export { Tooltip } from './components/Tooltip';

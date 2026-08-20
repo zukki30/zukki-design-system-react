@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { type ComponentProps, type ReactNode, useState } from 'react';
 
 import { Button } from '../Button';
 
-import { Dialog } from './Dialog';
+import { Dialog, useDialogContext } from './index';
 
 const bodyText = (
   <>
@@ -17,6 +17,41 @@ const bodyText = (
 
 const docsDescription = [
   'ネイティブの `<dialog>` を `showModal()` で開くモーダルダイアログです。',
+  '',
+  '### 構成',
+  '',
+  '中身は compound components を合成して組み立てます。',
+  'ヘッダーやフッター、閉じるボタンの有無は boolean prop ではなく、',
+  '**そのパーツを描画するかどうか**で表現します。',
+  '',
+  '```tsx',
+  '<Dialog open={open} onClose={close}>',
+  '  <Dialog.Header>',
+  '    <Dialog.Title>タイトル</Dialog.Title>',
+  '    <Dialog.Close />',
+  '  </Dialog.Header>',
+  '  <Dialog.Body>本文</Dialog.Body>',
+  '  <Dialog.Footer>',
+  '    <Button onClick={close}>閉じる</Button>',
+  '  </Dialog.Footer>',
+  '</Dialog>',
+  '```',
+  '',
+  '`Dialog.Title` を描画すると、ルートの `aria-labelledby` が自動で紐付きます。',
+  'タイトルを置かない場合は、代わりに `aria-label` を指定してください。',
+  '',
+  '### 独自パーツの作成',
+  '',
+  '`useDialogContext()` で開閉状態と閉じる操作を参照できるため、',
+  'フッターのキャンセルボタンなどを利用側で自由に組み立てられます。',
+  '',
+  '```tsx',
+  'const CancelButton = () => {',
+  '  const { actions } = useDialogContext();',
+  '',
+  '  return <Button onClick={actions.close}>キャンセル</Button>;',
+  '};',
+  '```',
   '',
   '### 背景スクロールについて',
   '',
@@ -46,9 +81,59 @@ const docsDescription = [
   '```',
 ].join('\n');
 
+/**
+ * context から閉じる操作を受け取る、利用側で組み立てたフッターボタン
+ */
+const FooterButton = ({
+  children,
+  variant,
+}: {
+  children: ReactNode;
+  variant: ComponentProps<typeof Button>['variant'];
+}) => {
+  const {
+    actions: { close },
+  } = useDialogContext();
+
+  return (
+    <Button size="sm" variant={variant} onClick={close}>
+      {children}
+    </Button>
+  );
+};
+
+/**
+ * 開閉状態は利用側が持つため、ストーリーでは開くボタンと合わせて描画する
+ */
+const DialogDemo = ({
+  children,
+  ...props
+}: Omit<ComponentProps<typeof Dialog>, 'open' | 'onClose'>) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="primary" onClick={() => setOpen(true)}>
+        ダイアログを開く
+      </Button>
+
+      <Dialog {...props} open={open} onClose={() => setOpen(false)}>
+        {children}
+      </Dialog>
+    </>
+  );
+};
+
 const meta = {
   title: 'Components/Dialog',
   component: Dialog,
+  subcomponents: {
+    'Dialog.Header': Dialog.Header,
+    'Dialog.Title': Dialog.Title,
+    'Dialog.Body': Dialog.Body,
+    'Dialog.Footer': Dialog.Footer,
+    'Dialog.Close': Dialog.Close,
+  },
   tags: ['autodocs'],
   parameters: {
     docs: {
@@ -59,83 +144,102 @@ const meta = {
   },
   args: {
     open: false,
-    title: 'Dialog Title',
-    children: bodyText,
-  },
-  render: function Render(args) {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <>
-        <Button variant="primary" onClick={() => setOpen(true)}>
-          ダイアログを開く
-        </Button>
-        <Dialog
-          {...args}
-          open={open}
-          onClose={() => setOpen(false)}
-          footer={
-            args.footer ?? (
-              <>
-                <Button size="sm" variant="default" onClick={() => setOpen(false)}>
-                  ボタン
-                </Button>
-                <Button size="sm" variant="primary" onClick={() => setOpen(false)}>
-                  ボタン
-                </Button>
-              </>
-            )
-          }
-        />
-      </>
-    );
   },
 } satisfies Meta<typeof Dialog>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Full: Story = {};
-
-export const NotHeader: Story = {
-  args: {
-    title: undefined,
-  },
+/**
+ * ヘッダー・本文・フッターをすべて合成した構成
+ */
+export const Full: Story = {
+  render: () => (
+    <DialogDemo>
+      <Dialog.Header>
+        <Dialog.Title>Dialog Title</Dialog.Title>
+        <Dialog.Close />
+      </Dialog.Header>
+      <Dialog.Body>{bodyText}</Dialog.Body>
+      <Dialog.Footer>
+        <FooterButton variant="default">ボタン</FooterButton>
+        <FooterButton variant="primary">ボタン</FooterButton>
+      </Dialog.Footer>
+    </DialogDemo>
+  ),
 };
 
-export const NotFooter: Story = {
-  args: {
-    footer: undefined,
-  },
-  render: function Render(args) {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <>
-        <Button variant="primary" onClick={() => setOpen(true)}>
-          ダイアログを開く
-        </Button>
-        <Dialog {...args} open={open} onClose={() => setOpen(false)} footer={undefined} />
-      </>
-    );
-  },
+/**
+ * ヘッダーを描画しない構成。
+ * タイトルが無いぶん、`aria-label` でアクセシブルネームを与える
+ */
+export const NoHeader: Story = {
+  render: () => (
+    <DialogDemo aria-label="お知らせ">
+      <Dialog.Body>{bodyText}</Dialog.Body>
+      <Dialog.Footer>
+        <FooterButton variant="primary">ボタン</FooterButton>
+      </Dialog.Footer>
+    </DialogDemo>
+  ),
 };
 
+/**
+ * フッターを描画しない構成
+ */
+export const NoFooter: Story = {
+  render: () => (
+    <DialogDemo>
+      <Dialog.Header>
+        <Dialog.Title>Dialog Title</Dialog.Title>
+        <Dialog.Close />
+      </Dialog.Header>
+      <Dialog.Body>{bodyText}</Dialog.Body>
+    </DialogDemo>
+  ),
+};
+
+/**
+ * 閉じるボタンを描画しない構成。
+ * `Dialog.Close` を置かないことで表現する（boolean prop は不要）
+ */
+export const NoCloseButton: Story = {
+  render: () => (
+    <DialogDemo>
+      <Dialog.Header>
+        <Dialog.Title>Dialog Title</Dialog.Title>
+      </Dialog.Header>
+      <Dialog.Body>{bodyText}</Dialog.Body>
+      <Dialog.Footer>
+        <FooterButton variant="primary">閉じる</FooterButton>
+      </Dialog.Footer>
+    </DialogDemo>
+  ),
+};
+
+/**
+ * 本文だけの最小構成
+ */
 export const Simple: Story = {
-  args: {
-    title: undefined,
-    footer: undefined,
-  },
-  render: function Render(args) {
-    const [open, setOpen] = useState(false);
+  render: () => (
+    <DialogDemo aria-label="お知らせ">
+      <Dialog.Body>{bodyText}</Dialog.Body>
+    </DialogDemo>
+  ),
+};
 
-    return (
-      <>
-        <Button variant="primary" onClick={() => setOpen(true)}>
-          ダイアログを開く
-        </Button>
-        <Dialog {...args} open={open} onClose={() => setOpen(false)} footer={undefined} />
-      </>
-    );
-  },
+/**
+ * オーバーレイクリックで閉じない構成。
+ * 描画を伴わない挙動の切り替えのため、こちらは prop で指定する
+ */
+export const KeepOpenOnOverlayClick: Story = {
+  render: () => (
+    <DialogDemo closeOnOverlayClick={false}>
+      <Dialog.Header>
+        <Dialog.Title>Dialog Title</Dialog.Title>
+        <Dialog.Close />
+      </Dialog.Header>
+      <Dialog.Body>{bodyText}</Dialog.Body>
+    </DialogDemo>
+  ),
 };

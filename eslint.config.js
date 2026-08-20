@@ -31,6 +31,14 @@ export default tseslint.config(
     },
   },
   {
+    // ライブラリのエントリポイントは再 export しかしないため、
+    // Fast Refresh（コンポーネント以外を export しない）の制約は当てはまらない
+    files: ['src/main.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
     // コンポーネント間の参照は barrel（index.ts）ではなく実装ファイルを直接 import する。
     // stories / spec は配布物に含まれないため、利用者と同じ barrel 経由を許容する。
     files: ['src/components/**/*.{ts,tsx}'],

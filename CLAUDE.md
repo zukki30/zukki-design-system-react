@@ -96,6 +96,15 @@ src/hooks/
 
 - DOM プロパティの同期を ref callback の付け替えに頼らない。`ref` を外に出した以上、callback の identity が変わるたびに利用側の ref も付け外しされてしまう。属性で表現できない DOM プロパティ（`indeterminate` など）は `useMergedRef` で ref の identity を固定したうえで、`useEffect` で同期する
 
+**compound components:**
+
+- 複数の領域（ヘッダー・本文・フッターなど）を持つコンポーネントは、`title` / `footer` のような **ReactNode スロット prop ではなく合成**で組み立てる。パーツの有無は `showXxx` boolean ではなく「そのパーツを描画するかどうか」で表す
+- パーツ間の共有値は context に持たせ、`useContext` ではなく `use()` で参照する。context の型は `state`（状態）/ `actions`（操作）/ `meta`（id や ref などの付帯情報）の 3 つに分ける
+- context を取得するフックは、プロバイダの外側で呼ばれたら例外を投げて誤用を早期に知らせる
+- パーツはルートのプロパティとしてぶら下げ、`<Dialog.Header>` のように使う。**このときルートだけは関数宣言で定義する**（アロー関数にはプロパティを生やせないため）。パーツ自体は通常どおりアロー関数でよい
+- 利用側が独自のパーツを作れるよう、context のフックと型も公開する
+- 描画を伴わない挙動のフラグ（`closeOnOverlayClick` など）は合成で表せないため、ルートの prop のまま残す
+
 **import の使い分け:**
 
 - `index.ts`（barrel）は **公開 API の境界** として使う。`src/main.tsx` からの再 export と、型の再 export の集約がその役割
