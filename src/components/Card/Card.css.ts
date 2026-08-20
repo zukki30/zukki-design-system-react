@@ -1,6 +1,6 @@
 import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
-import { style } from '@vanilla-extract/css';
+import { style, styleVariants } from '@vanilla-extract/css';
 
 export const card = style({
   boxSizing: 'border-box',
@@ -21,7 +21,7 @@ export const cardImage = style({
   flexShrink: 0,
 });
 
-export const cardHeader = style({
+const cardHeaderBase = style({
   boxSizing: 'border-box',
   display: 'flex',
   gap: vars.spacing.sm,
@@ -29,23 +29,31 @@ export const cardHeader = style({
   width: '100%',
   flexShrink: 0,
   paddingBottom: vars.spacing.none,
+});
 
-  selectors: {
-    '[data-size="md"] &': {
+export const cardHeader = styleVariants({
+  md: [
+    cardHeaderBase,
+    {
       paddingTop: vars.spacing['2xl'],
       paddingInline: vars.spacing['2xl'],
     },
-    '[data-size="sm"] &': {
+  ],
+  sm: [
+    cardHeaderBase,
+    {
       paddingTop: vars.spacing.xl,
       paddingInline: vars.spacing.xl,
     },
-  },
+  ],
 });
 
 export const cardTitle = style({
   // 長いタイトルは action を押し出さず 1 行で省略する。
-  // cardHeaderMeta が flex-shrink: 0 なので、縮む余地はこちらに寄る
+  // cardAction が flex-shrink: 0 なので、縮む余地はこちらに寄る
   ...truncate,
+  flex: '1 1 auto',
+  minWidth: 0,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size'].base,
@@ -53,15 +61,15 @@ export const cardTitle = style({
   color: vars.color.textOnLight.default,
 });
 
-export const cardHeaderMeta = style({
+export const cardAction = style({
   display: 'flex',
-  flex: '1 0 0',
-  minWidth: 0,
+  flex: '0 0 auto',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  // タイトルの有無にかかわらずヘッダーの右端に寄せる
+  marginInlineStart: 'auto',
 });
 
-export const cardBody = style({
+const cardBodyBase = style({
   boxSizing: 'border-box',
   display: 'flex',
   width: '100%',
@@ -75,33 +83,35 @@ export const cardBody = style({
   fontSize: vars['font-size'].sm,
   lineHeight: vars['line-height'].default,
   color: vars.color.textOnLight.default,
-
-  selectors: {
-    '[data-size="md"] &': {
-      padding: vars.spacing['2xl'],
-    },
-    '[data-size="sm"] &': {
-      padding: vars.spacing.xl,
-    },
-  },
 });
 
-export const cardFooter = style({
+export const cardBody = styleVariants({
+  md: [cardBodyBase, { padding: vars.spacing['2xl'] }],
+  sm: [cardBodyBase, { padding: vars.spacing.xl }],
+});
+
+const cardFooterBase = style({
   boxSizing: 'border-box',
   display: 'flex',
   alignItems: 'center',
   width: '100%',
   flexShrink: 0,
   paddingTop: vars.spacing.none,
+});
 
-  selectors: {
-    '[data-size="md"] &': {
+export const cardFooter = styleVariants({
+  md: [
+    cardFooterBase,
+    {
       paddingBottom: vars.spacing['2xl'],
       paddingInline: vars.spacing['2xl'],
     },
-    '[data-size="sm"] &': {
+  ],
+  sm: [
+    cardFooterBase,
+    {
       paddingBottom: vars.spacing.xl,
       paddingInline: vars.spacing.xl,
     },
-  },
+  ],
 });

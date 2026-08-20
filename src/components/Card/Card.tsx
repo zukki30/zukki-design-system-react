@@ -1,76 +1,56 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
-import {
-  card,
-  cardBody,
-  cardFooter,
-  cardHeader,
-  cardHeaderMeta,
-  cardImage,
-  cardTitle,
-} from './Card.css';
+import { card } from './Card.css';
+import { CardAction } from './CardAction';
+import { CardBody } from './CardBody';
+import { CardFooter } from './CardFooter';
+import { CardHeader } from './CardHeader';
+import { CardImage } from './CardImage';
+import { CardTitle } from './CardTitle';
+import { CardContext } from './hooks';
+import type { CardSize } from './hooks';
 
-/**
- * カードのサイズ（余白の大きさ）
- */
-export type CardSize = 'md' | 'sm';
-
-type Props = {
+export type CardProps = {
   /**
    * カードのサイズ
    * @default 'md'
    */
   size?: CardSize;
-  /**
-   * カード上部に表示する画像領域（img 要素など）
-   */
-  image?: ReactNode;
-  /**
-   * ヘッダーのタイトル。
-   *
-   * action を押し出さないよう 1 行に固定され、あふれたぶんは省略記号で表示される。
-   * `overflow: hidden` がかかるため、内部に配置した要素のフォーカスリングは切られうる
-   */
-  title?: ReactNode;
-  /**
-   * ヘッダー右側に表示する補足要素（リンクなど）。title 指定時のみ表示される
-   */
-  action?: ReactNode;
-  /**
-   * フッターに表示する要素
-   */
-  footer?: ReactNode;
-  /**
-   * カード本文
-   */
-  children?: ReactNode;
 } & ComponentPropsWithRef<'div'>;
 
-export const Card = ({
-  size = 'md',
-  image,
-  title,
-  action,
-  footer,
-  children,
-  className,
-  ...props
-}: Props) => {
+/**
+ * カード。表示する領域は Card.Image / Card.Header / Card.Body / Card.Footer を
+ * 組み合わせて構成する。余白の大きさ（size）は context 経由で共有される
+ *
+ * @example
+ * ```tsx
+ * <Card size="sm">
+ *   <Card.Image>
+ *     <img src="thumbnail.png" alt="" />
+ *   </Card.Image>
+ *   <Card.Header>
+ *     <Card.Title>タイトル</Card.Title>
+ *     <Card.Action>
+ *       <a href="#">more</a>
+ *     </Card.Action>
+ *   </Card.Header>
+ *   <Card.Body>本文</Card.Body>
+ *   <Card.Footer>フッター</Card.Footer>
+ * </Card>
+ * ```
+ */
+export const Card = ({ size = 'md', className, children, ...props }: CardProps) => {
   return (
     <div className={clsx(card, className)} data-size={size} {...props}>
-      {image !== undefined && <div className={cardImage}>{image}</div>}
-
-      {title !== undefined && (
-        <div className={cardHeader}>
-          <div className={cardTitle}>{title}</div>
-          {action !== undefined && <div className={cardHeaderMeta}>{action}</div>}
-        </div>
-      )}
-
-      {children !== undefined && <div className={cardBody}>{children}</div>}
-
-      {footer !== undefined && <div className={cardFooter}>{footer}</div>}
+      <CardContext value={{ size }}>{children}</CardContext>
     </div>
   );
 };
+
+Card.Image = CardImage;
+Card.Header = CardHeader;
+Card.Title = CardTitle;
+Card.Action = CardAction;
+Card.Body = CardBody;
+Card.Footer = CardFooter;

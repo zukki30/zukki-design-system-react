@@ -15,11 +15,11 @@ const MoreLink = () => (
   </a>
 );
 
-const imagePlaceholder = (
+const ImagePlaceholder = () => (
   <div style={{ height: '140px', width: '100%', backgroundColor: '#d9d9d9' }} />
 );
 
-const bodyText = (
+const BodyText = () => (
   <div>
     <p style={{ margin: 0, lineHeight: 1.5 }}>Card simple text</p>
     <p style={{ margin: 0, lineHeight: 1.5 }}>Card simple</p>
@@ -32,15 +32,26 @@ const meta = {
   tags: ['autodocs'],
   args: {
     size: 'md',
-    image: imagePlaceholder,
-    title: 'Card title',
-    action: <MoreLink />,
-    footer: <MoreLink />,
-    children: bodyText,
   },
   render: (args) => (
     <div style={{ width: '300px' }}>
-      <Card {...args} />
+      <Card {...args}>
+        <Card.Image>
+          <ImagePlaceholder />
+        </Card.Image>
+        <Card.Header>
+          <Card.Title>Card title</Card.Title>
+          <Card.Action>
+            <MoreLink />
+          </Card.Action>
+        </Card.Header>
+        <Card.Body>
+          <BodyText />
+        </Card.Body>
+        <Card.Footer>
+          <MoreLink />
+        </Card.Footer>
+      </Card>
     </div>
   ),
 } satisfies Meta<typeof Card>;
@@ -57,46 +68,113 @@ export const SizeSm: Story = {
 };
 
 export const NotImage: Story = {
-  args: {
-    image: undefined,
-  },
+  render: (args) => (
+    <div style={{ width: '300px' }}>
+      <Card {...args}>
+        <Card.Header>
+          <Card.Title>Card title</Card.Title>
+          <Card.Action>
+            <MoreLink />
+          </Card.Action>
+        </Card.Header>
+        <Card.Body>
+          <BodyText />
+        </Card.Body>
+        <Card.Footer>
+          <MoreLink />
+        </Card.Footer>
+      </Card>
+    </div>
+  ),
 };
 
-export const NotMeta: Story = {
-  args: {
-    action: undefined,
-  },
+export const NotAction: Story = {
+  render: (args) => (
+    <div style={{ width: '300px' }}>
+      <Card {...args}>
+        <Card.Header>
+          <Card.Title>Card title</Card.Title>
+        </Card.Header>
+        <Card.Body>
+          <BodyText />
+        </Card.Body>
+        <Card.Footer>
+          <MoreLink />
+        </Card.Footer>
+      </Card>
+    </div>
+  ),
+};
+
+/**
+ * Card.Title を置かず Card.Action だけを配置した場合。
+ * slot props の頃と違い、タイトルの有無に依存せず右端に表示される
+ */
+export const ActionOnly: Story = {
+  render: (args) => (
+    <div style={{ width: '300px' }}>
+      <Card {...args}>
+        <Card.Header>
+          <Card.Action>
+            <MoreLink />
+          </Card.Action>
+        </Card.Header>
+        <Card.Body>
+          <BodyText />
+        </Card.Body>
+      </Card>
+    </div>
+  ),
 };
 
 export const NotHeader: Story = {
-  args: {
-    image: undefined,
-    title: undefined,
-    action: undefined,
-  },
+  render: (args) => (
+    <div style={{ width: '300px' }}>
+      <Card {...args}>
+        <Card.Body>
+          <BodyText />
+        </Card.Body>
+        <Card.Footer>
+          <MoreLink />
+        </Card.Footer>
+      </Card>
+    </div>
+  ),
 };
 
 export const Simple: Story = {
-  args: {
-    image: undefined,
-    title: undefined,
-    action: undefined,
-    footer: undefined,
-  },
+  render: (args) => (
+    <div style={{ width: '300px' }}>
+      <Card {...args}>
+        <Card.Body>
+          <BodyText />
+        </Card.Body>
+      </Card>
+    </div>
+  ),
 };
 
 /**
  * タイトルは 1 行で省略し、本文は分割できない長い語も折り返すことの確認用
  */
 export const LongContent: Story = {
-  args: {
-    title: '非常に長いカードタイトルが指定された場合の表示確認用テキスト',
-    children: (
-      <p style={{ margin: 0, lineHeight: 1.5 }}>
-        https://example.com/very/long/path/that/cannot/be/broken/1234567890
-      </p>
-    ),
-  },
+  render: (args) => (
+    <div style={{ width: '300px' }}>
+      <Card {...args}>
+        <Card.Header>
+          <Card.Title>非常に長いカードタイトルが指定された場合の表示確認用テキスト</Card.Title>
+          <Card.Action>
+            <MoreLink />
+          </Card.Action>
+        </Card.Header>
+        <Card.Body>
+          <p style={{ margin: 0, lineHeight: 1.5 }}>
+            https://example.com/very/long/path/that/cannot/be/broken/1234567890
+          </p>
+        </Card.Body>
+      </Card>
+    </div>
+  ),
 };
 
 export const AllVariants: Story = {
@@ -108,50 +186,75 @@ export const AllVariants: Story = {
       width: '300px',
     };
 
+    const sizes = ['md', 'sm'] as const;
+
     return (
       <div style={{ display: 'flex', gap: '24px' }}>
-        <div style={columnStyle}>
-          <h4>size = md</h4>
-          <Card
-            image={imagePlaceholder}
-            title="Card title"
-            action={<MoreLink />}
-            footer={<MoreLink />}
-          >
-            {bodyText}
-          </Card>
-          <Card title="Card title" action={<MoreLink />} footer={<MoreLink />}>
-            {bodyText}
-          </Card>
-          <Card title="Card title" footer={<MoreLink />}>
-            {bodyText}
-          </Card>
-          <Card footer={<MoreLink />}>{bodyText}</Card>
-          <Card>{bodyText}</Card>
-        </div>
+        {sizes.map((size) => (
+          <div style={columnStyle} key={size}>
+            <h4>size = {size}</h4>
 
-        <div style={columnStyle}>
-          <h4>size = sm</h4>
-          <Card
-            size="sm"
-            image={imagePlaceholder}
-            title="Card title"
-            action={<MoreLink />}
-            footer={<MoreLink />}
-          >
-            {bodyText}
-          </Card>
-          <Card size="sm" title="Card title" action={<MoreLink />} footer={<MoreLink />}>
-            {bodyText}
-          </Card>
-          <Card size="sm" title="Card title" footer={<MoreLink />}>
-            {bodyText}
-          </Card>
-          <Card size="sm" footer={<MoreLink />}>
-            {bodyText}
-          </Card>
-          <Card size="sm">{bodyText}</Card>
-        </div>
+            <Card size={size}>
+              <Card.Image>
+                <ImagePlaceholder />
+              </Card.Image>
+              <Card.Header>
+                <Card.Title>Card title</Card.Title>
+                <Card.Action>
+                  <MoreLink />
+                </Card.Action>
+              </Card.Header>
+              <Card.Body>
+                <BodyText />
+              </Card.Body>
+              <Card.Footer>
+                <MoreLink />
+              </Card.Footer>
+            </Card>
+
+            <Card size={size}>
+              <Card.Header>
+                <Card.Title>Card title</Card.Title>
+                <Card.Action>
+                  <MoreLink />
+                </Card.Action>
+              </Card.Header>
+              <Card.Body>
+                <BodyText />
+              </Card.Body>
+              <Card.Footer>
+                <MoreLink />
+              </Card.Footer>
+            </Card>
+
+            <Card size={size}>
+              <Card.Header>
+                <Card.Title>Card title</Card.Title>
+              </Card.Header>
+              <Card.Body>
+                <BodyText />
+              </Card.Body>
+              <Card.Footer>
+                <MoreLink />
+              </Card.Footer>
+            </Card>
+
+            <Card size={size}>
+              <Card.Body>
+                <BodyText />
+              </Card.Body>
+              <Card.Footer>
+                <MoreLink />
+              </Card.Footer>
+            </Card>
+
+            <Card size={size}>
+              <Card.Body>
+                <BodyText />
+              </Card.Body>
+            </Card>
+          </div>
+        ))}
       </div>
     );
   },
