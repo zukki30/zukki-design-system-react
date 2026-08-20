@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
+import { useFormFieldState } from '../FormField/FormFieldContext';
+
 import { input, inputField, inputIcon } from './Input.css';
 
 type Props = {
@@ -17,16 +19,25 @@ type Props = {
    */
   endIcon?: React.ReactNode;
   /**
-   * 入力のエラー状態
+   * 入力のエラー状態。未指定のときは FormField のエラー状態を引き継ぐ
    */
   error?: boolean;
   /**
-   * 入力の disabled 属性
+   * 入力の disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
   disabled?: boolean;
 } & Omit<ComponentPropsWithRef<'input'>, 'prefix' | 'suffix'>;
 
-export const Input = ({ startIcon, endIcon, error, disabled, className, ...props }: Props) => {
+export const Input = ({
+  startIcon,
+  endIcon,
+  error: errorProp,
+  disabled: disabledProp,
+  className,
+  ...props
+}: Props) => {
+  const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
+
   return (
     <div className={clsx(input, className)} data-error={error} data-disabled={disabled}>
       {startIcon ? (

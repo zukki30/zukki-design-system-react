@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { FormField } from '../FormField';
+
 import { Checkbox } from './Checkbox';
 
 describe('Checkbox', () => {
@@ -130,5 +132,27 @@ describe('Checkbox', () => {
     );
 
     expect(ref.current?.indeterminate).toBe(true);
+  });
+
+  describe('FormField との連携', () => {
+    it('FormField の disabled を引き継ぐ', () => {
+      render(
+        <FormField disabled>
+          <Checkbox>同意する</Checkbox>
+        </FormField>
+      );
+
+      expect(screen.getByRole('checkbox')).toBeDisabled();
+    });
+
+    it('自身に指定した値を優先する', () => {
+      render(
+        <FormField disabled>
+          <Checkbox disabled={false}>同意する</Checkbox>
+        </FormField>
+      );
+
+      expect(screen.getByRole('checkbox')).toBeEnabled();
+    });
   });
 });

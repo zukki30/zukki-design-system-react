@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { FormField } from '../FormField';
+
 import { Select } from './Select';
 
 const options = (
@@ -94,5 +96,34 @@ describe('Select', () => {
     render(<Select ref={ref}>{options}</Select>);
 
     expect(ref.current).toBe(screen.getByRole('combobox'));
+  });
+
+  describe('FormField との連携', () => {
+    it('FormField のエラー状態と disabled を引き継ぐ', () => {
+      render(
+        <FormField error disabled>
+          <Select>{options}</Select>
+        </FormField>
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox).toHaveAttribute('aria-invalid', 'true');
+      expect(combobox).toBeDisabled();
+      expect(combobox.closest('[data-error]')).toHaveAttribute('data-error', 'true');
+    });
+
+    it('自身に指定した値を優先する', () => {
+      render(
+        <FormField error disabled>
+          <Select error={false} disabled={false}>
+            {options}
+          </Select>
+        </FormField>
+      );
+
+      const combobox = screen.getByRole('combobox');
+      expect(combobox).toHaveAttribute('aria-invalid', 'false');
+      expect(combobox).toBeEnabled();
+    });
   });
 });

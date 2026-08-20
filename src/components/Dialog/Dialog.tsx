@@ -4,14 +4,13 @@ import {
   type ComponentPropsWithRef,
   type MouseEvent,
   type ReactNode,
-  useCallback,
   useEffect,
   useId,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 
+import { useIdRegistry } from '@/hooks/useIdRegistry';
 import { useMergedRef } from '@/hooks/useMergedRef';
 
 import { Icon } from '../Icon/Icon';
@@ -95,13 +94,7 @@ export function Dialog({
   const mergedRef = useMergedRef(ref, dialogRef);
   // Dialog.Title は Dialog.Header の内側にネストされ、ルートからは children を検査できない。
   // そのためタイトル側から id を登録してもらい、aria-labelledby に反映する
-  const [titleIds, setTitleIds] = useState<string[]>([]);
-
-  const registerTitle = useCallback((id: string) => {
-    setTitleIds((ids) => [...ids, id]);
-
-    return () => setTitleIds((ids) => ids.filter((registered) => registered !== id));
-  }, []);
+  const [titleIds, registerTitle] = useIdRegistry();
 
   // onClose はインライン関数で渡されるのが一般的で、そのまま依存にすると context が毎レンダー
   // 作り直されて memo 化が効かない。最新の onClose を ref 経由で読み、close の参照を固定する

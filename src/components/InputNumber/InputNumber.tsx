@@ -3,6 +3,7 @@ import { type ComponentPropsWithRef, type MouseEvent, useRef } from 'react';
 
 import { useMergedRef } from '@/hooks/useMergedRef';
 
+import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
 import {
@@ -15,11 +16,11 @@ import {
 
 type Props = {
   /**
-   * 数値入力のエラー状態
+   * 数値入力のエラー状態。未指定のときは FormField のエラー状態を引き継ぐ
    */
   error?: boolean;
   /**
-   * 数値入力の disabled 属性
+   * 数値入力の disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
   disabled?: boolean;
 } & Omit<ComponentPropsWithRef<'input'>, 'type' | 'prefix' | 'suffix'>;
@@ -65,7 +66,15 @@ const resolveInputMode = (step: Props['step'], min: Props['min']): 'numeric' | '
  * @example
  * <InputNumber min={-100} max={100} inputMode="text" />
  */
-export const InputNumber = ({ error, disabled, className, ref, ...props }: Props) => {
+export const InputNumber = ({
+  error: errorProp,
+  disabled: disabledProp,
+  className,
+  ref,
+  ...props
+}: Props) => {
+  const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
+
   // スピンボタンの操作には DOM 要素が必要なため、内部で保持しつつ利用側の ref にも転送する
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergedRef(ref, inputRef);

@@ -3,6 +3,7 @@ import { type ComponentPropsWithRef, useEffect, useRef } from 'react';
 
 import { useMergedRef } from '@/hooks/useMergedRef';
 
+import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
 import {
@@ -25,7 +26,7 @@ type Props = {
    */
   indeterminate?: boolean;
   /**
-   * チェックボックスの disabled 属性
+   * チェックボックスの disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
   disabled?: boolean;
 } & Omit<ComponentPropsWithRef<'input'>, 'type' | 'children' | 'size'>;
@@ -35,11 +36,12 @@ const ICON_SIZE = 24;
 export const Checkbox = ({
   children,
   indeterminate = false,
-  disabled,
+  disabled: disabledProp,
   className,
   ref,
   ...props
 }: Props) => {
+  const { disabled } = useFormFieldState({ disabled: disabledProp });
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergedRef(ref, inputRef);
 
