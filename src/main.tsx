@@ -29,7 +29,16 @@ export { Select } from './components/Select';
 export { FormField } from './components/FormField';
 export type { FormFieldOrientation, FormFieldRequiredMark } from './components/FormField';
 export { Card } from './components/Card';
-export type { CardSize } from './components/Card';
+export type {
+  CardActionProps,
+  CardBodyProps,
+  CardFooterProps,
+  CardHeaderProps,
+  CardImageProps,
+  CardProps,
+  CardSize,
+  CardTitleProps,
+} from './components/Card';
 export { Dialog, useDialogContext } from './components/Dialog';
 export type {
   DialogBodyProps,
