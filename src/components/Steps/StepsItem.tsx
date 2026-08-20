@@ -1,5 +1,9 @@
+import type { ReactNode } from 'react';
+
 import { Icon } from '../Icon/Icon';
+import { stepsItemContainer } from './Steps.css';
 import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './StepsItem.css';
+import { useStepsContext, useStepsItemNumber } from './hooks';
 
 const CHECK_ICON_SIZE = 20;
 
@@ -21,39 +25,25 @@ const STATUS_TEXT = {
   current: '現在のステップ',
 } as const;
 
-type Props = {
+export type StepsItemProps = {
   /**
-   * The step number to display.
+   * ステップのラベル
    */
-  stepNumber: number;
-  /**
-   * The label for the step.
-   */
-  label: string;
-  /**
-   * Whether the step is the current step.
-   * If true, it will apply a different style to indicate it's the current step.
-   */
-  current?: boolean;
-  /**
-   * Whether the step is finished.
-   * If true, it will display a check icon instead of the number.
-   */
-  finished?: boolean;
-  /**
-   * Optional click handler for the step.
-   * If provided, the step will be clickable.
-   */
-  onClick?: (step: number) => void;
+  children: ReactNode;
 };
 
-export const StepsItem = ({
-  stepNumber,
-  label,
-  current = false,
-  finished = false,
-  onClick,
-}: Props) => {
+/**
+ * ステップ 1 件。ステップ番号・現在／完了の状態・クリック可否は、
+ * すべて Steps から context 経由で受け取る
+ */
+export const StepsItem = ({ children }: StepsItemProps) => {
+  const { current, orientation, total, onClick } = useStepsContext('Steps.Item');
+  const stepNumber = useStepsItemNumber('Steps.Item');
+
+  const isCurrent = stepNumber === current;
+  // 最終ステップは current を超えても完了にしない（次のステップが存在しないため）
+  const isFinished = stepNumber < total && stepNumber < current;
+
   const isNonInteractive = !onClick;
   const Component = isNonInteractive ? 'span' : 'button';
   const buttonProps = isNonInteractive
@@ -64,10 +54,10 @@ export const StepsItem = ({
       };
 
   const getStatusText = () => {
-    if (finished) {
+    if (isFinished) {
       return STATUS_TEXT.finished;
     }
-    if (current) {
+    if (isCurrent) {
       return STATUS_TEXT.current;
     }
     return undefined;
@@ -76,18 +66,24 @@ export const StepsItem = ({
   const statusText = getStatusText();
 
   return (
-    // 現在ステップは aria-current と状態テキストが重複して読み上げられるが、
-    // aria-current を読み上げない支援技術のための保険として意図的に併記している
-    <Component {...buttonProps} className={stepsItem} aria-current={current ? 'step' : undefined}>
-      {finished ? (
-        FINISHED_ICON
-      ) : (
-        <span className={current ? stepsItemIcon.current : stepsItemIcon.default}>
-          {stepNumber}
-        </span>
-      )}
-      <span className={stepsItemLabel}>{label}</span>
-      {statusText !== undefined && <span className={stepsItemStatus}>{statusText}</span>}
-    </Component>
+    <li data-orientation={orientation} className={stepsItemContainer}>
+      {/* 現在ステップは aria-current と状態テキストが重複して読み上げられるが、
+          aria-current を読み上げない支援技術のための保険として意図的に併記している */}
+      <Component
+        {...buttonProps}
+        className={stepsItem}
+        aria-current={isCurrent ? 'step' : undefined}
+      >
+        {isFinished ? (
+          FINISHED_ICON
+        ) : (
+          <span className={isCurrent ? stepsItemIcon.current : stepsItemIcon.default}>
+            {stepNumber}
+          </span>
+        )}
+        <span className={stepsItemLabel}>{children}</span>
+        {statusText !== undefined && <span className={stepsItemStatus}>{statusText}</span>}
+      </Component>
+    </li>
   );
 };

@@ -18,7 +18,7 @@ export { IconButton } from './components/IconButton';
 export { Skeleton } from './components/Skeleton';
 export type { SkeletonShape } from './components/Skeleton';
 export { Steps } from './components/Steps';
-export type { StepsOrientation } from './components/Steps';
+export type { StepsItemProps, StepsOrientation, StepsProps } from './components/Steps';
 export { Input } from './components/Input';
 export { InputNumber } from './components/InputNumber';
 export { TextArea } from './components/TextArea';
