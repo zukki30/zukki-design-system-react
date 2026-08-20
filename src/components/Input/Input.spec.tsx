@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { FormField } from '../FormField';
+
 import { Input } from './Input';
 
 describe('Input', () => {
@@ -98,5 +100,32 @@ describe('Input', () => {
     ref.current?.focus();
 
     expect(screen.getByPlaceholderText('focus')).toHaveFocus();
+  });
+
+  describe('FormField との連携', () => {
+    it('FormField のエラー状態と disabled を引き継ぐ', () => {
+      render(
+        <FormField error disabled>
+          <Input placeholder="input" />
+        </FormField>
+      );
+
+      const input = screen.getByPlaceholderText('input');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(input).toBeDisabled();
+      expect(input.closest('[data-error]')).toHaveAttribute('data-error', 'true');
+    });
+
+    it('自身に指定した値を優先する', () => {
+      render(
+        <FormField error disabled>
+          <Input placeholder="input" error={false} disabled={false} />
+        </FormField>
+      );
+
+      const input = screen.getByPlaceholderText('input');
+      expect(input).toHaveAttribute('aria-invalid', 'false');
+      expect(input).toBeEnabled();
+    });
   });
 });

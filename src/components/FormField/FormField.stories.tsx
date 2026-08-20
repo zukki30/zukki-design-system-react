@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Checkbox } from '../Checkbox';
 import { Input } from '../Input';
 
 import { FormField } from './FormField';
@@ -7,29 +8,59 @@ import { FormField } from './FormField';
 const docsDescription = [
   'ラベル・補助テキスト・エラーメッセージをまとめて扱うフォームフィールドです。',
   '',
-  '### 入力要素との自動的な紐付け',
+  '中身は `FormField.Label` / `FormField.Control` / `FormField.HelperText` / `FormField.ErrorText`',
+  'を合成して組み立てます。各パーツの有無は、描画するかどうかで表現します。',
   '',
-  'children が **単一の要素** のとき、次の属性を自動で注入します。利用側で id を書く必要はありません。',
+  '```tsx',
+  '<FormField required>',
+  '  <FormField.Label>メールアドレス</FormField.Label>',
+  '  <FormField.Control>',
+  '    <Input type="email" />',
+  '  </FormField.Control>',
+  '  <FormField.HelperText>会社のアドレスを入力してください</FormField.HelperText>',
+  '  {message !== undefined && <FormField.ErrorText>{message}</FormField.ErrorText>}',
+  '</FormField>',
+  '```',
+  '',
+  '### 状態の自動伝播',
+  '',
+  'ルートで指定した状態は context 経由で入力要素へ伝わります。`<Input error disabled>` のように',
+  '入力要素側で指定し直す必要はありません。',
+  '',
+  '| ルートの指定 | 入力要素に伝わるもの |',
+  '| --- | --- |',
+  '| `required` | `aria-required`（ラベルには必須マーク） |',
+  '| `disabled` | `disabled`（ラベルは disabled 表示） |',
+  '| `FormField.ErrorText` の描画 | `error` / `aria-invalid` |',
+  '',
+  'エラー状態は `FormField.ErrorText` を描画しているかどうかで決まります。',
+  'メッセージを出さずにエラー表示だけしたい場合は、ルートに `error` を指定して上書きできます。',
+  '',
+  '入力要素側で明示した値は常に優先されるため、`<Input disabled={false} />` のように',
+  'フィールド単位の状態から外すこともできます。',
+  '',
+  '### 入力要素との紐付け',
+  '',
+  '`FormField.Control` の子が **単一の要素** のとき、次の属性を自動で注入します。',
+  '利用側で id を書く必要はありません。',
   '',
   '| 属性 | 内容 |',
   '| --- | --- |',
-  '| `id` | `htmlFor` → children の `id` → 自動生成（`useId`）の順に決まり、label の `for` と一致する |',
-  '| `aria-describedby` | `helperText` / `errorText` の id。children が指定済みの値があれば結合する |',
-  '| `aria-required` | `required` のとき `true`。children が指定済みならそちらを優先する |',
+  '| `id` | 子の `id` があればそれを尊重し、無ければ自動生成（`useId`）する |',
+  '| `aria-describedby` | 補助テキスト・エラーメッセージの id。子が指定済みの値があれば結合する |',
+  '| `aria-required` / `aria-invalid` / `disabled` | ルートの状態。子が指定済みならそちらを優先する |',
   '',
-  '`errorText` には `role="alert"` を付与しているため、表示された時点で支援技術に通知されます。',
+  '`FormField.Label` の `htmlFor` は、実際に描画された入力要素の id と自動で紐付きます',
+  '（入力要素が無いときは出力しません）。',
   '',
-  '`htmlFor` を指定した場合は children 側の `id` を **上書き** します。外部から children の `id` を',
-  '参照している場合は、`htmlFor` に同じ値を渡してください。',
+  '子が複数要素・テキスト・単一の Fragment の場合は注入しません（Fragment は props を',
+  '受け取れないため）。この場合は入力要素の `id` と ARIA 属性を利用側で指定してください。',
+  'エラー状態と `disabled` は context 経由で伝わるため、指定は不要です。',
   '',
-  'children が複数要素・テキスト・単一の Fragment の場合は注入を行いません（Fragment は props を',
-  '受け取れないため）。この場合、`htmlFor` 未指定なら label の `for` も出力しないので、',
-  '`htmlFor` と入力要素の `id` を明示的に指定してください。',
+  '### レイアウト',
   '',
-  '### 伝播しないもの',
-  '',
-  '`error`（`aria-invalid`）と `disabled` は入力要素へ伝播しません。`errorText` を表示するときは',
-  '`<Input error>` のように入力要素側にも状態を指定してください。',
+  '横並びのレイアウトはルートの grid で組んでいます。**パーツはルートの直下に置いてください。**',
+  '別の要素で囲むと列の割り当てが崩れます。',
 ].join('\n');
 
 const meta = {
@@ -44,8 +75,14 @@ const meta = {
     },
   },
   args: {
-    label: 'ラベル',
-    children: <Input placeholder="placeholder" />,
+    children: (
+      <>
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
+      </>
+    ),
   },
   render: (args) => (
     <div style={{ width: '320px' }}>
@@ -72,7 +109,6 @@ export const Vertical: Story = {
 export const Disabled: Story = {
   args: {
     disabled: true,
-    children: <Input placeholder="Disabled入力" disabled />,
   },
 };
 
@@ -94,12 +130,17 @@ export const ErrorText: Story = {
   args: {
     required: true,
     requiredMark: 'both',
-    children: <Input placeholder="placeholder" error />,
-    errorText: (
+    children: (
       <>
-        Error メッセージError メッセージ
-        <br />
-        Error メッセージ
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
+        <FormField.ErrorText>
+          Error メッセージError メッセージ
+          <br />
+          Error メッセージ
+        </FormField.ErrorText>
       </>
     ),
   },
@@ -109,11 +150,17 @@ export const HelperText: Story = {
   args: {
     required: true,
     requiredMark: 'both',
-    helperText: (
+    children: (
       <>
-        Helper テキストHelper テキスト
-        <br />
-        Helper テキスト
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
+        <FormField.HelperText>
+          Helper テキストHelper テキスト
+          <br />
+          Helper テキスト
+        </FormField.HelperText>
       </>
     ),
   },
@@ -123,19 +170,43 @@ export const HelperAndError: Story = {
   args: {
     required: true,
     requiredMark: 'both',
-    children: <Input placeholder="placeholder" error />,
-    helperText: (
+    children: (
       <>
-        Helper テキストHelper テキスト
-        <br />
-        Helper テキスト
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
+        <FormField.HelperText>
+          Helper テキストHelper テキスト
+          <br />
+          Helper テキスト
+        </FormField.HelperText>
+        <FormField.ErrorText>
+          Error メッセージError メッセージ
+          <br />
+          Error メッセージ
+        </FormField.ErrorText>
       </>
     ),
-    errorText: (
+  },
+};
+
+/**
+ * 複数の入力要素を並べる例。
+ * この場合は id が自動注入されないため、それぞれにラベルを持たせる
+ */
+export const MultipleControls: Story = {
+  args: {
+    orientation: 'vertical',
+    disabled: true,
+    children: (
       <>
-        Error メッセージError メッセージ
-        <br />
-        Error メッセージ
+        <FormField.Label>受け取る通知</FormField.Label>
+        <FormField.Control>
+          <Checkbox defaultChecked>メール</Checkbox>
+          <Checkbox>SMS</Checkbox>
+        </FormField.Control>
+        <FormField.HelperText>あとから設定画面で変更できます</FormField.HelperText>
       </>
     ),
   },
@@ -144,76 +215,80 @@ export const HelperAndError: Story = {
 export const AllStates: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '320px' }}>
-      <FormField label="ラベル" orientation="horizontal">
-        <Input placeholder="placeholder" />
+      <FormField orientation="horizontal">
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
       </FormField>
 
-      <FormField label="ラベル" orientation="vertical">
-        <Input placeholder="placeholder" />
+      <FormField orientation="vertical">
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
       </FormField>
 
-      <FormField label="ラベル" disabled>
-        <Input placeholder="Disabled入力" disabled />
+      <FormField disabled>
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="Disabled入力" />
+        </FormField.Control>
       </FormField>
 
-      <FormField label="ラベル" required requiredMark="badge">
-        <Input placeholder="placeholder" />
+      <FormField required requiredMark="badge">
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
       </FormField>
 
-      <FormField label="ラベル" required requiredMark="asterisk">
-        <Input placeholder="placeholder" />
+      <FormField required requiredMark="asterisk">
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
       </FormField>
 
-      <FormField
-        label="ラベル"
-        required
-        requiredMark="both"
-        errorText={
-          <>
-            Error メッセージError メッセージ
-            <br />
-            Error メッセージ
-          </>
-        }
-      >
-        <Input placeholder="placeholder" error />
+      <FormField required requiredMark="both">
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
+        <FormField.ErrorText>
+          Error メッセージError メッセージ
+          <br />
+          Error メッセージ
+        </FormField.ErrorText>
       </FormField>
 
-      <FormField
-        label="ラベル"
-        required
-        requiredMark="both"
-        helperText={
-          <>
-            Helper テキストHelper テキスト
-            <br />
-            Helper テキスト
-          </>
-        }
-      >
-        <Input placeholder="placeholder" />
+      <FormField required requiredMark="both">
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
+        <FormField.HelperText>
+          Helper テキストHelper テキスト
+          <br />
+          Helper テキスト
+        </FormField.HelperText>
       </FormField>
 
-      <FormField
-        label="ラベル"
-        required
-        requiredMark="both"
-        helperText={
-          <>
-            Helper テキストHelper テキスト
-            <br />
-            Helper テキスト
-          </>
-        }
-        errorText={
-          <>
-            Error メッセージError メッセージ
-            <br />
-            Error メッセージ
-          </>
-        }
-      >
-        <Input placeholder="placeholder" error />
+      <FormField required requiredMark="both">
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+        </FormField.Control>
+        <FormField.HelperText>
+          Helper テキストHelper テキスト
+          <br />
+          Helper テキスト
+        </FormField.HelperText>
+        <FormField.ErrorText>
+          Error メッセージError メッセージ
+          <br />
+          Error メッセージ
+        </FormField.ErrorText>
       </FormField>
     </div>
   ),

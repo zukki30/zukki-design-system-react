@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { FormField } from '../FormField';
+
 import { Radio } from './Radio';
 
 describe('Radio', () => {
@@ -93,5 +95,27 @@ describe('Radio', () => {
     render(<Radio ref={ref}>りんご</Radio>);
 
     expect(ref.current).toBe(screen.getByRole('radio'));
+  });
+
+  describe('FormField との連携', () => {
+    it('FormField の disabled を引き継ぐ', () => {
+      render(
+        <FormField disabled>
+          <Radio>りんご</Radio>
+        </FormField>
+      );
+
+      expect(screen.getByRole('radio')).toBeDisabled();
+    });
+
+    it('自身に指定した値を優先する', () => {
+      render(
+        <FormField disabled>
+          <Radio disabled={false}>りんご</Radio>
+        </FormField>
+      );
+
+      expect(screen.getByRole('radio')).toBeEnabled();
+    });
   });
 });

@@ -1,34 +1,46 @@
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
+/**
+ * 横並びのときのラベル列の幅
+ */
+const LABEL_COLUMN_WIDTH = 100;
+
 export const formField = style({
-  display: 'flex',
+  display: 'grid',
   gap: vars.spacing.sm,
-  alignItems: 'flex-start',
+  alignItems: 'start',
 
   selectors: {
+    // パーツはルート直下に並ぶため、列の割り当てだけでラベルと入力欄を配置する。
+    // 入力欄の列は minmax(0, 1fr) にして、長いコンテンツで列が広がらないようにする
+    '&[data-orientation="horizontal"]': {
+      gridTemplateColumns: `${LABEL_COLUMN_WIDTH}px minmax(0, 1fr)`,
+    },
     '&[data-orientation="vertical"]': {
-      flexDirection: 'column',
+      gridTemplateColumns: 'minmax(0, 1fr)',
     },
   },
 });
 
-export const formFieldLabelContainer = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  flexShrink: 0,
+/**
+ * 入力欄・補助テキスト・エラーメッセージが並ぶ列。
+ * 横並びのときだけ 2 列目に送る（縦並びでは 1 列しかない）
+ */
+const formFieldControlColumn = style({
+  minWidth: 0,
 
   selectors: {
     // data-orientation は Steps など他コンポーネントも使うため、
     // 祖先セレクタは FormField のルートに限定する
     [`${formField}[data-orientation="horizontal"] &`]: {
-      width: 100,
+      gridColumn: 2,
     },
   },
 });
 
 export const formFieldLabel = style({
+  gridColumn: 1,
   display: 'flex',
   alignItems: 'center',
   gap: vars.spacing.sm,
@@ -76,27 +88,34 @@ export const formFieldRequiredBadge = style({
   whiteSpace: 'nowrap',
 });
 
-export const formFieldControl = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-  gap: vars.spacing.sm,
-  flex: '1 0 0',
-  minWidth: 0,
-});
+export const formFieldControl = style([
+  formFieldControlColumn,
+  {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: vars.spacing.sm,
+  },
+]);
 
-export const formFieldHelperText = style({
-  fontFamily: vars['font-family'].default,
-  fontWeight: vars['font-weight'].normal,
-  fontSize: vars['font-size'].xs,
-  lineHeight: vars['line-height'].default,
-  color: vars.color.grey['400'],
-});
+export const formFieldHelperText = style([
+  formFieldControlColumn,
+  {
+    fontFamily: vars['font-family'].default,
+    fontWeight: vars['font-weight'].normal,
+    fontSize: vars['font-size'].xs,
+    lineHeight: vars['line-height'].default,
+    color: vars.color.grey['400'],
+  },
+]);
 
-export const formFieldErrorText = style({
-  fontFamily: vars['font-family'].default,
-  fontWeight: vars['font-weight'].normal,
-  fontSize: vars['font-size'].xs,
-  lineHeight: vars['line-height'].default,
-  color: vars.color.textOnFailure.default,
-});
+export const formFieldErrorText = style([
+  formFieldControlColumn,
+  {
+    fontFamily: vars['font-family'].default,
+    fontWeight: vars['font-weight'].normal,
+    fontSize: vars['font-size'].xs,
+    lineHeight: vars['line-height'].default,
+    color: vars.color.textOnFailure.default,
+  },
+]);

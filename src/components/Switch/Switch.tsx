@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
+import { useFormFieldState } from '../FormField/FormFieldContext';
+
 import {
   switchControl,
   switchInput,
@@ -16,12 +18,14 @@ type Props = {
    */
   children?: React.ReactNode;
   /**
-   * スイッチの disabled 属性
+   * スイッチの disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
   disabled?: boolean;
 } & Omit<ComponentPropsWithRef<'input'>, 'type' | 'children' | 'size' | 'role'>;
 
-export const Switch = ({ children, disabled, className, ...props }: Props) => {
+export const Switch = ({ children, disabled: disabledProp, className, ...props }: Props) => {
+  const { disabled } = useFormFieldState({ disabled: disabledProp });
+
   return (
     <label className={clsx(switchRoot, className)} data-disabled={disabled}>
       <span className={switchControl}>

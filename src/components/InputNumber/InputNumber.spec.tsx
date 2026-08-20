@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { FormField } from '../FormField';
+
 import { InputNumber } from './InputNumber';
 
 describe('InputNumber', () => {
@@ -141,5 +143,34 @@ describe('InputNumber', () => {
     fireEvent.click(screen.getByLabelText('増やす'));
 
     expect(screen.getByRole('spinbutton')).toHaveValue(6);
+  });
+
+  describe('FormField との連携', () => {
+    it('FormField のエラー状態と disabled を引き継ぐ', () => {
+      render(
+        <FormField error disabled>
+          <InputNumber />
+        </FormField>
+      );
+
+      const spinbutton = screen.getByRole('spinbutton');
+      expect(spinbutton).toHaveAttribute('aria-invalid', 'true');
+      expect(spinbutton).toBeDisabled();
+      expect(spinbutton.closest('[data-error]')).toHaveAttribute('data-error', 'true');
+      // スピンボタンも一緒に無効化する
+      expect(screen.getByLabelText('増やす')).toBeDisabled();
+    });
+
+    it('自身に指定した値を優先する', () => {
+      render(
+        <FormField error disabled>
+          <InputNumber error={false} disabled={false} />
+        </FormField>
+      );
+
+      const spinbutton = screen.getByRole('spinbutton');
+      expect(spinbutton).toHaveAttribute('aria-invalid', 'false');
+      expect(spinbutton).toBeEnabled();
+    });
   });
 });

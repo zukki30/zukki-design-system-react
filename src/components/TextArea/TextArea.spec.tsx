@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { FormField } from '../FormField';
+
 import { TextArea } from './TextArea';
 
 describe('TextArea', () => {
@@ -58,5 +60,32 @@ describe('TextArea', () => {
     render(<TextArea ref={ref} placeholder="ref" />);
 
     expect(ref.current).toBe(screen.getByPlaceholderText('ref'));
+  });
+
+  describe('FormField との連携', () => {
+    it('FormField のエラー状態と disabled を引き継ぐ', () => {
+      render(
+        <FormField error disabled>
+          <TextArea placeholder="textarea" />
+        </FormField>
+      );
+
+      const textarea = screen.getByPlaceholderText('textarea');
+      expect(textarea).toHaveAttribute('aria-invalid', 'true');
+      expect(textarea).toHaveAttribute('data-error', 'true');
+      expect(textarea).toBeDisabled();
+    });
+
+    it('自身に指定した値を優先する', () => {
+      render(
+        <FormField error disabled>
+          <TextArea placeholder="textarea" error={false} disabled={false} />
+        </FormField>
+      );
+
+      const textarea = screen.getByPlaceholderText('textarea');
+      expect(textarea).toHaveAttribute('aria-invalid', 'false');
+      expect(textarea).toBeEnabled();
+    });
   });
 });

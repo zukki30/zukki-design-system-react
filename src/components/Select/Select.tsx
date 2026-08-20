@@ -1,6 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
+import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
 import { select, selectField, selectIcon } from './Select.css';
@@ -11,11 +12,11 @@ type Props = {
    */
   placeholder?: string;
   /**
-   * セレクトのエラー状態
+   * セレクトのエラー状態。未指定のときは FormField のエラー状態を引き継ぐ
    */
   error?: boolean;
   /**
-   * セレクトの disabled 属性
+   * セレクトの disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
   disabled?: boolean;
   /**
@@ -28,14 +29,16 @@ const ICON_SIZE = 20;
 
 export const Select = ({
   placeholder,
-  error,
-  disabled,
+  error: errorProp,
+  disabled: disabledProp,
   className,
   children,
   value,
   defaultValue,
   ...props
 }: Props) => {
+  const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
+
   // placeholder 指定かつ未制御・初期値なしのときは空文字を初期選択にして placeholder を表示する
   const resolvedDefaultValue =
     value === undefined && defaultValue === undefined && placeholder !== undefined

@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { FormField } from '../FormField';
+
 import { Switch } from './Switch';
 
 describe('Switch', () => {
@@ -76,5 +78,27 @@ describe('Switch', () => {
     render(<Switch ref={ref}>通知を受け取る</Switch>);
 
     expect(ref.current).toBe(screen.getByRole('switch'));
+  });
+
+  describe('FormField との連携', () => {
+    it('FormField の disabled を引き継ぐ', () => {
+      render(
+        <FormField disabled>
+          <Switch>通知を受け取る</Switch>
+        </FormField>
+      );
+
+      expect(screen.getByRole('switch')).toBeDisabled();
+    });
+
+    it('自身に指定した値を優先する', () => {
+      render(
+        <FormField disabled>
+          <Switch disabled={false}>通知を受け取る</Switch>
+        </FormField>
+      );
+
+      expect(screen.getByRole('switch')).toBeEnabled();
+    });
   });
 });
