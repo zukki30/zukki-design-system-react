@@ -1,8 +1,13 @@
 import type { ReactNode } from 'react';
 
 import { Icon } from '../Icon/Icon';
-import { stepsItemContainer } from './Steps.css';
-import { stepsItem, stepsItemIcon, stepsItemLabel, stepsItemStatus } from './StepsItem.css';
+import {
+  stepsItem,
+  stepsItemContainer,
+  stepsItemIcon,
+  stepsItemLabel,
+  stepsItemStatus,
+} from './StepsItem.css';
 import { useStepsContext, useStepsItemNumber } from './hooks';
 
 const CHECK_ICON_SIZE = 20;
@@ -37,20 +42,23 @@ export type StepsItemProps = {
  * すべて Steps から context 経由で受け取る
  */
 export const StepsItem = ({ children }: StepsItemProps) => {
-  const { current, orientation, total, onClick } = useStepsContext('Steps.Item');
-  const stepNumber = useStepsItemNumber('Steps.Item');
+  const {
+    state: { current, total, orientation },
+    actions: { select },
+  } = useStepsContext();
+  const stepNumber = useStepsItemNumber();
 
   const isCurrent = stepNumber === current;
   // 最終ステップは current を超えても完了にしない（次のステップが存在しないため）
   const isFinished = stepNumber < total && stepNumber < current;
 
-  const isNonInteractive = !onClick;
+  const isNonInteractive = !select;
   const Component = isNonInteractive ? 'span' : 'button';
   const buttonProps = isNonInteractive
     ? {}
     : {
         type: 'button' as const,
-        onClick: () => onClick(stepNumber),
+        onClick: () => select(stepNumber),
       };
 
   const getStatusText = () => {

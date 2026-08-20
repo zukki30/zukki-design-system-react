@@ -1,4 +1,4 @@
-import { Children, isValidElement, useMemo } from 'react';
+import { Children, Fragment, isValidElement, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 import { steps } from './Steps.css';
@@ -23,7 +23,8 @@ export type StepsProps = {
    */
   onClick?: (stepNumber: number) => void;
   /**
-   * ステップの並び。直下には Steps.Item のみを指定する
+   * ステップの並び。ステップ番号は直下の子の並び順から採番されるため、
+   * 1 ステップにつき 1 つの子を置く
    */
   children: ReactNode;
 };
@@ -41,34 +42,35 @@ export type StepsProps = {
  * </Steps>
  * ```
  */
-export const Steps = ({ current, orientation = 'horizontal', onClick, children }: StepsProps) => {
+export function Steps({ current, orientation = 'horizontal', onClick, children }: StepsProps) {
   // 採番に使う。Children.count と違い null や false の子は取り除かれるので、
   // 条件付きで描画しないステップが番号を消費することはない
-  const items = Children.toArray(children);
+  const items = useMemo(() => Children.toArray(children), [children]);
+  const total = items.length;
 
   // context の value が毎レンダー新しい参照になると、children が変わっていなくても
-  // Steps.Item の再レンダーが走るため、共有する値が変わったときだけ更新する。
-  // items.length を依存に置くと React Compiler がメモ化を保てないため、総数は中で数え直す
+  // サブコンポーネントの再レンダーが走るため、共有する値が変わったときだけ更新する
   const contextValue = useMemo<StepsContextValue>(
-    () => ({ current, orientation, total: Children.toArray(children).length, onClick }),
-    [current, orientation, children, onClick]
+    () => ({ state: { current, total, orientation }, actions: { select: onClick } }),
+    [current, total, orientation, onClick]
   );
 
   return (
     <StepsContext value={contextValue}>
       <ol className={steps[orientation]}>
         {items.map((item, index) => {
-          // 番号を並び順から決める以上、Steps.Item 以外を挟むと採番がずれる。
-          // 静かにずれるより、使い方の誤りとして例外を投げる
-          if (!isValidElement(item) || item.type !== StepsItem) {
+          // Fragment は複数のステップが 1 つの子にまとまるため、採番が静かにずれる。
+          // 独自のパーツは許容したいので、弾くのは採番が必ず壊れる Fragment だけにする
+          if (isValidElement(item) && item.type === Fragment) {
             throw new Error(
-              'Steps の直下には Steps.Item のみ指定できます。Fragment や独自のラッパーで包むとステップ番号がずれます。'
+              'Steps の直下に Fragment は置けません。ステップ番号は直下の子の並び順から採番されるため、1 ステップにつき 1 つの子を置いてください。'
             );
           }
 
           return (
-            // ラベルは重複しうるため key にできない。ステップの同一性は並び順そのものなので index を使う
-            <StepsItemNumberContext key={index} value={index + 1}>
+            // Children.toArray が振り直したキーをそのまま使う。
+            // 利用側が key を付けていれば、ステップの並び替えでも同一性が保たれる
+            <StepsItemNumberContext key={isValidElement(item) ? item.key : index} value={index + 1}>
               {item}
             </StepsItemNumberContext>
           );
@@ -76,6 +78,6 @@ export const Steps = ({ current, orientation = 'horizontal', onClick, children }
       </ol>
     </StepsContext>
   );
-};
+}
 
 Steps.Item = StepsItem;

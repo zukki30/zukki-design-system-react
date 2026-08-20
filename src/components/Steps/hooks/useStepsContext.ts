@@ -6,42 +6,47 @@ import { createContext, use } from 'react';
 export type StepsOrientation = 'horizontal' | 'vertical';
 
 /**
- * Steps が子孫のサブコンポーネントへ共有する値
+ * Steps がサブコンポーネントへ共有する値。
+ *
+ * 利用側が独自のパーツ（アイコンだけのステップなど）を作るときは、
+ * `useStepsContext()` と `useStepsItemNumber()` からこの値を参照する
  */
 export type StepsContextValue = {
-  /**
-   * 現在のステップ番号（1 始まり）
-   */
-  current: number;
-  /**
-   * ステップの並び方向
-   */
-  orientation: StepsOrientation;
-  /**
-   * Steps 直下の Steps.Item の総数
-   */
-  total: number;
-  /**
-   * ステップをクリックしたときに呼ばれるハンドラ。未指定ならステップは非インタラクティブになる
-   */
-  onClick?: (stepNumber: number) => void;
+  state: {
+    /**
+     * 現在のステップ番号（1 始まり）
+     */
+    current: number;
+    /**
+     * Steps の直下に描画されるステップの総数
+     */
+    total: number;
+    /**
+     * ステップの並び方向
+     */
+    orientation: StepsOrientation;
+  };
+  actions: {
+    /**
+     * ステップを選択する（ルートの `onClick` を呼ぶ）。
+     *
+     * ルートに `onClick` が渡されていないときは `undefined` になり、
+     * ステップは非インタラクティブとして描画される
+     */
+    select?: (stepNumber: number) => void;
+  };
 };
 
 export const StepsContext = createContext<StepsContextValue | null>(null);
 
 /**
- * Steps が共有する値を読み取る。
- *
- * Steps.Item は自身の状態（現在／完了）を current との比較で決めるため、Steps の外では成立しない。
- * 静かに既定値へフォールバックせず、使い方の誤りとして例外を投げる
- *
- * @param componentName エラーメッセージに含めるサブコンポーネント名
+ * Steps の context を取得する。`<Steps>` の外側で呼ぶと例外を投げる
  */
-export const useStepsContext = (componentName: string): StepsContextValue => {
+export const useStepsContext = (): StepsContextValue => {
   const context = use(StepsContext);
 
   if (context === null) {
-    throw new Error(`${componentName} は Steps の内側でのみ使用できます。`);
+    throw new Error('Steps のサブコンポーネントは <Steps> の内側で使用してください');
   }
 
   return context;

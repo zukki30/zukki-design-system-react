@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { StepsContext, useStepsContext } from './useStepsContext';
+import type { StepsContextValue } from './useStepsContext';
 
 describe('useStepsContext', () => {
   afterEach(() => {
@@ -10,12 +11,15 @@ describe('useStepsContext', () => {
   });
 
   it('Steps の内側では共有された値を返す', () => {
-    const value = { current: 2, orientation: 'vertical', total: 3 } as const;
+    const value: StepsContextValue = {
+      state: { current: 2, total: 3, orientation: 'vertical' },
+      actions: { select: vi.fn() },
+    };
     const wrapper = ({ children }: { children: ReactNode }) => (
       <StepsContext value={value}>{children}</StepsContext>
     );
 
-    const { result } = renderHook(() => useStepsContext('Steps.Item'), { wrapper });
+    const { result } = renderHook(() => useStepsContext(), { wrapper });
 
     expect(result.current).toEqual(value);
   });
@@ -24,8 +28,8 @@ describe('useStepsContext', () => {
     // React が投げられたエラーをコンソールへ出力するため、テスト出力を汚さないよう抑制する
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(() => renderHook(() => useStepsContext('Steps.Item'))).toThrow(
-      'Steps.Item は Steps の内側でのみ使用できます。'
+    expect(() => renderHook(() => useStepsContext())).toThrow(
+      'Steps のサブコンポーネントは <Steps> の内側で使用してください'
     );
   });
 });

@@ -2,9 +2,51 @@ import { truncate } from '@/styles/text';
 import { vars } from '@/styles/theme.css';
 import { style, styleVariants } from '@vanilla-extract/css';
 
-import { stepsItemContainer } from './Steps.css';
-
 const ICON_SIZE = '32px';
+
+const STEP_ITEM_BAR_MIN_SIZE = 2;
+
+export const stepsItemContainer = style({
+  display: 'flex',
+  flex: 1,
+  minWidth: 0,
+
+  '::after': {
+    backgroundColor: vars.color.grey[100],
+    content: '',
+  },
+
+  selectors: {
+    '&:last-child': {
+      flex: 'none',
+    },
+    // 横並びの末尾のみ、伸ばさずに縮む余地だけ残す。
+    // 縦並びで縮ませると高さが潰れる意味になってしまうためスコープを絞る
+    '&[data-orientation="horizontal"]:last-child': {
+      flex: '0 1 auto',
+    },
+    '&:last-child::after': {
+      display: 'none',
+    },
+    '&[data-orientation="horizontal"]': {
+      gap: vars.spacing.md,
+      alignItems: 'center',
+    },
+    '&[data-orientation="horizontal"]::after': {
+      flex: 1,
+      height: STEP_ITEM_BAR_MIN_SIZE,
+    },
+    '&[data-orientation="vertical"]': {
+      gap: vars.spacing.sm,
+      flexDirection: 'column',
+    },
+    '&[data-orientation="vertical"]::after': {
+      width: STEP_ITEM_BAR_MIN_SIZE,
+      height: 20,
+      marginInlineStart: `calc(${vars.spacing['xl']} - ${STEP_ITEM_BAR_MIN_SIZE}px)`,
+    },
+  },
+});
 
 export const stepsItem = style({
   // stepsItemStatus（position: absolute）の包含ブロックを固定する

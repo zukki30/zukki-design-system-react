@@ -14,7 +14,7 @@ describe('useStepsItemNumber', () => {
       <StepsItemNumberContext value={2}>{children}</StepsItemNumberContext>
     );
 
-    const { result } = renderHook(() => useStepsItemNumber('Steps.Item'), { wrapper });
+    const { result } = renderHook(() => useStepsItemNumber(), { wrapper });
 
     expect(result.current).toBe(2);
   });
@@ -23,8 +23,8 @@ describe('useStepsItemNumber', () => {
     // React が投げられたエラーをコンソールへ出力するため、テスト出力を汚さないよう抑制する
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(() => renderHook(() => useStepsItemNumber('Steps.Item'))).toThrow(
-      'Steps.Item は Steps の内側でのみ使用できます。'
+    expect(() => renderHook(() => useStepsItemNumber())).toThrow(
+      'Steps のサブコンポーネントは <Steps> の内側で使用してください'
     );
   });
 });

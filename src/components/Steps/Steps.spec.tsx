@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Steps } from './Steps';
 import { steps } from './Steps.css';
 import { StepsItem } from './StepsItem';
+import { useStepsContext, useStepsItemNumber } from './hooks';
 import { stepsItem } from './StepsItem.css';
 
 const labels = ['カート', '配送先', '確認'];
@@ -90,9 +91,17 @@ describe('Steps', () => {
   });
 
   it('現在ステップの状態をテキストでも伝える', () => {
-    render(<Steps current={2}>{stepItems()}</Steps>);
+    render(
+      <Steps current={2} onClick={vi.fn()}>
+        {stepItems()}
+      </Steps>
+    );
 
     expect(screen.getAllByText('現在のステップ')).toHaveLength(1);
+    // 番号 → ラベル → 状態の順で連結されることまで確認する
+    // （stepsItemStatus の display: block が外れると「配送先現在のステップ」に詰まる）
+    expect(screen.getByRole('button', { name: '2 配送先 現在のステップ' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'カート 完了' })).toBeInTheDocument();
   });
 
   it('完了ステップの状態をテキストで伝え、番号を描画しない', () => {
@@ -231,12 +240,12 @@ describe('Steps', () => {
       silenceReactError();
 
       expect(() => render(<StepsItem>カート</StepsItem>)).toThrow(
-        'Steps.Item は Steps の内側でのみ使用できます。'
+        'Steps のサブコンポーネントは <Steps> の内側で使用してください'
       );
     });
   });
 
-  describe('直下に Steps.Item 以外を置いたとき', () => {
+  describe('直下の子', () => {
     it('Fragment で包むと例外を投げる', () => {
       silenceReactError();
 
@@ -249,15 +258,28 @@ describe('Steps', () => {
             </>
           </Steps>
         )
-      ).toThrow('Steps の直下には Steps.Item のみ指定できます。');
+      ).toThrow('Steps の直下に Fragment は置けません。');
     });
 
-    it('要素でない子を渡すと例外を投げる', () => {
-      silenceReactError();
+    // context のフックを公開しているため、利用側は独自のパーツを直下に置ける
+    it('独自のパーツにも context と採番が届く', () => {
+      const CustomItem = () => {
+        const {
+          state: { current, total, orientation },
+        } = useStepsContext();
+        const stepNumber = useStepsItemNumber();
 
-      expect(() => render(<Steps current={1}>カート</Steps>)).toThrow(
-        'Steps の直下には Steps.Item のみ指定できます。'
+        return <li>{`${stepNumber}/${total} current=${current} orientation=${orientation}`}</li>;
+      };
+
+      render(
+        <Steps current={2} orientation="vertical">
+          <Steps.Item>カート</Steps.Item>
+          <CustomItem />
+        </Steps>
       );
+
+      expect(screen.getByText('2/2 current=2 orientation=vertical')).toBeInTheDocument();
     });
   });
 });
