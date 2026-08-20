@@ -9,8 +9,9 @@ export const dialog = style({
   alignItems: 'stretch',
   width: '520px',
   maxWidth: `calc(100% - ${vars.spacing.xl} - ${vars.spacing.xl})`,
+  // 余白はルートではなく各パーツが持つ。
+  // ヘッダーが任意になったため、ルートに上余白を置くと未合成時に本文の余白と二重になる
   padding: 0,
-  paddingTop: vars.spacing['2xl'],
   backgroundColor: vars.color.grey['0'],
   borderWidth: 1,
   borderStyle: 'solid',
@@ -42,6 +43,7 @@ export const dialogHeader = style({
   gap: vars.spacing.md,
   width: '100%',
   flexShrink: 0,
+  paddingBlockStart: vars.spacing['2xl'],
   paddingInline: vars.spacing['2xl'],
 });
 

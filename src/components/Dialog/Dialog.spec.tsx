@@ -96,6 +96,42 @@ describe('Dialog', () => {
 
       expect(screen.getByRole('heading', { level: 2 })).toHaveClass('custom-class');
     });
+
+    it('複数描画しても id が重複せず、すべてが aria-labelledby に並ぶ', () => {
+      render(
+        <Dialog open>
+          <Dialog.Title>ひとつめ</Dialog.Title>
+          <Dialog.Title>ふたつめ</Dialog.Title>
+        </Dialog>
+      );
+
+      const headings = screen.getAllByRole('heading', { level: 2 });
+      const ids = headings.map((heading) => heading.id);
+
+      expect(new Set(ids).size).toBe(2);
+      expect(document.querySelector('dialog')?.getAttribute('aria-labelledby')?.split(' ')).toEqual(
+        expect.arrayContaining(ids)
+      );
+    });
+
+    it('複数のうち 1 つを外しても、残ったタイトルとの紐付けは維持される', () => {
+      const { rerender } = render(
+        <Dialog open>
+          <Dialog.Title key="first">ひとつめ</Dialog.Title>
+          <Dialog.Title key="second">ふたつめ</Dialog.Title>
+        </Dialog>
+      );
+
+      rerender(
+        <Dialog open>
+          <Dialog.Title key="second">ふたつめ</Dialog.Title>
+        </Dialog>
+      );
+
+      const heading = screen.getByRole('heading', { level: 2, name: 'ふたつめ' });
+
+      expect(document.querySelector('dialog')).toHaveAttribute('aria-labelledby', heading.id);
+    });
   });
 
   describe('Dialog.Close', () => {
@@ -159,6 +195,29 @@ describe('Dialog', () => {
       );
 
       expect(screen.getByRole('button', { name: '閉じる' })).toHaveTextContent('×');
+    });
+
+    it('onClick で preventDefault すると閉じない', () => {
+      const handleClose = vi.fn();
+      render(
+        <Dialog open onClose={handleClose}>
+          <Dialog.Close onClick={(event) => event.preventDefault()} />
+        </Dialog>
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: '閉じる' }));
+
+      expect(handleClose).not.toHaveBeenCalled();
+    });
+
+    it('onClose 未指定でもクリックで例外にならない', () => {
+      render(
+        <Dialog open>
+          <Dialog.Close />
+        </Dialog>
+      );
+
+      expect(() => fireEvent.click(screen.getByRole('button', { name: '閉じる' }))).not.toThrow();
     });
   });
 
@@ -252,6 +311,95 @@ describe('Dialog', () => {
       fireEvent.click(screen.getByText('本文テキスト'));
 
       expect(handleClose).not.toHaveBeenCalled();
+    });
+
+    it('onClose 未指定でも例外にならない', () => {
+      render(
+        <Dialog open>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      expect(() => fireEvent.click(dialogElement)).not.toThrow();
+    });
+  });
+
+  describe('ネイティブイベント', () => {
+    it('Escape キー（cancel イベント）で onClose が呼ばれる', () => {
+      const handleClose = vi.fn();
+      render(
+        <Dialog open onClose={handleClose}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      fireEvent(dialogElement, new Event('cancel', { bubbles: false, cancelable: true }));
+
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('native の close イベントで onClose が呼ばれる', () => {
+      const handleClose = vi.fn();
+      render(
+        <Dialog open onClose={handleClose}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      fireEvent(dialogElement, new Event('close'));
+
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('余白', () => {
+    const getDialogElement = () => {
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      return dialogElement;
+    };
+
+    // ヘッダーが任意になったため、上余白はルートではなく先頭のパーツが持つ。
+    // ルートが上余白を持つと、ヘッダー未合成のときに本文の余白と二重になる
+    it('ルートは上余白を持たず、合成するパーツによらず一定である', () => {
+      const { unmount } = render(
+        <Dialog open>
+          <Dialog.Header>
+            <Dialog.Title>タイトル</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      expect(getComputedStyle(getDialogElement()).paddingTop).toBe('0px');
+
+      unmount();
+
+      render(
+        <Dialog open aria-label="お知らせ">
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      expect(getComputedStyle(getDialogElement()).paddingTop).toBe('0px');
     });
   });
 

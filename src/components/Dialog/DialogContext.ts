@@ -21,14 +21,13 @@ export type DialogContextValue = {
   };
   meta: {
     /**
-     * タイトル要素に付与する id。ルートの `aria-labelledby` と対応する
+     * タイトル要素の id をルートへ登録する。
+     *
+     * 登録された id はルートの `aria-labelledby` に反映される。
+     * タイトルが無いときに `aria-labelledby` が宙に浮くのを防ぐために使う。
+     * 戻り値は登録解除用の関数で、`useEffect` のクリーンアップにそのまま渡せる
      */
-    titleId: string;
-    /**
-     * `Dialog.Title` の有無をルートへ登録する。
-     * タイトルが無いときに `aria-labelledby` が宙に浮くのを防ぐために使う
-     */
-    registerTitle: (registered: boolean) => void;
+    registerTitle: (id: string) => () => void;
   };
 };
 
