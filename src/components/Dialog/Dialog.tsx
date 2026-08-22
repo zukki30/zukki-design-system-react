@@ -4,6 +4,7 @@ import {
   type ComponentPropsWithRef,
   type MouseEvent,
   type ReactNode,
+  type SyntheticEvent,
   useEffect,
   useId,
   useMemo,
@@ -37,7 +38,15 @@ export type DialogProps = {
    */
   open: boolean;
   /**
-   * ダイアログを閉じるときに呼ばれる（Escape キー・`Dialog.Close`・オーバーレイクリック）
+   * ダイアログを閉じてほしいときに呼ばれる
+   * （Escape キー・`Dialog.Close`・オーバーレイクリック・`<form method="dialog">`）。
+   *
+   * 1 回の操作につき 1 回だけ呼ばれる。
+   * 利用側が `open` を `false` にしたことで閉じた場合は、既に閉じると決めた後なので呼ばれない。
+   *
+   * **これは「閉じる要求」であり、閉じるかどうかは `open` で決まる。**
+   * Escape も含めてすべての経路で既定動作を止めているため、
+   * 呼ばれても `open` を `true` のままにすれば閉じない（入力途中の確認などに使える）
    */
   onClose?: () => void;
   /**
@@ -52,8 +61,10 @@ export type DialogProps = {
    */
   children?: ReactNode;
   // title はネイティブの属性（ツールチップ）だが、旧 API の見出し用 prop と紛らわしく、
-  // 移行時に型エラーにならず素通りしてしまうため引き続き受け付けない
-} & Omit<ComponentPropsWithRef<'dialog'>, 'open' | 'title' | 'children'>;
+  // 移行時に型エラーにならず素通りしてしまうため引き続き受け付けない。
+  // ネイティブの onClose / onCancel は「閉じる要求」を表す上記の onClose と紛らわしく、
+  // 内部で閉じる通知の起点として使っているため受け付けない
+} & Omit<ComponentPropsWithRef<'dialog'>, 'open' | 'title' | 'children' | 'onClose' | 'onCancel'>;
 
 /**
  * モーダルダイアログ。
@@ -87,6 +98,10 @@ export function Dialog({
   children,
   className,
   ref,
+  // 内部でオーバーレイクリックの判定に使うため、利用側の指定を潰さないよう合成する
+  onClick,
+  // ラベル付けは外部の見出しを指したい場合があるため、利用側から上書きできるようにする
+  'aria-labelledby': ariaLabelledBy,
   ...props
 }: DialogProps) {
   // showModal / close の呼び出しに DOM 要素が必要なため、内部で保持しつつ利用側の ref にも転送する
@@ -118,11 +133,42 @@ export function Dialog({
     }
   }, [open]);
 
-  const handleOverlayClick = (event: MouseEvent<HTMLDialogElement>) => {
+  // 利用側の onClick を潰さずに、実行後へオーバーレイクリックの処理を足す
+  const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
+    onClick?.(event);
+
+    // 利用側が preventDefault したときは閉じない
+    if (event.defaultPrevented) {
+      return;
+    }
+
     // ダイアログ要素自身（＝オーバーレイ領域）がクリックされたときのみ閉じる
     if (closeOnOverlayClick && event.target === dialogRef.current) {
       onClose?.();
     }
+  };
+
+  // Escape の既定動作（DOM を直接閉じる）は止め、他の経路と同じ「閉じる要求」に揃える。
+  // 止めないと、利用側が onClose を受けて「まだ閉じない」と判断し open を true のままにしたとき、
+  // DOM だけ閉じているのに open が変化せず、同期 effect も再実行されないため開き直せなくなる
+  const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
+    event.preventDefault();
+
+    onClose?.();
+  };
+
+  // 実際に閉じたことの通知はネイティブの close イベントで拾う。
+  // Escape は上の handleCancel で open 経由に寄せてあるため、ここに来るのは
+  // <form method="dialog"> の送信と、ref から直接 close() を呼ばれた場合
+  const handleNativeClose = () => {
+    // open が false のまま閉じたときは、利用側の指示に従って閉じただけなので通知しない。
+    // すべての閉じる経路は onClose → open=false → close() と流れるため、
+    // ここで弾かないと 1 回の操作で onClose が 2 回呼ばれる
+    if (!open) {
+      return;
+    }
+
+    onClose?.();
   };
 
   // context の値は全サブコンポーネントの再レンダー要因になるため memo 化する。
@@ -138,15 +184,16 @@ export function Dialog({
 
   return (
     <DialogContext value={contextValue}>
+      {/* パーツ間の配線を利用側の props に潰されないよう、{...props} は先に展開する */}
       <dialog
+        {...props}
         ref={mergedRef}
         className={clsx(dialog, className)}
         // 登録されたタイトルがあるときだけ紐付ける（未描画なら参照先が存在しないため）
-        aria-labelledby={titleIds.length > 0 ? titleIds.join(' ') : undefined}
-        onClose={onClose}
-        onCancel={onClose}
-        onClick={handleOverlayClick}
-        {...props}
+        aria-labelledby={ariaLabelledBy ?? (titleIds.length > 0 ? titleIds.join(' ') : undefined)}
+        onClose={handleNativeClose}
+        onCancel={handleCancel}
+        onClick={handleClick}
       >
         {children}
       </dialog>
@@ -160,7 +207,7 @@ export type DialogHeaderProps = ComponentPropsWithRef<'div'>;
  * ダイアログのヘッダー。`Dialog.Title` と `Dialog.Close` を並べる
  */
 const DialogHeader = ({ className, ...props }: DialogHeaderProps) => {
-  return <div className={clsx(dialogHeader, className)} {...props} />;
+  return <div {...props} className={clsx(dialogHeader, className)} />;
 };
 
 export type DialogTitleProps = Omit<ComponentPropsWithRef<'h2'>, 'id'>;
@@ -182,7 +229,7 @@ const DialogTitle = ({ className, ...props }: DialogTitleProps) => {
   // マウントされている間だけ id を登録する（registerTitle は登録解除用の関数を返す）
   useEffect(() => registerTitle(titleId), [registerTitle, titleId]);
 
-  return <h2 id={titleId} className={clsx(dialogTitle, className)} {...props} />;
+  return <h2 {...props} id={titleId} className={clsx(dialogTitle, className)} />;
 };
 
 export type DialogBodyProps = ComponentPropsWithRef<'div'>;
@@ -191,7 +238,7 @@ export type DialogBodyProps = ComponentPropsWithRef<'div'>;
  * ダイアログの本文
  */
 const DialogBody = ({ className, ...props }: DialogBodyProps) => {
-  return <div className={clsx(dialogBody, className)} {...props} />;
+  return <div {...props} className={clsx(dialogBody, className)} />;
 };
 
 export type DialogFooterProps = ComponentPropsWithRef<'div'>;
@@ -200,12 +247,15 @@ export type DialogFooterProps = ComponentPropsWithRef<'div'>;
  * ダイアログのフッター。ボタンなどを右寄せで並べる
  */
 const DialogFooter = ({ className, ...props }: DialogFooterProps) => {
-  return <div className={clsx(dialogFooter, className)} {...props} />;
+  return <div {...props} className={clsx(dialogFooter, className)} />;
 };
 
+// type は受け付けない。`type="submit"` を <form method="dialog"> 内で指定すると、
+// このボタンの onClose とフォーム送信による close の 2 経路から閉じることになり、
+// どちらが閉じたのかが曖昧になる。送信を伴う閉じ方は Button と useDialogContext で組む
 export type DialogCloseProps = Omit<
   ComponentProps<typeof IconButton>,
-  'aria-label' | 'children'
+  'aria-label' | 'children' | 'type'
 > & {
   /**
    * 閉じるボタンのアクセシブルネーム
@@ -227,6 +277,9 @@ const DialogClose = ({
   children,
   className,
   onClick,
+  // 見た目は既定を持ちつつ利用側から差し替えられるよう、明示的に受け取って合成する
+  variant = 'secondary-exposed',
+  size = 'sm',
   'aria-label': ariaLabel = '閉じる',
   ...props
 }: DialogCloseProps) => {
@@ -248,12 +301,12 @@ const DialogClose = ({
 
   return (
     <IconButton
+      {...props}
       className={clsx(dialogClose, className)}
-      variant="secondary-exposed"
-      size="sm"
+      variant={variant}
+      size={size}
       aria-label={ariaLabel}
       onClick={handleClick}
-      {...props}
     >
       {children ?? CLOSE_ICON}
     </IconButton>

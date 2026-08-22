@@ -1,5 +1,7 @@
 import { createContext, use } from 'react';
 
+import { toTruthyOrUndefined } from '@/utils/dataAttribute';
+
 /**
  * ラベルの並び方向
  */
@@ -108,13 +110,6 @@ export type FormFieldControlState = {
    */
   disabled?: boolean;
 };
-
-/**
- * `false` を undefined に潰す。
- * 属性として出力したときに `data-error="false"` のような無意味な値を増やさないため
- */
-const toTruthyOrUndefined = (value: boolean | undefined): true | undefined =>
-  value === true ? true : undefined;
 
 /**
  * 入力コンポーネントが FormField のエラー・無効状態を引き継ぐ。

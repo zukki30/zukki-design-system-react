@@ -2,6 +2,7 @@ import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, useEffect, useId, useMemo } from 'react';
 
 import { useIdRegistry } from '@/hooks/useIdRegistry';
+import { toTruthyOrUndefined } from '@/utils/dataAttribute';
 
 import {
   formField,
@@ -146,8 +147,11 @@ export function FormField({
         role={role ?? (isLabelledGroup ? 'group' : undefined)}
         aria-labelledby={ariaLabelledBy ?? (isLabelledGroup ? labelId : undefined)}
         data-orientation={orientation}
-        data-disabled={disabled}
-        data-error={hasError}
+        // false は属性ごと出力しない。CSS は [data-error="true"] で拾うため、
+        // false の出力は DOM のノイズにしかならない。
+        // useFormFieldState が入力コンポーネントへ引き継ぐ値と同じ扱いに揃えている
+        data-disabled={toTruthyOrUndefined(disabled)}
+        data-error={toTruthyOrUndefined(hasError)}
       >
         {children}
       </div>

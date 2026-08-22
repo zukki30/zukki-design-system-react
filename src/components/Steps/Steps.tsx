@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 
 import { steps } from './Steps.css';
 import { StepsItem } from './StepsItem';
-import { StepsContext, StepsItemNumberContext } from './hooks';
-import type { StepsContextValue, StepsOrientation } from './hooks';
+import { StepsContext, StepsItemNumberContext } from './StepsContext';
+import type { StepsContextValue, StepsOrientation } from './StepsContext';
 
 export type StepsProps = {
   /**

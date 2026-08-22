@@ -750,6 +750,43 @@ describe('FormField', () => {
     });
   });
 
+  describe('data 属性の出力', () => {
+    // Input など入力コンポーネント側と揃えて、false のときは属性ごと出力しない。
+    // data-error="false" のような無意味な値を DOM に増やさないため
+    it('エラーでも無効でもないときは data-error / data-disabled を出力しない', () => {
+      render(
+        <FormField data-testid="field">
+          <FormField.Label>ラベル</FormField.Label>
+        </FormField>
+      );
+
+      const field = screen.getByTestId('field');
+
+      expect(field).not.toHaveAttribute('data-error');
+      expect(field).not.toHaveAttribute('data-disabled');
+    });
+
+    it('error を明示的に false にしても data-error を出力しない', () => {
+      render(
+        <FormField data-testid="field" error={false}>
+          <FormField.ErrorText>必須項目です</FormField.ErrorText>
+        </FormField>
+      );
+
+      expect(screen.getByTestId('field')).not.toHaveAttribute('data-error');
+    });
+
+    it('data-orientation は常に出力する', () => {
+      render(
+        <FormField data-testid="field">
+          <FormField.Label>ラベル</FormField.Label>
+        </FormField>
+      );
+
+      expect(screen.getByTestId('field')).toHaveAttribute('data-orientation', 'horizontal');
+    });
+  });
+
   describe('パーツへの props', () => {
     it('Label にネイティブ属性と className を渡す', () => {
       render(

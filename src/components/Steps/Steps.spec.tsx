@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Steps } from './Steps';
 import { steps } from './Steps.css';
 import { StepsItem } from './StepsItem';
-import { useStepsContext, useStepsItemNumber } from './hooks';
+import { useStepsContext, useStepsItemNumber } from './StepsContext';
 import { stepsItem } from './StepsItem.css';
 
 const labels = ['カート', '配送先', '確認'];

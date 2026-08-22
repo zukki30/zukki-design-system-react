@@ -43,10 +43,11 @@ export type {
   FormFieldProps,
   FormFieldRequiredMark,
 } from './components/FormField';
-export { Card } from './components/Card';
+export { Card, useCardContext } from './components/Card';
 export type {
   CardActionProps,
   CardBodyProps,
+  CardContextValue,
   CardFooterProps,
   CardHeaderProps,
   CardImageProps,

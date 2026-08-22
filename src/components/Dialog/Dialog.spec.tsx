@@ -1,8 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { Dialog, useDialogContext } from './index';
+import { iconButtonSize, iconButtonVariant } from '../IconButton/IconButton.css';
+
+import { Dialog } from './index';
+
+const classesOf = (className: string) => className.split(' ');
 
 // jsdom は showModal/close を未実装のためモックする
 beforeAll(() => {
@@ -330,25 +334,9 @@ describe('Dialog', () => {
   });
 
   describe('ネイティブイベント', () => {
-    it('Escape キー（cancel イベント）で onClose が呼ばれる', () => {
-      const handleClose = vi.fn();
-      render(
-        <Dialog open onClose={handleClose}>
-          <Dialog.Body>本文</Dialog.Body>
-        </Dialog>
-      );
-
-      const dialogElement = document.querySelector('dialog');
-      if (dialogElement === null) {
-        throw new Error('dialog element not found');
-      }
-
-      fireEvent(dialogElement, new Event('cancel', { bubbles: false, cancelable: true }));
-
-      expect(handleClose).toHaveBeenCalledTimes(1);
-    });
-
-    it('native の close イベントで onClose が呼ばれる', () => {
+    // Escape も <form method="dialog"> も、最終的にはネイティブの close イベントに集約される。
+    // cancel を個別に拾わないのは、Escape のときだけ二重に通知されるのを避けるため
+    it('native の close イベントで onClose が呼ばれる（Escape 経由もここに集約される）', () => {
       const handleClose = vi.fn();
       render(
         <Dialog open onClose={handleClose}>
@@ -364,6 +352,244 @@ describe('Dialog', () => {
       fireEvent(dialogElement, new Event('close'));
 
       expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('Escape（cancel）は既定動作を止めたうえで onClose を呼ぶ', () => {
+      const handleClose = vi.fn();
+      render(
+        <Dialog open onClose={handleClose}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      const cancelEvent = new Event('cancel', { bubbles: false, cancelable: true });
+      fireEvent(dialogElement, cancelEvent);
+
+      // 既定動作を止めることで、閉じるかどうかを open 側に一本化する
+      expect(cancelEvent.defaultPrevented).toBe(true);
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    // 修正前は cancel と close の両方を onClose に配線していたため、この流れで 2 回呼ばれていた。
+    // 現在は cancel を止めるので close 自体が発火しないが、リグレッションの防波堤として残す
+    it('Escape の一連の流れ（cancel → close）でも onClose は 1 回だけ呼ばれる', () => {
+      const handleClose = vi.fn();
+      render(
+        <Dialog open onClose={handleClose}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      // jsdom は cancel の既定動作を実装しないため、実ブラウザの流れを手で並べる
+      const cancelEvent = new Event('cancel', { bubbles: false, cancelable: true });
+      fireEvent(dialogElement, cancelEvent);
+
+      if (!cancelEvent.defaultPrevented) {
+        fireEvent(dialogElement, new Event('close'));
+      }
+
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    // Escape だけ「閉じるのを取りやめる」手段が無いと、DOM だけ閉じて open が変化せず、
+    // 同期 effect（[open] 依存）も再実行されないため以降その Dialog を開き直せなくなる
+    it('Escape で onClose を受けても open を true のままにすれば閉じない', () => {
+      const StayOpenDialog = () => {
+        // 「入力途中なので確認する」= onClose を受けても open は変えない
+        const [open] = useState(true);
+
+        return (
+          <Dialog open={open} onClose={() => {}}>
+            <Dialog.Body>本文</Dialog.Body>
+          </Dialog>
+        );
+      };
+
+      render(<StayOpenDialog />);
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      // close の呼び出し履歴は同じモックに溜まるため、この操作分だけを見る
+      vi.mocked(HTMLDialogElement.prototype.close).mockClear();
+
+      const cancelEvent = new Event('cancel', { bubbles: false, cancelable: true });
+      fireEvent(dialogElement, cancelEvent);
+
+      if (!cancelEvent.defaultPrevented) {
+        dialogElement.removeAttribute('open');
+      }
+
+      // DOM と open prop が食い違わないこと（食い違うと開き直せなくなる）
+      expect(dialogElement).toHaveAttribute('open');
+      expect(HTMLDialogElement.prototype.close).not.toHaveBeenCalled();
+    });
+
+    it('open=false のまま閉じたときは onClose を呼ばない', () => {
+      const handleClose = vi.fn();
+      const { rerender } = render(
+        <Dialog open onClose={handleClose}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      // 利用側が open を false にしたときの close は、利用側が既に閉じると決めた結果なので
+      // 通知しない（通知すると 1 回の操作で onClose が 2 回呼ばれる）
+      rerender(
+        <Dialog open={false} onClose={handleClose}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      expect(handleClose).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('制御された Dialog での通知回数', () => {
+    const ControlledDialog = ({ onCloseSpy }: { onCloseSpy: () => void }) => {
+      const [open, setOpen] = useState(true);
+
+      return (
+        <Dialog
+          open={open}
+          onClose={() => {
+            onCloseSpy();
+            setOpen(false);
+          }}
+        >
+          <Dialog.Header>
+            <Dialog.Close />
+          </Dialog.Header>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+    };
+
+    it('オーバーレイクリックで onClose が 1 回だけ呼ばれる', () => {
+      const spy = vi.fn();
+      render(<ControlledDialog onCloseSpy={spy} />);
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      fireEvent.click(dialogElement);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('Dialog.Close のクリックで onClose が 1 回だけ呼ばれる', () => {
+      const spy = vi.fn();
+      render(<ControlledDialog onCloseSpy={spy} />);
+
+      fireEvent.click(screen.getByRole('button', { name: '閉じる' }));
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('利用側の props と内部の配線', () => {
+    it('onClick を渡してもオーバーレイクリックで閉じる', () => {
+      const handleClose = vi.fn();
+      const handleClick = vi.fn();
+      render(
+        <Dialog open onClose={handleClose} onClick={handleClick}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      fireEvent.click(dialogElement);
+
+      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('onClick で preventDefault すると閉じない', () => {
+      const handleClose = vi.fn();
+      render(
+        <Dialog
+          open
+          onClose={handleClose}
+          onClick={(event) => {
+            event.preventDefault();
+          }}
+        >
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      fireEvent.click(dialogElement);
+
+      expect(handleClose).not.toHaveBeenCalled();
+    });
+
+    it('aria-labelledby を明示すると利用側の指定が優先される', () => {
+      render(
+        <Dialog open aria-labelledby="external-heading">
+          <Dialog.Header>
+            <Dialog.Title>タイトル</Dialog.Title>
+          </Dialog.Header>
+        </Dialog>
+      );
+
+      expect(document.querySelector('dialog')).toHaveAttribute(
+        'aria-labelledby',
+        'external-heading'
+      );
+    });
+
+    it('Dialog.Close は既定で secondary-exposed / sm で描画する', () => {
+      render(
+        <Dialog open>
+          <Dialog.Header>
+            <Dialog.Close data-testid="close" />
+          </Dialog.Header>
+        </Dialog>
+      );
+
+      const closeButton = screen.getByTestId('close');
+
+      expect(closeButton).toHaveClass(...classesOf(iconButtonVariant['secondary-exposed']));
+      expect(closeButton).toHaveClass(...classesOf(iconButtonSize.sm));
+    });
+
+    // {...props} を先に展開しても、意図的に受け取っている見た目の prop は上書きできる
+    it('Dialog.Close の variant / size は上書きできる', () => {
+      render(
+        <Dialog open>
+          <Dialog.Header>
+            <Dialog.Close variant="primary" size="md" data-testid="close" />
+          </Dialog.Header>
+        </Dialog>
+      );
+
+      const closeButton = screen.getByTestId('close');
+
+      expect(closeButton).toHaveClass(...classesOf(iconButtonVariant.primary));
+      expect(closeButton).toHaveClass(...classesOf(iconButtonSize.md));
     });
   });
 
@@ -442,45 +668,5 @@ describe('Dialog', () => {
     });
   });
 
-  describe('useDialogContext', () => {
-    const CustomCloseButton = () => {
-      const {
-        state: { open },
-        actions: { close },
-      } = useDialogContext();
-
-      return (
-        <button type="button" onClick={close}>
-          {open ? '開いている' : '閉じている'}
-        </button>
-      );
-    };
-
-    it('利用側のパーツから開閉状態と閉じる操作を参照できる', () => {
-      const handleClose = vi.fn();
-      render(
-        <Dialog open onClose={handleClose}>
-          <Dialog.Footer>
-            <CustomCloseButton />
-          </Dialog.Footer>
-        </Dialog>
-      );
-
-      const button = screen.getByRole('button', { name: '開いている' });
-      fireEvent.click(button);
-
-      expect(handleClose).toHaveBeenCalledTimes(1);
-    });
-
-    it('Dialog の外側で使うと例外を投げる', () => {
-      // React が投げたエラーをコンソールへ出すため、テスト出力を汚さないよう抑制する
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      expect(() => render(<CustomCloseButton />)).toThrow(
-        'Dialog のサブコンポーネントは <Dialog> の内側で使用してください'
-      );
-
-      consoleError.mockRestore();
-    });
-  });
+  // useDialogContext のテストは DialogContext.spec.tsx にある
 });
