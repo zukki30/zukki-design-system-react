@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
+import { isRenderable } from '@/utils/renderableNode';
+
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import {
@@ -41,7 +43,7 @@ export const Switch = ({ children, disabled: disabledProp, className, ...props }
         </span>
       </span>
 
-      {children != null && <span className={switchLabel}>{children}</span>}
+      {isRenderable(children) && <span className={switchLabel}>{children}</span>}
     </label>
   );
 };

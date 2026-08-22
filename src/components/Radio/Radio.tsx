@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
+import { isRenderable } from '@/utils/renderableNode';
+
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import { radio, radioBox, radioControl, radioDot, radioInput, radioLabel } from './Radio.css';
@@ -28,7 +30,7 @@ export const Radio = ({ children, disabled: disabledProp, className, ...props }:
         </span>
       </span>
 
-      {children != null && <span className={radioLabel}>{children}</span>}
+      {isRenderable(children) && <span className={radioLabel}>{children}</span>}
     </label>
   );
 };

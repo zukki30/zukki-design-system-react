@@ -73,23 +73,28 @@ describe('Breadcrumb', () => {
     expect(screen.getByTestId('home-icon')).toBeInTheDocument();
   });
 
-  it.each([0, '', false, NaN])(
-    'icon に falsy な値（%s）を渡してもアイコン要素を描画しない',
-    (icon) => {
-      const withFalsyIcon: BreadcrumbItem[] = [
-        { label: 'HOME', href: '/', icon },
-        { label: '現在のページ' },
-      ];
-      render(<Breadcrumb items={withFalsyIcon} />);
+  it.each([
+    { name: '0', icon: 0 },
+    { name: '空文字', icon: '' },
+    { name: 'false', icon: false },
+    { name: 'NaN', icon: NaN },
+    // {cond ? icon : null} という一般的な書き方で渡る値。
+    // !== undefined だと「指定あり」と判定され、中身が空の span が残ってしまう
+    { name: 'null', icon: null },
+  ])('icon に falsy な値（$name）を渡してもアイコン要素を描画しない', ({ icon }) => {
+    const withFalsyIcon: BreadcrumbItem[] = [
+      { label: 'HOME', href: '/', icon },
+      { label: '現在のページ' },
+    ];
+    render(<Breadcrumb items={withFalsyIcon} />);
 
-      const link = screen.getByRole('link');
+    const link = screen.getByRole('link');
 
-      // && だと 0 や NaN がそのままテキストとして描画されてしまう
-      expect(link.textContent).toBe('HOME');
-      // アイコン用の span も描画されないため、子要素はラベルだけ
-      expect(link.childElementCount).toBe(1);
-    }
-  );
+    // && だと 0 や NaN がそのままテキストとして描画されてしまう
+    expect(link.textContent).toBe('HOME');
+    // アイコン用の span も描画されないため、子要素はラベルだけ
+    expect(link.childElementCount).toBe(1);
+  });
 
   it('1項目のみのとき区切りアイコンを描画しない', () => {
     const single: BreadcrumbItem[] = [{ label: 'HOME' }];
