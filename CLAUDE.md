@@ -58,6 +58,24 @@ ComponentName/
 └── index.ts                  # バレルエクスポート
 ```
 
+compound components の場合は、context の定義を `ComponentNameContext.ts` としてトップレベルに置きます。context は「共有する値の宣言」であってフックではないため、`hooks/` には入れません（`hooks/` に置くのはロジックのフックだけ）。
+
+```
+ComponentName/
+├── hooks/                        # 任意: ロジックのフック
+│   ├── useComponentNameControl.ts
+│   ├── useComponentNameControl.spec.tsx
+│   └── index.ts
+├── ComponentName.tsx             # ルートとパーツ
+├── ComponentNameContext.ts       # context の定義と取得フック
+├── ComponentNameContext.spec.tsx # context のテスト
+├── ComponentName.stories.tsx
+├── ComponentName.css.ts
+└── index.ts
+```
+
+パーツはルートと同じ `ComponentName.tsx` に置きます。ただし専用の `.css.ts` を持つパーツは、スタイルとセットで独立させたほうが見通しがよいため別ファイルに分けます（例: `StepsItem.tsx` と `StepsItem.css.ts`）。
+
 複数のコンポーネントで共有するフックは `src/hooks/` 直下に置きます（例: `src/hooks/useMergedRef.ts`）。単一コンポーネントでしか使わないフックは、上記のとおりそのコンポーネント配下の `hooks/` に置きます。
 
 ```
@@ -107,6 +125,26 @@ src/hooks/
 - ルートの状態（`disabled` やエラーなど）を **パーツではない子コンポーネント**（`Input` など）へ伝えるときは、`cloneElement` での注入ではなく子側に context を読ませる。子は自身の props を優先し、未指定のときだけ context の値を使う。単体でも使えるよう、この用途の取得フックは context が無くても例外を投げない
 - `cloneElement` で子に注入してよいのは `id` / `aria-*` / `disabled` のように **DOM の属性として妥当なものだけ**。素の HTML 要素が子に来ても壊れないようにする。独自 prop（`error` など）は context 経由で伝える
 - ルートからは子孫の描画有無を検査できないため、パーツ側から id を登録してもらい `htmlFor` や `aria-describedby` に反映する。存在しない id を指す属性は出力しない
+- **`{...props}` は内部の指定より前に展開する**。compound components では `id` / `aria-*` がパーツ間の配線に使われるため、利用側の props に黙って上書きされると壊れ方が分かりにくい。上書きを許したい prop だけを明示的に分割代入し、`??` で「未指定のときだけ内部の値を使う」形にする
+
+  ```tsx
+  export function FormField({
+    // グループとしての名前付けは利用側から上書きできるようにする
+    role,
+    'aria-labelledby': ariaLabelledBy,
+    ...props
+  }: FormFieldProps) {
+    return (
+      <div
+        {...props}
+        role={role ?? (isLabelledGroup ? 'group' : undefined)}
+        aria-labelledby={ariaLabelledBy ?? (isLabelledGroup ? labelId : undefined)}
+      />
+    );
+  }
+  ```
+
+- 内部でハンドラを持つ prop（`onClick` など）は、上書きさせるのではなく利用側のハンドラを呼んでから内部の処理を足す。利用側が取りやめられるよう、`event.defaultPrevented` を見て中断できる逃げ道を用意する
 
 **import の使い分け:**
 

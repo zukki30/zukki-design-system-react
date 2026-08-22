@@ -37,7 +37,11 @@ export type DialogProps = {
    */
   open: boolean;
   /**
-   * ダイアログを閉じるときに呼ばれる（Escape キー・`Dialog.Close`・オーバーレイクリック）
+   * ダイアログを閉じてほしいときに呼ばれる
+   * （Escape キー・`Dialog.Close`・オーバーレイクリック・`<form method="dialog">`）。
+   *
+   * 1 回の操作につき 1 回だけ呼ばれる。
+   * 利用側が `open` を `false` にしたことで閉じた場合は、既に閉じると決めた後なので呼ばれない
    */
   onClose?: () => void;
   /**
@@ -52,8 +56,10 @@ export type DialogProps = {
    */
   children?: ReactNode;
   // title はネイティブの属性（ツールチップ）だが、旧 API の見出し用 prop と紛らわしく、
-  // 移行時に型エラーにならず素通りしてしまうため引き続き受け付けない
-} & Omit<ComponentPropsWithRef<'dialog'>, 'open' | 'title' | 'children'>;
+  // 移行時に型エラーにならず素通りしてしまうため引き続き受け付けない。
+  // ネイティブの onClose / onCancel は「閉じる要求」を表す上記の onClose と紛らわしく、
+  // 内部で閉じる通知の起点として使っているため受け付けない
+} & Omit<ComponentPropsWithRef<'dialog'>, 'open' | 'title' | 'children' | 'onClose' | 'onCancel'>;
 
 /**
  * モーダルダイアログ。
@@ -87,6 +93,10 @@ export function Dialog({
   children,
   className,
   ref,
+  // 内部でオーバーレイクリックの判定に使うため、利用側の指定を潰さないよう合成する
+  onClick,
+  // ラベル付けは外部の見出しを指したい場合があるため、利用側から上書きできるようにする
+  'aria-labelledby': ariaLabelledBy,
   ...props
 }: DialogProps) {
   // showModal / close の呼び出しに DOM 要素が必要なため、内部で保持しつつ利用側の ref にも転送する
@@ -118,11 +128,33 @@ export function Dialog({
     }
   }, [open]);
 
-  const handleOverlayClick = (event: MouseEvent<HTMLDialogElement>) => {
+  // 利用側の onClick を潰さずに、実行後へオーバーレイクリックの処理を足す
+  const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
+    onClick?.(event);
+
+    // 利用側が preventDefault したときは閉じない
+    if (event.defaultPrevented) {
+      return;
+    }
+
     // ダイアログ要素自身（＝オーバーレイ領域）がクリックされたときのみ閉じる
     if (closeOnOverlayClick && event.target === dialogRef.current) {
       onClose?.();
     }
+  };
+
+  // 閉じたことの通知はネイティブの close イベントに一本化する。
+  // Escape（cancel → close）も <form method="dialog"> もここに集約されるため、
+  // cancel を個別に拾うと Escape のときだけ二重に通知されてしまう
+  const handleNativeClose = () => {
+    // open が false のまま閉じたときは、利用側の指示に従って閉じただけなので通知しない。
+    // オーバーレイクリックや Dialog.Close は onClose → open=false → close() と流れるため、
+    // ここで弾かないと 1 回の操作で onClose が 2 回呼ばれる
+    if (!open) {
+      return;
+    }
+
+    onClose?.();
   };
 
   // context の値は全サブコンポーネントの再レンダー要因になるため memo 化する。
@@ -138,15 +170,15 @@ export function Dialog({
 
   return (
     <DialogContext value={contextValue}>
+      {/* パーツ間の配線を利用側の props に潰されないよう、{...props} は先に展開する */}
       <dialog
+        {...props}
         ref={mergedRef}
         className={clsx(dialog, className)}
         // 登録されたタイトルがあるときだけ紐付ける（未描画なら参照先が存在しないため）
-        aria-labelledby={titleIds.length > 0 ? titleIds.join(' ') : undefined}
-        onClose={onClose}
-        onCancel={onClose}
-        onClick={handleOverlayClick}
-        {...props}
+        aria-labelledby={ariaLabelledBy ?? (titleIds.length > 0 ? titleIds.join(' ') : undefined)}
+        onClose={handleNativeClose}
+        onClick={handleClick}
       >
         {children}
       </dialog>
@@ -160,7 +192,7 @@ export type DialogHeaderProps = ComponentPropsWithRef<'div'>;
  * ダイアログのヘッダー。`Dialog.Title` と `Dialog.Close` を並べる
  */
 const DialogHeader = ({ className, ...props }: DialogHeaderProps) => {
-  return <div className={clsx(dialogHeader, className)} {...props} />;
+  return <div {...props} className={clsx(dialogHeader, className)} />;
 };
 
 export type DialogTitleProps = Omit<ComponentPropsWithRef<'h2'>, 'id'>;
@@ -182,7 +214,7 @@ const DialogTitle = ({ className, ...props }: DialogTitleProps) => {
   // マウントされている間だけ id を登録する（registerTitle は登録解除用の関数を返す）
   useEffect(() => registerTitle(titleId), [registerTitle, titleId]);
 
-  return <h2 id={titleId} className={clsx(dialogTitle, className)} {...props} />;
+  return <h2 {...props} id={titleId} className={clsx(dialogTitle, className)} />;
 };
 
 export type DialogBodyProps = ComponentPropsWithRef<'div'>;
@@ -191,7 +223,7 @@ export type DialogBodyProps = ComponentPropsWithRef<'div'>;
  * ダイアログの本文
  */
 const DialogBody = ({ className, ...props }: DialogBodyProps) => {
-  return <div className={clsx(dialogBody, className)} {...props} />;
+  return <div {...props} className={clsx(dialogBody, className)} />;
 };
 
 export type DialogFooterProps = ComponentPropsWithRef<'div'>;
@@ -200,7 +232,7 @@ export type DialogFooterProps = ComponentPropsWithRef<'div'>;
  * ダイアログのフッター。ボタンなどを右寄せで並べる
  */
 const DialogFooter = ({ className, ...props }: DialogFooterProps) => {
-  return <div className={clsx(dialogFooter, className)} {...props} />;
+  return <div {...props} className={clsx(dialogFooter, className)} />;
 };
 
 export type DialogCloseProps = Omit<
@@ -227,6 +259,9 @@ const DialogClose = ({
   children,
   className,
   onClick,
+  // 見た目は既定を持ちつつ利用側から差し替えられるよう、明示的に受け取って合成する
+  variant = 'secondary-exposed',
+  size = 'sm',
   'aria-label': ariaLabel = '閉じる',
   ...props
 }: DialogCloseProps) => {
@@ -248,12 +283,12 @@ const DialogClose = ({
 
   return (
     <IconButton
+      {...props}
       className={clsx(dialogClose, className)}
-      variant="secondary-exposed"
-      size="sm"
+      variant={variant}
+      size={size}
       aria-label={ariaLabel}
       onClick={handleClick}
-      {...props}
     >
       {children ?? CLOSE_ICON}
     </IconButton>

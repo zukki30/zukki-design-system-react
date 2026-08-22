@@ -111,9 +111,12 @@ export type FormFieldControlState = {
 
 /**
  * `false` を undefined に潰す。
- * 属性として出力したときに `data-error="false"` のような無意味な値を増やさないため
+ * 属性として出力したときに `data-error="false"` のような無意味な値を増やさないため。
+ *
+ * ルートの `data-*` と入力コンポーネントへ引き継ぐ状態の両方で使う。
+ * ライブラリ内部専用のため `index.ts` からは公開しない
  */
-const toTruthyOrUndefined = (value: boolean | undefined): true | undefined =>
+export const toTruthyOrUndefined = (value: boolean | undefined): true | undefined =>
   value === true ? true : undefined;
 
 /**

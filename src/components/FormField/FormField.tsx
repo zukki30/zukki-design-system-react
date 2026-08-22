@@ -17,6 +17,7 @@ import {
   type FormFieldContextValue,
   type FormFieldOrientation,
   type FormFieldRequiredMark,
+  toTruthyOrUndefined,
   useFormFieldContext,
 } from './FormFieldContext';
 import { useFormFieldControl } from './hooks';
@@ -146,8 +147,9 @@ export function FormField({
         role={role ?? (isLabelledGroup ? 'group' : undefined)}
         aria-labelledby={ariaLabelledBy ?? (isLabelledGroup ? labelId : undefined)}
         data-orientation={orientation}
-        data-disabled={disabled}
-        data-error={hasError}
+        // false は属性ごと出力しない。入力コンポーネント側（Input など）の data-* と揃える
+        data-disabled={toTruthyOrUndefined(disabled)}
+        data-error={toTruthyOrUndefined(hasError)}
       >
         {children}
       </div>

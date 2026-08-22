@@ -8,7 +8,7 @@ import {
   stepsItemLabel,
   stepsItemStatus,
 } from './StepsItem.css';
-import { useStepsContext, useStepsItemNumber } from './hooks';
+import { useStepsContext, useStepsItemNumber } from './StepsContext';
 
 const CHECK_ICON_SIZE = 20;
 

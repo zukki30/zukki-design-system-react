@@ -243,20 +243,31 @@ describe('Card', () => {
       vi.restoreAllMocks();
     });
 
-    const subComponents = [
-      ['Card.Image', <Card.Image key="image" />],
+    // size を必要とするパーツだけが context を読むため、誤用を検知できるのもこの 3 つ。
+    // Dialog.Header などと同じく、context を使わないパーツは単体でも描画できる
+    const contextDependentParts = [
       ['Card.Header', <Card.Header key="header" />],
-      ['Card.Title', <Card.Title key="title" />],
-      ['Card.Action', <Card.Action key="action" />],
       ['Card.Body', <Card.Body key="body" />],
       ['Card.Footer', <Card.Footer key="footer" />],
     ] as const;
 
-    it.each(subComponents)('%s は Card の外で使うと例外を投げる', (name, element) => {
+    it.each(contextDependentParts)('%s は Card の外で使うと例外を投げる', (_name, element) => {
       // React が投げられたエラーをコンソールへ出力するため、テスト出力を汚さないよう抑制する
       vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      expect(() => render(element)).toThrow(`${name} は Card の内側でのみ使用できます。`);
+      expect(() => render(element)).toThrow(
+        'Card のサブコンポーネントは <Card> の内側で使用してください'
+      );
+    });
+
+    const standaloneParts = [
+      ['Card.Image', <Card.Image key="image" />],
+      ['Card.Title', <Card.Title key="title" />],
+      ['Card.Action', <Card.Action key="action" />],
+    ] as const;
+
+    it.each(standaloneParts)('%s は size を参照しないため単体でも描画できる', (_name, element) => {
+      expect(() => render(element)).not.toThrow();
     });
   });
 });
