@@ -90,7 +90,7 @@ export const StepsItem = ({ children }: StepsItemProps) => {
           </span>
         )}
         <span className={stepsItemLabel}>{children}</span>
-        {statusText !== undefined && <span className={stepsItemStatus}>{statusText}</span>}
+        {statusText != null && <span className={stepsItemStatus}>{statusText}</span>}
       </Component>
     </li>
   );

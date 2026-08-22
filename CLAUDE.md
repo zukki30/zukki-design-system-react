@@ -107,6 +107,28 @@ src/utils/
 - **相互排他な見た目の選択肢は boolean ではなく文字列 union で表す**（`circle?: boolean` ではなく `shape?: 'rect' | 'circle'`）。選択肢が 3 つ目に増えても破壊的変更にならず、`data-*` 属性や `styleVariants()` のキーにそのまま使える。union は `SkeletonShape` のように名前付きで export する
   - ただし真偽で意味が完結する状態（`disabled` / `loading` / `error` / `required` など）は boolean のままでよい
 
+**任意 prop の条件描画:**
+
+`ReactNode` や文字列を受け取る任意 prop をラッパー要素で包んで描画するときは、`&&` の左辺に prop をそのまま置かない。`0` や `NaN` がテキストとして漏れる。判定は用途で使い分ける。
+
+- **装飾（アイコンなど、中身が空だと視覚的なゴミになるもの）は truthy 三項** — `''` / `0` / `false` はすべて未指定として扱い、ラッパーごと描画しない。`aria-hidden` な span に `0` が入っても意味がないため
+
+  ```tsx
+  {startIcon ? <span className={inputIcon} aria-hidden="true">{startIcon}</span> : null}
+  ```
+
+  この挙動は「falsy な値はアイコン未指定として扱う」と JSDoc に明記する
+
+- **テキスト・ラベルは `!= null`** — `''` / `0` は指定ありとして描画する。`<Checkbox>{count}</Checkbox>` で `count` が `0` のときラベルが黙って消えるのを防ぐ
+
+  ```tsx
+  {children != null && <span className={checkboxLabel}>{children}</span>}
+  ```
+
+- `!== undefined` は使わない。`{cond ? icon : null}` という一般的な書き方で `null` が「指定あり」と判定され、中身が空のラッパーが残ってしまう
+- 描画の有無を prop から算出する箇所（`Select` の `defaultValue` など）は、描画側の条件式と必ず同じ判定にする
+- boolean / 関数 prop（`loading` / `onClose` など）は falsy 値が漏れないため `&&` のままでよい
+
 **ref の扱い（React 19 の ref-as-prop）:**
 
 - `ref` は通常の prop として受け取り、内部の DOM 要素へ転送する。`forwardRef` は使用しない

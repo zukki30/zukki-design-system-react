@@ -13,6 +13,12 @@ describe('Checkbox', () => {
     expect(screen.getByRole('checkbox', { name: '同意する' })).toBeInTheDocument();
   });
 
+  it('ラベルに 0 を渡してもテキストとして描画する', () => {
+    render(<Checkbox>{0}</Checkbox>);
+
+    expect(screen.getByRole('checkbox')).toHaveAccessibleName('0');
+  });
+
   it('デフォルトは未チェックである', () => {
     render(<Checkbox>label</Checkbox>);
 

@@ -13,6 +13,12 @@ describe('Radio', () => {
     expect(screen.getByRole('radio', { name: 'りんご' })).toBeInTheDocument();
   });
 
+  it('ラベルに 0 を渡してもテキストとして描画する', () => {
+    render(<Radio>{0}</Radio>);
+
+    expect(screen.getByRole('radio')).toHaveAccessibleName('0');
+  });
+
   it('デフォルトは未選択である', () => {
     render(<Radio>label</Radio>);
 

@@ -13,6 +13,12 @@ describe('Switch', () => {
     expect(screen.getByRole('switch', { name: '通知を受け取る' })).toBeInTheDocument();
   });
 
+  it('ラベルに 0 を渡してもテキストとして描画する', () => {
+    render(<Switch>{0}</Switch>);
+
+    expect(screen.getByRole('switch')).toHaveAccessibleName('0');
+  });
+
   it('switch ロールを持つ', () => {
     render(<Switch>label</Switch>);
 

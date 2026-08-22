@@ -28,6 +28,21 @@ describe('Select', () => {
     expect(screen.getByText('選択してください')).toBeInTheDocument();
   });
 
+  it('placeholder 未指定のとき placeholder option を描画しない', () => {
+    // hidden な option はアクセシビリティツリーから外れるため、DOM を直接数える
+    const { container } = render(<Select>{options}</Select>);
+
+    expect(container.querySelectorAll('option')).toHaveLength(2);
+  });
+
+  it('placeholder に空文字を渡しても指定として扱い placeholder option を描画する', () => {
+    const { container } = render(<Select placeholder="">{options}</Select>);
+
+    // テキストが空でも「未選択」の初期選択先として option は必要になる
+    expect(container.querySelectorAll('option')).toHaveLength(3);
+    expect(screen.getByRole('combobox')).toHaveValue('');
+  });
+
   it('選択を変更できる', () => {
     render(<Select placeholder="選択してください">{options}</Select>);
 
