@@ -86,6 +86,14 @@ src/hooks/
 
 共有フックはライブラリ内部専用です。`src/main.tsx` からは export せず、barrel（`index.ts`）も置かずに実装ファイルを直接 import します（内部では barrel を経由しない規約に合わせる）。
 
+フックではない共有のユーティリティ関数は `src/utils/` に置きます（例: `src/utils/dataAttribute.ts`）。扱う関心ごとにファイルを分け、共有フックと同じく内部専用として barrel を置かずに直接 import します。
+
+```
+src/utils/
+├── dataAttribute.ts      # 実装
+└── dataAttribute.spec.ts # テスト
+```
+
 ## コーディング規約
 
 **TypeScript / React:**

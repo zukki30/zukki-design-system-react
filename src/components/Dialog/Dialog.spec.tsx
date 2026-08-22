@@ -354,7 +354,7 @@ describe('Dialog', () => {
       expect(handleClose).toHaveBeenCalledTimes(1);
     });
 
-    it('cancel イベントは既定動作に任せ、単体では onClose を呼ばない', () => {
+    it('Escape（cancel）は既定動作を止めたうえで onClose を呼ぶ', () => {
       const handleClose = vi.fn();
       render(
         <Dialog open onClose={handleClose}>
@@ -367,11 +367,74 @@ describe('Dialog', () => {
         throw new Error('dialog element not found');
       }
 
-      // 実ブラウザでは cancel を止めなければ続けて close が発火する。
-      // cancel だけで通知すると、その close と合わせて 2 回呼ばれてしまう
-      fireEvent(dialogElement, new Event('cancel', { bubbles: false, cancelable: true }));
+      const cancelEvent = new Event('cancel', { bubbles: false, cancelable: true });
+      fireEvent(dialogElement, cancelEvent);
 
-      expect(handleClose).not.toHaveBeenCalled();
+      // 既定動作を止めることで、閉じるかどうかを open 側に一本化する
+      expect(cancelEvent.defaultPrevented).toBe(true);
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    // 修正前は cancel と close の両方を onClose に配線していたため、この流れで 2 回呼ばれていた。
+    // 現在は cancel を止めるので close 自体が発火しないが、リグレッションの防波堤として残す
+    it('Escape の一連の流れ（cancel → close）でも onClose は 1 回だけ呼ばれる', () => {
+      const handleClose = vi.fn();
+      render(
+        <Dialog open onClose={handleClose}>
+          <Dialog.Body>本文</Dialog.Body>
+        </Dialog>
+      );
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      // jsdom は cancel の既定動作を実装しないため、実ブラウザの流れを手で並べる
+      const cancelEvent = new Event('cancel', { bubbles: false, cancelable: true });
+      fireEvent(dialogElement, cancelEvent);
+
+      if (!cancelEvent.defaultPrevented) {
+        fireEvent(dialogElement, new Event('close'));
+      }
+
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    // Escape だけ「閉じるのを取りやめる」手段が無いと、DOM だけ閉じて open が変化せず、
+    // 同期 effect（[open] 依存）も再実行されないため以降その Dialog を開き直せなくなる
+    it('Escape で onClose を受けても open を true のままにすれば閉じない', () => {
+      const StayOpenDialog = () => {
+        // 「入力途中なので確認する」= onClose を受けても open は変えない
+        const [open] = useState(true);
+
+        return (
+          <Dialog open={open} onClose={() => {}}>
+            <Dialog.Body>本文</Dialog.Body>
+          </Dialog>
+        );
+      };
+
+      render(<StayOpenDialog />);
+
+      const dialogElement = document.querySelector('dialog');
+      if (dialogElement === null) {
+        throw new Error('dialog element not found');
+      }
+
+      // close の呼び出し履歴は同じモックに溜まるため、この操作分だけを見る
+      vi.mocked(HTMLDialogElement.prototype.close).mockClear();
+
+      const cancelEvent = new Event('cancel', { bubbles: false, cancelable: true });
+      fireEvent(dialogElement, cancelEvent);
+
+      if (!cancelEvent.defaultPrevented) {
+        dialogElement.removeAttribute('open');
+      }
+
+      // DOM と open prop が食い違わないこと（食い違うと開き直せなくなる）
+      expect(dialogElement).toHaveAttribute('open');
+      expect(HTMLDialogElement.prototype.close).not.toHaveBeenCalled();
     });
 
     it('open=false のまま閉じたときは onClose を呼ばない', () => {

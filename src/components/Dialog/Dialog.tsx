@@ -4,6 +4,7 @@ import {
   type ComponentPropsWithRef,
   type MouseEvent,
   type ReactNode,
+  type SyntheticEvent,
   useEffect,
   useId,
   useMemo,
@@ -41,7 +42,11 @@ export type DialogProps = {
    * （Escape キー・`Dialog.Close`・オーバーレイクリック・`<form method="dialog">`）。
    *
    * 1 回の操作につき 1 回だけ呼ばれる。
-   * 利用側が `open` を `false` にしたことで閉じた場合は、既に閉じると決めた後なので呼ばれない
+   * 利用側が `open` を `false` にしたことで閉じた場合は、既に閉じると決めた後なので呼ばれない。
+   *
+   * **これは「閉じる要求」であり、閉じるかどうかは `open` で決まる。**
+   * Escape も含めてすべての経路で既定動作を止めているため、
+   * 呼ばれても `open` を `true` のままにすれば閉じない（入力途中の確認などに使える）
    */
   onClose?: () => void;
   /**
@@ -143,12 +148,21 @@ export function Dialog({
     }
   };
 
-  // 閉じたことの通知はネイティブの close イベントに一本化する。
-  // Escape（cancel → close）も <form method="dialog"> もここに集約されるため、
-  // cancel を個別に拾うと Escape のときだけ二重に通知されてしまう
+  // Escape の既定動作（DOM を直接閉じる）は止め、他の経路と同じ「閉じる要求」に揃える。
+  // 止めないと、利用側が onClose を受けて「まだ閉じない」と判断し open を true のままにしたとき、
+  // DOM だけ閉じているのに open が変化せず、同期 effect も再実行されないため開き直せなくなる
+  const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
+    event.preventDefault();
+
+    onClose?.();
+  };
+
+  // 実際に閉じたことの通知はネイティブの close イベントで拾う。
+  // Escape は上の handleCancel で open 経由に寄せてあるため、ここに来るのは
+  // <form method="dialog"> の送信と、ref から直接 close() を呼ばれた場合
   const handleNativeClose = () => {
     // open が false のまま閉じたときは、利用側の指示に従って閉じただけなので通知しない。
-    // オーバーレイクリックや Dialog.Close は onClose → open=false → close() と流れるため、
+    // すべての閉じる経路は onClose → open=false → close() と流れるため、
     // ここで弾かないと 1 回の操作で onClose が 2 回呼ばれる
     if (!open) {
       return;
@@ -178,6 +192,7 @@ export function Dialog({
         // 登録されたタイトルがあるときだけ紐付ける（未描画なら参照先が存在しないため）
         aria-labelledby={ariaLabelledBy ?? (titleIds.length > 0 ? titleIds.join(' ') : undefined)}
         onClose={handleNativeClose}
+        onCancel={handleCancel}
         onClick={handleClick}
       >
         {children}
@@ -235,9 +250,12 @@ const DialogFooter = ({ className, ...props }: DialogFooterProps) => {
   return <div {...props} className={clsx(dialogFooter, className)} />;
 };
 
+// type は受け付けない。`type="submit"` を <form method="dialog"> 内で指定すると、
+// このボタンの onClose とフォーム送信による close の 2 経路から閉じることになり、
+// どちらが閉じたのかが曖昧になる。送信を伴う閉じ方は Button と useDialogContext で組む
 export type DialogCloseProps = Omit<
   ComponentProps<typeof IconButton>,
-  'aria-label' | 'children'
+  'aria-label' | 'children' | 'type'
 > & {
   /**
    * 閉じるボタンのアクセシブルネーム
