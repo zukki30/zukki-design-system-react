@@ -2,6 +2,7 @@ import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, useEffect, useRef } from 'react';
 
 import { useMergedRef } from '@/hooks/useMergedRef';
+import { isRenderable } from '@/utils/renderableNode';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
@@ -80,7 +81,7 @@ export const Checkbox = ({
         </span>
       </span>
 
-      {children != null && <span className={checkboxLabel}>{children}</span>}
+      {isRenderable(children) && <span className={checkboxLabel}>{children}</span>}
     </label>
   );
 };

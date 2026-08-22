@@ -107,6 +107,29 @@ src/utils/
 - **相互排他な見た目の選択肢は boolean ではなく文字列 union で表す**（`circle?: boolean` ではなく `shape?: 'rect' | 'circle'`）。選択肢が 3 つ目に増えても破壊的変更にならず、`data-*` 属性や `styleVariants()` のキーにそのまま使える。union は `SkeletonShape` のように名前付きで export する
   - ただし真偽で意味が完結する状態（`disabled` / `loading` / `error` / `required` など）は boolean のままでよい
 
+**任意 prop の条件描画:**
+
+`ReactNode` や文字列を受け取る任意 prop をラッパー要素で包んで描画するときは、`&&` の左辺に prop をそのまま置かない。`0` や `NaN` がテキストとして漏れる。判定は用途で使い分ける。
+
+- **装飾（アイコンなど）は truthy 三項** — `''` / `0` / `false` はすべて未指定として扱い、ラッパーごと描画しない。中身が空のまま残ると `gap` や `padding` の余白だけが空いてしまうため
+
+  ```tsx
+  {startIcon ? <span className={inputIcon} aria-hidden="true">{startIcon}</span> : null}
+  ```
+
+  この挙動は「falsy な値はアイコン未指定として扱う」と JSDoc に明記する
+
+- **テキスト・ラベルは `@/utils/renderableNode` の `isRenderable()`** — React が何も描画しない値（`null` / `undefined` / `boolean`）だけを未指定として扱い、`''` / `0` は描画する。`<Checkbox>{count}</Checkbox>` で `count` が `0` のときラベルが黙って消えるのを防ぐ
+
+  ```tsx
+  {isRenderable(children) && <span className={checkboxLabel}>{children}</span>}
+  ```
+
+- **素の比較（`!= null` / `!== undefined`）で済ませない。** どちらも `{cond && label}` が偽のときに渡る `false` を「指定あり」と判定してしまい、中身が空のラッパーが残る。`!== undefined` はさらに `{cond ? icon : null}` の `null` も取りこぼす
+- 描画の有無を prop から算出する箇所（`Select` の `defaultValue` など）は、判定を `hasPlaceholder` のような変数に括り出して描画側と共有する。同じ条件式を 2 箇所に書くと、片方だけ書き換えられて壊れる
+- boolean / 関数 prop（`loading` / `onClose` など）は falsy 値が漏れないため `&&` のままでよい
+- 装飾を包む span に `aria-hidden` を付けるかはコンポーネントごとに判断する。`Icon` は `aria-label` の有無で自身の `aria-hidden` を出し分けるため、ラッパー側で一律に隠すと利用側が意味を持たせたアイコンまで隠れてしまう
+
 **ref の扱い（React 19 の ref-as-prop）:**
 
 - `ref` は通常の prop として受け取り、内部の DOM 要素へ転送する。`forwardRef` は使用しない

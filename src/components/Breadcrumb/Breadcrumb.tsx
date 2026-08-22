@@ -41,7 +41,8 @@ export type BreadcrumbItem = {
    */
   href?: string;
   /**
-   * ラベルの前に表示するアイコン（先頭項目の home アイコンなど）
+   * ラベルの前に表示するアイコン（先頭項目の home アイコンなど）。
+   * `0` や `''` などの falsy な値はアイコン未指定として扱い、何も描画しない
    */
   icon?: ReactNode;
 };
@@ -78,7 +79,7 @@ export const Breadcrumb = ({
           const key = `${index}-${item.href ?? ''}`;
           const content = (
             <>
-              {item.icon !== undefined && <span className={breadcrumbIcon}>{item.icon}</span>}
+              {item.icon ? <span className={breadcrumbIcon}>{item.icon}</span> : null}
               <span className={breadcrumbLabel}>{item.label}</span>
             </>
           );
@@ -89,7 +90,7 @@ export const Breadcrumb = ({
                 <span className={breadcrumbCurrent[variant]} aria-current="page">
                   {content}
                 </span>
-              ) : item.href !== undefined ? (
+              ) : item.href != null ? (
                 <a className={breadcrumbLink} href={item.href}>
                   {content}
                 </a>

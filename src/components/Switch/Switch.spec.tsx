@@ -13,6 +13,23 @@ describe('Switch', () => {
     expect(screen.getByRole('switch', { name: '通知を受け取る' })).toBeInTheDocument();
   });
 
+  it('ラベルに 0 を渡してもテキストとして描画する', () => {
+    render(<Switch>{0}</Switch>);
+
+    expect(screen.getByRole('switch')).toHaveAccessibleName('0');
+  });
+
+  it.each([
+    { name: 'undefined', children: undefined },
+    // {cond && label} が偽のときに渡る値。空の span が残ると gap だけが空いてしまう
+    { name: 'false', children: false },
+  ])('ラベルが $name のときラベル要素ごと描画しない', ({ children }) => {
+    render(<Switch aria-label="通知を受け取る">{children}</Switch>);
+
+    // 子要素はスイッチ本体だけになる
+    expect(screen.getByRole('switch').closest('label')?.childElementCount).toBe(1);
+  });
+
   it('switch ロールを持つ', () => {
     render(<Switch>label</Switch>);
 

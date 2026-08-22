@@ -13,6 +13,23 @@ describe('Checkbox', () => {
     expect(screen.getByRole('checkbox', { name: '同意する' })).toBeInTheDocument();
   });
 
+  it('ラベルに 0 を渡してもテキストとして描画する', () => {
+    render(<Checkbox>{0}</Checkbox>);
+
+    expect(screen.getByRole('checkbox')).toHaveAccessibleName('0');
+  });
+
+  it.each([
+    { name: 'undefined', children: undefined },
+    // {cond && label} が偽のときに渡る値。空の span が残ると gap だけが空いてしまう
+    { name: 'false', children: false },
+  ])('ラベルが $name のときラベル要素ごと描画しない', ({ children }) => {
+    render(<Checkbox aria-label="同意する">{children}</Checkbox>);
+
+    // 子要素はチェックボックス本体だけになる
+    expect(screen.getByRole('checkbox').closest('label')?.childElementCount).toBe(1);
+  });
+
   it('デフォルトは未チェックである', () => {
     render(<Checkbox>label</Checkbox>);
 

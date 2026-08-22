@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
+import { isRenderable } from '@/utils/renderableNode';
+
 import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
@@ -39,11 +41,12 @@ export const Select = ({
 }: Props) => {
   const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
 
+  // 初期選択の行き先が消えないよう、option の描画と初期値の算出は同じ判定を使う
+  const hasPlaceholder = isRenderable(placeholder);
+
   // placeholder 指定かつ未制御・初期値なしのときは空文字を初期選択にして placeholder を表示する
   const resolvedDefaultValue =
-    value === undefined && defaultValue === undefined && placeholder !== undefined
-      ? ''
-      : defaultValue;
+    value === undefined && defaultValue === undefined && hasPlaceholder ? '' : defaultValue;
 
   return (
     <div className={clsx(select, className)} data-error={error} data-disabled={disabled}>
@@ -55,7 +58,7 @@ export const Select = ({
         defaultValue={resolvedDefaultValue}
         {...props}
       >
-        {placeholder !== undefined && (
+        {hasPlaceholder && (
           <option value="" disabled hidden>
             {placeholder}
           </option>
