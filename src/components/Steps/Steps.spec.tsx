@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { vars } from '@/styles/theme.css';
@@ -7,7 +8,7 @@ import { Steps } from './Steps';
 import { steps } from './Steps.css';
 import { StepsItem } from './StepsItem';
 import { useStepsContext, useStepsItemNumber } from './StepsContext';
-import { stepsItem } from './StepsItem.css';
+import { stepsItem, stepsItemContainer } from './StepsItem.css';
 
 const labels = ['カート', '配送先', '確認'];
 
@@ -189,6 +190,41 @@ describe('Steps', () => {
     expect(container.querySelector('ol')).toHaveClass(steps.vertical);
   });
 
+  it('ネイティブ属性を ol に渡す', () => {
+    render(
+      <Steps current={1} id="checkout-steps" aria-label="購入手順" data-testid="steps">
+        {stepItems()}
+      </Steps>
+    );
+
+    const list = screen.getByTestId('steps');
+    expect(list.tagName).toBe('OL');
+    expect(list).toHaveAttribute('id', 'checkout-steps');
+    expect(list).toHaveAttribute('aria-label', '購入手順');
+  });
+
+  it('ref を ol に転送する', () => {
+    const ref = createRef<HTMLOListElement>();
+    render(
+      <Steps current={1} ref={ref} data-testid="steps">
+        {stepItems()}
+      </Steps>
+    );
+
+    expect(ref.current).toBe(screen.getByTestId('steps'));
+  });
+
+  it('className をベースのクラスに結合して ol に付与する', () => {
+    render(
+      <Steps current={1} className="custom" data-testid="steps">
+        {stepItems()}
+      </Steps>
+    );
+
+    // 上書きではなくマージであることを、ベースのクラスが残っているかで確認する
+    expect(screen.getByTestId('steps')).toHaveClass(steps.horizontal, 'custom');
+  });
+
   it('ラベルが重複していても描画できる', () => {
     render(<Steps current={1}>{stepItems(['確認', '入力', '確認'])}</Steps>);
 
@@ -263,6 +299,37 @@ describe('Steps', () => {
           vars['font-weight'].normal
         );
       });
+    });
+
+    it('ref・ネイティブ属性を li に転送する', () => {
+      const ref = createRef<HTMLLIElement>();
+      render(
+        <Steps current={1}>
+          <Steps.Item ref={ref} id="cart-step" data-testid="item" className="custom">
+            カート
+          </Steps.Item>
+        </Steps>
+      );
+
+      const item = screen.getByTestId('item');
+      expect(item.tagName).toBe('LI');
+      expect(ref.current).toBe(item);
+      expect(item).toHaveAttribute('id', 'cart-step');
+      // 上書きではなくマージであることを、ベースのクラスが残っているかで確認する
+      expect(item).toHaveClass(stepsItemContainer, 'custom');
+    });
+
+    it('data-orientation は利用側から上書きできない', () => {
+      // data-orientation はスタイルの分岐に使うため、Steps の orientation と食い違わせない
+      render(
+        <Steps current={1} orientation="vertical">
+          <Steps.Item data-orientation="horizontal" data-testid="item">
+            カート
+          </Steps.Item>
+        </Steps>
+      );
+
+      expect(screen.getByTestId('item')).toHaveAttribute('data-orientation', 'vertical');
     });
 
     it('Steps の外では例外を投げる', () => {
