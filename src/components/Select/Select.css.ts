@@ -1,3 +1,4 @@
+import { inputColorSchemeLight } from '@/styles/colorScheme';
 import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { globalStyle, style } from '@vanilla-extract/css';
@@ -5,15 +6,12 @@ import { globalStyle, style } from '@vanilla-extract/css';
 const ICON_SIZE = 20;
 
 export const select = style({
+  // UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin の JSDoc）。
+  // ネイティブの選択肢リストが対象で、ラッパーに置くことでシェブロンとも解決を揃える
+  ...inputColorSchemeLight,
   position: 'relative',
   display: 'inline-flex',
   width: '100%',
-  // 入力面のトークンはライト・ダークとも白背景 + 濃色テキストなので light に固定する。
-  // :root の `color-scheme: light dark` のままだと、OS がダークのときに UA が
-  // ネイティブの選択肢リストだけを暗く描画してしまう。
-  // 継承プロパティなのでラッパーに置き、フィールドとシェブロンアイコンで解決を揃える
-  // （副作用として、このコンポーネント内で参照する light-dark() はすべてライト側に固定される）
-  colorScheme: 'light',
 });
 
 export const selectField = style({

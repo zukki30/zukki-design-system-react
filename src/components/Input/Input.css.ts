@@ -1,8 +1,12 @@
+import { inputColorSchemeLight } from '@/styles/colorScheme';
 import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
 export const input = style({
+  // UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin の JSDoc）。
+  // 利用側が type="date" / "time" などを渡せるぶん、対象になるネイティブウィジェットが多い
+  ...inputColorSchemeLight,
   boxSizing: 'border-box',
   display: 'inline-flex',
   alignItems: 'center',

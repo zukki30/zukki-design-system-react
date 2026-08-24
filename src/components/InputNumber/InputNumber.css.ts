@@ -1,3 +1,4 @@
+import { inputColorSchemeLight } from '@/styles/colorScheme';
 import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
@@ -6,6 +7,9 @@ const SPIN_WIDTH = 22;
 const FIELD_MIN_WIDTH = 80;
 
 export const inputNumber = style({
+  // UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin の JSDoc）。
+  // ネイティブのスピンボタンは inputNumberField 側で非表示にしているため対象外
+  ...inputColorSchemeLight,
   boxSizing: 'border-box',
   display: 'inline-flex',
   alignItems: 'stretch',

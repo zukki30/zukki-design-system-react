@@ -1,3 +1,4 @@
+import { inputColorSchemeLight } from '@/styles/colorScheme';
 import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
@@ -6,6 +7,8 @@ import { style } from '@vanilla-extract/css';
 const MIN_HEIGHT = '136px';
 
 export const textArea = style({
+  // UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin の JSDoc）
+  ...inputColorSchemeLight,
   boxSizing: 'border-box',
   display: 'block',
   width: '100%',
