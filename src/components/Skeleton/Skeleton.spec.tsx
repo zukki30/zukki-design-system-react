@@ -1,10 +1,11 @@
 import { render } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Skeleton } from './Skeleton';
 import { skeleton as skeletonClass } from './Skeleton.css';
 
-const renderSkeleton = (ui: React.ReactElement) => {
+const renderSkeleton = (ui: ReactElement) => {
   const { container } = render(ui);
   const element = container.querySelector('span');
 

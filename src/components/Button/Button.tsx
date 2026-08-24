@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentProps, ComponentPropsWithRef, MouseEvent } from 'react';
+import type { ComponentProps, ComponentPropsWithRef, MouseEvent, ReactNode } from 'react';
 
 import type { SizeType, ZukkiVariantType } from '@/types';
 
@@ -18,15 +18,15 @@ type Props = {
   /**
    * ボタンの中身
    */
-  children: React.ReactNode;
+  children: ReactNode;
   /**
    * ボタンの前に表示する要素
    */
-  startIcon?: React.ReactNode;
+  startIcon?: ReactNode;
   /**
    * ボタンの後に表示する要素
    */
-  endIcon?: React.ReactNode;
+  endIcon?: ReactNode;
   /**
    * ボタンのバリアント
    */

@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithRef } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { isRenderable } from '@/utils/renderableNode';
 
@@ -24,7 +24,7 @@ type Props = {
   /**
    * option 要素
    */
-  children?: React.ReactNode;
+  children?: ReactNode;
 } & Omit<ComponentPropsWithRef<'select'>, 'prefix' | 'suffix'>;
 
 const ICON_SIZE = 20;

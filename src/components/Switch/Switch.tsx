@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithRef } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { isRenderable } from '@/utils/renderableNode';
 
@@ -18,7 +18,7 @@ type Props = {
   /**
    * スイッチのラベル
    */
-  children?: React.ReactNode;
+  children?: ReactNode;
   /**
    * スイッチの disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
