@@ -89,7 +89,9 @@ export const StepsItem = ({ children }: StepsItemProps) => {
             {stepNumber}
           </span>
         )}
-        <span className={stepsItemLabel}>{children}</span>
+        <span className={isCurrent ? stepsItemLabel.current : stepsItemLabel.default}>
+          {children}
+        </span>
         {statusText != null && <span className={stepsItemStatus}>{statusText}</span>}
       </Component>
     </li>

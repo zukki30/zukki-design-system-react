@@ -158,12 +158,11 @@ export const stepsItemStatus = style({
 });
 
 // 横並びはステップ同士が幅を奪い合うため 1 行で省略する
-export const stepsItemLabel = style({
+const stepsItemLabelBase = style({
   ...truncate,
   color: vars.color.textOnLight.default,
   fontFamily: vars['font-family'].default,
   fontSize: vars['font-size'].base,
-  fontWeight: vars['font-weight'].normal,
   lineHeight: vars['line-height'].line,
 
   selectors: {
@@ -172,15 +171,16 @@ export const stepsItemLabel = style({
       whiteSpace: 'normal',
       overflowWrap: 'anywhere',
     },
-    // 現在ステップを色以外でも示す（WCAG 1.4.1）。完了ステップはチェックアイコンという
-    // 形状差があるが、現在ステップは default と円の形が同じで差が色だけになるため。
-    // aria-current="step" を手がかりにするのは、Breadcrumb の現在ページと同じく
-    // 「現在」の表し方を太字に揃えつつ、描画側と条件を二重に持たないため
-    [`${stepsItem}[aria-current="step"] &`]: {
-      fontWeight: vars['font-weight'].bold,
-    },
     [`${stepsItem}:is(button):hover &`]: {
       color: vars.color.blue[400],
     },
   },
+});
+
+export const stepsItemLabel = styleVariants({
+  default: [stepsItemLabelBase, { fontWeight: vars['font-weight'].normal }],
+  // 現在ステップを色以外でも示す（WCAG 1.4.1）。完了ステップはチェックアイコンという
+  // 形状差があるが、現在ステップは default と円の形が同じで差が色だけになるため。
+  // 「現在」を太字で表すのは Breadcrumb の現在ページと揃えている
+  current: [stepsItemLabelBase, { fontWeight: vars['font-weight'].bold }],
 });

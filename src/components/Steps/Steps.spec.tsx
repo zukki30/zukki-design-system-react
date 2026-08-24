@@ -1,6 +1,7 @@
-import { vars } from '@/styles/theme.css';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { vars } from '@/styles/theme.css';
 
 import { Steps } from './Steps';
 import { steps } from './Steps.css';
@@ -239,6 +240,11 @@ describe('Steps', () => {
 
     // 現在ステップの円は default と形が同じで差が色だけになるため、
     // ラベルの太さを色以外の手がかりにしている（WCAG 1.4.1）
+    //
+    // jsdom の getComputedStyle はカスタムプロパティを解決せず、宣言値の
+    // var(--font-weight-bold__…) をそのまま返す。そのため vars の値と直接比較できる
+    // （jsdom が var の解決に対応したら 700 / 400 が返って落ちるため、その際は
+    // 期待値も getComputedStyle 越しに取る形へ寄せる）
     it('現在ステップのラベルだけを太字にする', () => {
       render(<Steps current={2}>{stepItems()}</Steps>);
 
