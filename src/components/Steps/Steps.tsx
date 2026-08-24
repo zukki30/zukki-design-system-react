@@ -33,6 +33,8 @@ export type StepsProps = {
  * 手順の進捗を示すステップ。ステップは Steps.Item を並べて構成する。
  * ステップ番号は Steps が並び順から採番し、現在／完了の状態とあわせて context 経由で共有される
  *
+ * 現在のステップは色に加えてラベルの太字でも示すため、色だけに頼らずに見分けられる
+ *
  * @example
  * ```tsx
  * <Steps current={2}>
