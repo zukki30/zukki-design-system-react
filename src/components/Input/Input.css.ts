@@ -1,8 +1,13 @@
+import { inputColorSchemeLight } from '@/styles/colorScheme';
 import { reducedMotionNone } from '@/styles/motion';
 import { vars } from '@/styles/theme.css';
 import { style } from '@vanilla-extract/css';
 
 export const input = style({
+  // UA が描画するパーツ（オートフィル背景・選択ハイライト・キャレット、
+  // type="date" / "time" / "search" などのネイティブウィジェット）を
+  // ライト固定のフィールドに合わせる。継承させるためラッパーに置く
+  ...inputColorSchemeLight,
   boxSizing: 'border-box',
   display: 'inline-flex',
   alignItems: 'center',
