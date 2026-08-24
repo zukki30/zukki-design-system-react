@@ -172,6 +172,13 @@ export const stepsItemLabel = style({
       whiteSpace: 'normal',
       overflowWrap: 'anywhere',
     },
+    // 現在ステップを色以外でも示す（WCAG 1.4.1）。完了ステップはチェックアイコンという
+    // 形状差があるが、現在ステップは default と円の形が同じで差が色だけになるため。
+    // aria-current="step" を手がかりにするのは、Breadcrumb の現在ページと同じく
+    // 「現在」の表し方を太字に揃えつつ、描画側と条件を二重に持たないため
+    [`${stepsItem}[aria-current="step"] &`]: {
+      fontWeight: vars['font-weight'].bold,
+    },
     [`${stepsItem}:is(button):hover &`]: {
       color: vars.color.blue[400],
     },

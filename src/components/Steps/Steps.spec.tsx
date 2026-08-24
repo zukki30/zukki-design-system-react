@@ -1,3 +1,4 @@
+import { vars } from '@/styles/theme.css';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -234,6 +235,28 @@ describe('Steps', () => {
       rerender(<Steps current={2}>{stepItems()}</Steps>);
 
       expect(screen.getByText('2').className).not.toBe(defaultClassName);
+    });
+
+    // 現在ステップの円は default と形が同じで差が色だけになるため、
+    // ラベルの太さを色以外の手がかりにしている（WCAG 1.4.1）
+    it('現在ステップのラベルだけを太字にする', () => {
+      render(<Steps current={2}>{stepItems()}</Steps>);
+
+      const [finished, current, upcoming] = labels.map((label) => screen.getByText(label));
+
+      expect(getComputedStyle(current).fontWeight).toBe(vars['font-weight'].bold);
+      expect(getComputedStyle(finished).fontWeight).toBe(vars['font-weight'].normal);
+      expect(getComputedStyle(upcoming).fontWeight).toBe(vars['font-weight'].normal);
+    });
+
+    it('現在ステップがないときはどのラベルも太字にしない', () => {
+      render(<Steps current={labels.length + 1}>{stepItems()}</Steps>);
+
+      labels.forEach((label) => {
+        expect(getComputedStyle(screen.getByText(label)).fontWeight).toBe(
+          vars['font-weight'].normal
+        );
+      });
     });
 
     it('Steps の外では例外を投げる', () => {
