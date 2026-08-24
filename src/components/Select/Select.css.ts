@@ -6,8 +6,8 @@ import { globalStyle, style } from '@vanilla-extract/css';
 const ICON_SIZE = 20;
 
 export const select = style({
-  // UA が描画するネイティブの選択肢リストを、ライト固定のフィールドに合わせる。
-  // 継承させるためラッパーに置き、フィールドとシェブロンアイコンで解決を揃える
+  // UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin の JSDoc）。
+  // ネイティブの選択肢リストが対象で、ラッパーに置くことでシェブロンとも解決を揃える
   ...inputColorSchemeLight,
   position: 'relative',
   display: 'inline-flex',

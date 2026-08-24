@@ -7,8 +7,7 @@ import { style } from '@vanilla-extract/css';
 const MIN_HEIGHT = '136px';
 
 export const textArea = style({
-  // UA が描画するパーツ（選択ハイライト・キャレット、あふれたときのスクロールバー）を
-  // ライト固定のフィールドに合わせる
+  // UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin の JSDoc）
   ...inputColorSchemeLight,
   boxSizing: 'border-box',
   display: 'block',
