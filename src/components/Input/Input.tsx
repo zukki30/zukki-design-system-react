@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import type { ComponentPropsWithRef } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
@@ -11,13 +11,13 @@ type Props = {
    * 支援技術からは隠されるため、操作要素や意味のあるテキストは渡さないこと。
    * `0` や `''` などの falsy な値はアイコン未指定として扱い、何も描画しない
    */
-  startIcon?: React.ReactNode;
+  startIcon?: ReactNode;
   /**
    * 入力の後に表示する装飾アイコン。
    * 支援技術からは隠されるため、操作要素や意味のあるテキストは渡さないこと。
    * `0` や `''` などの falsy な値はアイコン未指定として扱い、何も描画しない
    */
-  endIcon?: React.ReactNode;
+  endIcon?: ReactNode;
   /**
    * 入力のエラー状態。未指定のときは FormField のエラー状態を引き継ぐ
    */

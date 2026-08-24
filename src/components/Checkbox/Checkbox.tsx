@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { type ComponentPropsWithRef, useEffect, useRef } from 'react';
+import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef } from 'react';
 
 import { useMergedRef } from '@/hooks/useMergedRef';
 import { isRenderable } from '@/utils/renderableNode';
@@ -21,7 +21,7 @@ type Props = {
   /**
    * チェックボックスのラベル
    */
-  children?: React.ReactNode;
+  children?: ReactNode;
   /**
    * 中間状態
    */

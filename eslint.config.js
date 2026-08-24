@@ -28,6 +28,30 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // React は名前空間ごと参照せず named import で使う。
+      // React.ReactNode のような参照は @types/react の UMD グローバル宣言経由で
+      // import なしでも型が通ってしまい、暗黙のグローバル依存になる。
+      'no-restricted-syntax': [
+        'error',
+        {
+          // 型注釈: React.ReactNode / React.ReactElement など
+          selector: 'TSQualifiedName[left.name="React"]',
+          message:
+            "React 名前空間ではなく named import を使ってください（例: import type { ReactNode } from 'react'）",
+        },
+        {
+          // 値: React.useState など
+          selector: 'MemberExpression[object.name="React"]',
+          message:
+            "React 名前空間ではなく named import を使ってください（例: import { useState } from 'react'）",
+        },
+        {
+          // JSX: <React.Fragment> など。JSX は MemberExpression と別ノードになる
+          selector: 'JSXMemberExpression[object.name="React"]',
+          message:
+            "React 名前空間ではなく named import を使ってください（例: import { Fragment } from 'react'）",
+        },
+      ],
     },
   },
   {

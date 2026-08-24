@@ -101,6 +101,7 @@ src/utils/
 - 関数コンポーネントのみ: `export const ComponentName = ({ ...props }: Props) => { ... }`
 - 型定義はすべて `interface` ではなく `type` を使用する。`any` は使用しない
 - ネイティブな HTML 属性を展開するには `ComponentPropsWithRef<'tag'>` を使用する
+- **React の型・値は `react` からの named import で参照し、`React` 名前空間は使わない**（`React.ReactNode` ではなく `import type { ReactNode } from 'react'`）。`@types/react` が `React` を UMD グローバルとして宣言しているため、名前空間参照はファイル内に import が無くても型が通ってしまい、暗黙のグローバル依存になる。値（`React.useState`）と JSX（`<React.Fragment>`）も同様。ESLint の `no-restricted-syntax` で機械的に担保している
 - 条件付き className の結合には `clsx()` を使用する
 - `useEffect` の使用は最小限に抑え、宣言的なパターンを優先する
 - 深い `if/else` のネストを避け、条件が複数ある場合は `switch` を使用する
