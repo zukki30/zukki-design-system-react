@@ -88,8 +88,8 @@ importers:
         specifier: ^10.5.10
         version: 10.5.10(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8)
       style-dictionary:
-        specifier: ^5.5.1
-        version: 5.5.1
+        specifier: ^5.5.2
+        version: 5.5.2
       token-transformer:
         specifier: ^0.0.33
         version: 0.0.33
@@ -1581,8 +1581,8 @@ packages:
   '@webcontainer/env@1.1.1':
     resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
 
-  '@zip.js/zip.js@2.8.43':
-    resolution: {integrity: sha512-LesnlKQyNaCm3NWd7TwMLYYRVShxaeItzReGGRiwxRhsad5PhIF2Vxl+tOWoajjK7xiukZtqmJf5ckkE/OVpYw==}
+  '@zip.js/zip.js@2.8.54':
+    resolution: {integrity: sha512-Nr2JRdMBxmdh6v8JYb/BBipvTvBr3Ztwf6+bIdVxb1EMaNNm5gsM9R80pB+c9S2WMdODb3LIWiXfYekDA3+JSw==}
     engines: {bun: '>=0.7.0', deno: '>=1.0.0', node: '>=18.0.0'}
 
   acorn-jsx@5.3.2:
@@ -2930,8 +2930,8 @@ packages:
     resolution: {integrity: sha512-SlyRoSkdh1dYP0PzclLE7r0M9sgbFKKMFXpFRUMNuKhQSbC6VQIGzq3E0qsfvGJaUFJPGv6Ws1NZ/haTAjfbMA==}
     engines: {node: '>=12'}
 
-  style-dictionary@5.5.1:
-    resolution: {integrity: sha512-+fwPuRKopBLNolzefOHrAtCQomJqj0HVbH0XWBwXEQR3CV+i2pkNY5yCSPPv0qNHc3ibnbuzF4Qui3tZehexIw==}
+  style-dictionary@5.5.2:
+    resolution: {integrity: sha512-OPXsfLzy+8YZrUmlgOGDmTlykL8xWLvhb70bHUvBKkPCY75eQabQsl+Jd4JO8nC/uuz/6UdikCHxagiBdUugtw==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
@@ -4651,7 +4651,7 @@ snapshots:
 
   '@webcontainer/env@1.1.1': {}
 
-  '@zip.js/zip.js@2.8.43': {}
+  '@zip.js/zip.js@2.8.54': {}
 
   acorn-jsx@5.3.2(acorn@8.18.0):
     dependencies:
@@ -6195,12 +6195,12 @@ snapshots:
 
   strip-indent@4.1.1: {}
 
-  style-dictionary@5.5.1:
+  style-dictionary@5.5.2:
     dependencies:
       '@bundled-es-modules/deepmerge': 4.3.2
       '@bundled-es-modules/glob': 13.0.6
       '@bundled-es-modules/memfs': 4.17.0
-      '@zip.js/zip.js': 2.8.43
+      '@zip.js/zip.js': 2.8.54
       chalk: 5.6.2
       change-case: 5.4.4
       colorjs.io: 0.5.2
