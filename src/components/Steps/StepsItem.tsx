@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { clsx } from 'clsx';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { Icon } from '../Icon/Icon';
 import {
@@ -35,13 +36,16 @@ export type StepsItemProps = {
    * ステップのラベル
    */
   children: ReactNode;
-};
+} & ComponentPropsWithRef<'li'>;
 
 /**
  * ステップ 1 件。ステップ番号・現在／完了の状態・クリック可否は、
  * すべて Steps から context 経由で受け取る
+ *
+ * ref とネイティブ属性は、他のパーツと同じく自身が描画する要素（li）に転送される。
+ * 内側の span / button は状態によって描画し分けるため、転送先にはしない
  */
-export const StepsItem = ({ children }: StepsItemProps) => {
+export const StepsItem = ({ children, className, ...props }: StepsItemProps) => {
   const {
     state: { current, total, orientation },
     actions: { select },
@@ -74,7 +78,8 @@ export const StepsItem = ({ children }: StepsItemProps) => {
   const statusText = getStatusText();
 
   return (
-    <li data-orientation={orientation} className={stepsItemContainer}>
+    // data-orientation は context の値と常に一致させたいので、利用側の props より後に指定する
+    <li {...props} data-orientation={orientation} className={clsx(stepsItemContainer, className)}>
       {/* 現在ステップは aria-current と状態テキストが重複して読み上げられるが、
           aria-current を読み上げない支援技術のための保険として意図的に併記している */}
       <Component

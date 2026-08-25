@@ -1,5 +1,6 @@
+import { clsx } from 'clsx';
 import { Children, Fragment, isValidElement, useMemo } from 'react';
-import type { ReactNode } from 'react';
+import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { steps } from './Steps.css';
 import { StepsItem } from './StepsItem';
@@ -20,6 +21,9 @@ export type StepsProps = {
   /**
    * ステップをクリックしたときに呼ばれるハンドラ。
    * 指定するとステップがボタンとして描画される
+   *
+   * ステップ番号を受け取る独自のハンドラのため、ol のネイティブな
+   * `onClick` / `onClickCapture` は受け取らない
    */
   onClick?: (stepNumber: number) => void;
   /**
@@ -27,13 +31,17 @@ export type StepsProps = {
    * 1 ステップにつき 1 つの子を置く
    */
   children: ReactNode;
-};
+  // キャプチャ側だけネイティブのまま残すと、同じ「クリック」の名前で
+  // 一方はステップ番号・他方は MouseEvent を受け取る食い違いが型から見えなくなる
+} & Omit<ComponentPropsWithRef<'ol'>, 'onClick' | 'onClickCapture'>;
 
 /**
  * 手順の進捗を示すステップ。ステップは Steps.Item を並べて構成する。
  * ステップ番号は Steps が並び順から採番し、現在／完了の状態とあわせて context 経由で共有される
  *
  * 現在のステップは色に加えてラベルの太字でも示すため、色だけに頼らずに見分けられる
+ *
+ * ref とネイティブ属性はルートの ol に転送される
  *
  * @example
  * ```tsx
@@ -44,7 +52,14 @@ export type StepsProps = {
  * </Steps>
  * ```
  */
-export function Steps({ current, orientation = 'horizontal', onClick, children }: StepsProps) {
+export function Steps({
+  current,
+  orientation = 'horizontal',
+  onClick,
+  className,
+  children,
+  ...props
+}: StepsProps) {
   // 採番に使う。Children.count と違い null や false の子は取り除かれるので、
   // 条件付きで描画しないステップが番号を消費することはない
   const items = useMemo(() => Children.toArray(children), [children]);
@@ -59,7 +74,7 @@ export function Steps({ current, orientation = 'horizontal', onClick, children }
 
   return (
     <StepsContext value={contextValue}>
-      <ol className={steps[orientation]}>
+      <ol {...props} className={clsx(steps[orientation], className)}>
         {items.map((item, index) => {
           // Fragment は複数のステップが 1 つの子にまとまるため、採番が静かにずれる。
           // 独自のパーツは許容したいので、弾くのは採番が必ず壊れる Fragment だけにする
