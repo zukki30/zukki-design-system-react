@@ -10,12 +10,16 @@ export type SkeletonShape = 'rect' | 'circle';
 
 type Props = {
   /**
-   * シェイプの幅
+   * シェイプの幅。
+   * `style` にも `width` を指定した場合はそちらが優先される
+   *
    * @default '100%'
    */
   width?: CSSProperties['width'];
   /**
-   * シェイプの高さ
+   * シェイプの高さ。
+   * `style` にも `height` を指定した場合はそちらが優先される
+   *
    * @default '16px'
    */
   height?: CSSProperties['height'];
@@ -24,7 +28,8 @@ type Props = {
    * @default 'rect'
    */
   shape?: SkeletonShape;
-} & ComponentPropsWithRef<'span'>;
+  // 中身を持たない自己閉じの span を描画するため、children は受け取らない
+} & Omit<ComponentPropsWithRef<'span'>, 'children'>;
 
 /**
  * 読み込み中のプレースホルダー。ref とネイティブ属性は span に転送される

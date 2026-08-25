@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { vars } from '@/styles/theme.css';
 
-import { Steps } from './Steps';
+import { Steps, type StepsProps } from './Steps';
 import { steps } from './Steps.css';
 import { StepsItem } from './StepsItem';
 import { useStepsContext, useStepsItemNumber } from './StepsContext';
@@ -212,6 +212,22 @@ describe('Steps', () => {
     );
 
     expect(ref.current).toBe(screen.getByTestId('steps'));
+  });
+
+  it('ネイティブの onClickCapture を型として受け取らない', () => {
+    // onClick はステップ番号を受け取る独自ハンドラのため、キャプチャ側も型で弾いて
+    // 同名で受け取る値が食い違わないようにしている。
+    // Omit から外れると「未使用の @ts-expect-error」として tsc -b が失敗する
+    const propsWithCapture: StepsProps = {
+      current: 1,
+      children: stepItems(),
+      // @ts-expect-error ネイティブのクリックハンドラは受け取らない
+      onClickCapture: vi.fn(),
+    };
+
+    render(<Steps {...propsWithCapture} />);
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(labels.length);
   });
 
   it('className をベースのクラスに結合して ol に付与する', () => {

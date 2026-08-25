@@ -22,7 +22,8 @@ export type StepsProps = {
    * ステップをクリックしたときに呼ばれるハンドラ。
    * 指定するとステップがボタンとして描画される
    *
-   * ステップ番号を受け取る独自のハンドラのため、ol のネイティブな `onClick` は受け取らない
+   * ステップ番号を受け取る独自のハンドラのため、ol のネイティブな
+   * `onClick` / `onClickCapture` は受け取らない
    */
   onClick?: (stepNumber: number) => void;
   /**
@@ -30,7 +31,9 @@ export type StepsProps = {
    * 1 ステップにつき 1 つの子を置く
    */
   children: ReactNode;
-} & Omit<ComponentPropsWithRef<'ol'>, 'onClick'>;
+  // キャプチャ側だけネイティブのまま残すと、同じ「クリック」の名前で
+  // 一方はステップ番号・他方は MouseEvent を受け取る食い違いが型から見えなくなる
+} & Omit<ComponentPropsWithRef<'ol'>, 'onClick' | 'onClickCapture'>;
 
 /**
  * 手順の進捗を示すステップ。ステップは Steps.Item を並べて構成する。
