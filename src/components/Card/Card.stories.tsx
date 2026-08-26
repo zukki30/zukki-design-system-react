@@ -10,8 +10,10 @@ const moreLinkStyle = {
   textDecoration: 'underline',
 };
 
+// href は anchor-is-valid を満たすため実在するパスにしつつ、
+// ストーリーの表示が壊れないよう遷移だけ止める
 const MoreLink = () => (
-  <a href="/" style={moreLinkStyle}>
+  <a href="/" style={moreLinkStyle} onClick={(event) => event.preventDefault()}>
     more
   </a>
 );

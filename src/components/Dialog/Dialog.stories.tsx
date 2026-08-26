@@ -250,10 +250,6 @@ export const Simple: Story = {
 };
 
 /**
- * オーバーレイクリックで閉じない構成。
- * 描画を伴わない挙動の切り替えのため、こちらは prop で指定する
- */
-/**
  * 最初から開いた状態で描画する構成。
  *
  * 閉じている間はダイアログの中身が DOM に存在せず a11y 検査の対象にならないため、
@@ -275,6 +271,10 @@ export const Opened: Story = {
   ),
 };
 
+/**
+ * オーバーレイクリックで閉じない構成。
+ * 描画を伴わない挙動の切り替えのため、こちらは prop で指定する
+ */
 export const KeepOpenOnOverlayClick: Story = {
   render: () => (
     <DialogDemo closeOnOverlayClick={false}>

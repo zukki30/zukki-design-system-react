@@ -57,10 +57,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # インストール済みの playwright から直接読む。runner に jq 等を要求しない
       - name: Resolve playwright version
         id: playwright
         run: |
-          echo "version=$(pnpm ls playwright --depth 0 --json | jq -r '.[0].devDependencies.playwright.version')" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
 
       # ブラウザバイナリは 90MB 超あるのでバージョンをキーにキャッシュする
       - uses: actions/cache@v4
