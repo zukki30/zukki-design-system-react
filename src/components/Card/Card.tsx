@@ -1,6 +1,9 @@
 import { clsx } from 'clsx';
-import { useMemo } from 'react';
-import type { ComponentPropsWithRef } from 'react';
+import { createElement, useMemo } from 'react';
+import type { ComponentPropsWithRef, Ref } from 'react';
+
+import type { HeadingLevel } from '@/types';
+import { headingTag } from '@/utils/headingTag';
 
 import {
   card,
@@ -84,17 +87,43 @@ const CardHeader = ({ className, ...props }: CardHeaderProps) => {
   return <div {...props} className={clsx(cardHeader[size], className)} />;
 };
 
-export type CardTitleProps = ComponentPropsWithRef<'div'>;
+export type CardTitleProps = {
+  /**
+   * 見出しレベル。指定すると `h2`〜`h6` として描画する。
+   *
+   * カードが文書構造のどの階層に置かれるかはライブラリ側からは分からないため、
+   * 省略時は `div` で描画し、見出しとしての意味付けは行わない。
+   * カードのタイトルを見出しとして扱いたい場合に、周囲の見出し階層に合わせて指定する。
+   *
+   * 変わるのは意味付けだけで、見た目（フォントサイズ・太さ）はレベルによらず同じ
+   */
+  level?: HeadingLevel;
+  /**
+   * タイトル要素への ref。
+   *
+   * 転送先は `level` 未指定なら `div`、指定時は `h2`〜`h6` と変わるため、
+   * 共通の親である `HTMLElement` として受け取る
+   */
+  ref?: Ref<HTMLElement>;
+} & Omit<ComponentPropsWithRef<'div'>, 'ref'>;
 
 /**
  * ヘッダーのタイトル。
  *
  * Card.Action を押し出さないよう 1 行に固定され、あふれたぶんは省略記号で表示される。
  * `overflow: hidden` がかかるため、内部に配置した要素のフォーカスリングは切られうる。
- * 見出しとしての意味付けが必要な場合は `role="heading"` と `aria-level` を指定する
+ * 見出しとしての意味付けが必要な場合は `level` を指定する
  */
-const CardTitle = ({ className, ...props }: CardTitleProps) => {
-  return <div {...props} className={clsx(cardTitle, className)} />;
+const CardTitle = ({ level, className, ref, ...props }: CardTitleProps) => {
+  // level 未指定のときは見出しの意味付けをせず div で描画する。
+  // 描画するタグが level で変わるため、JSX ではなく createElement で組み立てる
+  // （JSX にすると大文字始まりの変数になり、レンダーごとにコンポーネントを
+  // 作っていると誤検知される。実際に渡すのは 'h2' などのタグ名の文字列）
+  return createElement(level === undefined ? 'div' : headingTag(level), {
+    ...props,
+    ref,
+    className: clsx(cardTitle, className),
+  });
 };
 
 export type CardActionProps = ComponentPropsWithRef<'div'>;

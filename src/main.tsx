@@ -10,6 +10,9 @@ import './styles/variables-dark-only.css';
 import './styles/variables-light-only.css';
 import './styles/variables.css';
 
+// 複数コンポーネントで共有する型
+export type { HeadingLevel } from './types';
+
 // components
 export { Icon } from './components/Icon';
 export { Button } from './components/Button';

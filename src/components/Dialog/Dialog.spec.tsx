@@ -1,3 +1,4 @@
+import { headingLevels } from '@/types';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef, useState } from 'react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
@@ -47,7 +48,7 @@ describe('Dialog', () => {
   });
 
   describe('Dialog.Title', () => {
-    it('h2 として描画し aria-labelledby で紐付ける', () => {
+    it('level 未指定のとき h2 として描画し aria-labelledby で紐付ける', () => {
       render(
         <Dialog open>
           <Dialog.Header>
@@ -59,6 +60,37 @@ describe('Dialog', () => {
       const heading = screen.getByRole('heading', { level: 2, name: '確認' });
 
       expect(document.querySelector('dialog')).toHaveAttribute('aria-labelledby', heading.id);
+    });
+
+    it.each(headingLevels)(
+      'level=%i を指定するとその見出しレベルで描画し aria-labelledby も紐付く',
+      (level) => {
+        render(
+          <Dialog open>
+            <Dialog.Header>
+              <Dialog.Title level={level}>確認</Dialog.Title>
+            </Dialog.Header>
+          </Dialog>
+        );
+
+        const heading = screen.getByRole('heading', { level, name: '確認' });
+
+        expect(heading.tagName).toBe(`H${level}`);
+        expect(document.querySelector('dialog')).toHaveAttribute('aria-labelledby', heading.id);
+      }
+    );
+
+    it('ref を見出し要素に転送する', () => {
+      const ref = createRef<HTMLHeadingElement>();
+      render(
+        <Dialog open>
+          <Dialog.Title ref={ref} level={3}>
+            確認
+          </Dialog.Title>
+        </Dialog>
+      );
+
+      expect(ref.current).toBe(screen.getByRole('heading', { level: 3 }));
     });
 
     it('描画しないとき aria-labelledby を付与しない', () => {

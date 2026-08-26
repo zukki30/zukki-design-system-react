@@ -178,6 +178,37 @@ src/utils/
 
 - 内部でハンドラを持つ prop（`onClick` など）は、上書きさせるのではなく利用側のハンドラを呼んでから内部の処理を足す。利用側が取りやめられるよう、`event.defaultPrevented` を見て中断できる逃げ道を用意する
 
+**タイトルの見出しレベル:**
+
+- タイトルを描画するパーツ（`Card.Title` / `Dialog.Title` など）は、`level?: HeadingLevel` で見出しレベルを受け取り `h2`〜`h6` を出し分ける。`role="heading"` と `aria-level` を利用側に組ませない。片方だけ渡されると無効な ARIA になり、ライブラリ側では防げないため
+- `HeadingLevel`（`2 | 3 | 4 | 5 | 6`）は複数コンポーネントで共有するため `src/types` に置く。`h1` はページ全体の見出しなので含めない。レベルからタグ名への変換は `@/utils/headingTag` の `headingTag()` を使う
+- **省略時に見出しにするかは「ライブラリが正しいレベルを決められるか」で決める**
+
+  | パーツ | 省略時 | 理由 |
+  | --- | --- | --- |
+  | `Card.Title` | `div`（見出しなし） | カードが文書構造のどの階層に置かれるかはライブラリ側から分からない。勝手にレベルを決めず、必要なときだけ利用側が指定する |
+  | `Dialog.Title` | `h2` | ダイアログの中は背景が inert になる独立したコンテキストで、タイトルは常にその最上位の見出しにあたる |
+
+- 描画する要素が `div` と `h2`〜`h6` で変わるパーツは、`ref` を共通の親である `HTMLElement` で受け取る。`ComponentPropsWithRef<'div'>` の `ref` は `HTMLDivElement` に固定されるため、`Omit<..., 'ref'>` してから広げる
+
+  ```tsx
+  export type CardTitleProps = {
+    level?: HeadingLevel;
+    ref?: Ref<HTMLElement>;
+  } & Omit<ComponentPropsWithRef<'div'>, 'ref'>;
+  ```
+
+- 見出ししか描画しないパーツ（`Dialog.Title`）は `h2`〜`h6` がいずれも `HTMLHeadingElement` なので、`ComponentPropsWithRef<'h2'>` のままでよい
+- **タグ名が可変の描画は JSX ではなく `createElement()` で組み立てる**。JSX で書くには `const Heading = headingTag(level)` のように大文字始まりの変数へ入れる必要があり、`react-hooks/static-components` に「レンダーごとにコンポーネントを作っている」と誤検知される。実際に渡しているのはタグ名の文字列なので識別子は毎回同じで、再マウントは起きない
+
+  ```tsx
+  return createElement(level === undefined ? 'div' : headingTag(level), {
+    ...props,
+    ref,
+    className: clsx(cardTitle, className),
+  });
+  ```
+
 **import の使い分け:**
 
 - `index.ts`（barrel）は **公開 API の境界** として使う。`src/main.tsx` からの再 export と、型の再 export の集約がその役割

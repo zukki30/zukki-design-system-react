@@ -5,6 +5,7 @@ import {
   type MouseEvent,
   type ReactNode,
   type SyntheticEvent,
+  createElement,
   useEffect,
   useId,
   useMemo,
@@ -13,6 +14,8 @@ import {
 
 import { useIdRegistry } from '@/hooks/useIdRegistry';
 import { useMergedRef } from '@/hooks/useMergedRef';
+import type { HeadingLevel } from '@/types';
+import { headingTag } from '@/utils/headingTag';
 
 import { Icon } from '../Icon/Icon';
 import { IconButton } from '../IconButton/IconButton';
@@ -210,7 +213,21 @@ const DialogHeader = ({ className, ...props }: DialogHeaderProps) => {
   return <div {...props} className={clsx(dialogHeader, className)} />;
 };
 
-export type DialogTitleProps = Omit<ComponentPropsWithRef<'h2'>, 'id'>;
+export type DialogTitleProps = {
+  /**
+   * 見出しレベル。
+   *
+   * ダイアログの中は背景が inert になる独立したコンテキストで、タイトルは常にその最上位の
+   * 見出しにあたるため、`Card.Title` と違って省略時も見出しとして描画する。
+   * 本文に見出しを含む場合など、階層を合わせたいときに指定する。
+   *
+   * 変わるのは意味付けだけで、見た目（フォントサイズ・太さ）はレベルによらず同じ
+   *
+   * @default 2
+   */
+  level?: HeadingLevel;
+  // h2〜h6 はいずれも HTMLHeadingElement なので、ref の型は h2 のまま変わらない
+} & Omit<ComponentPropsWithRef<'h2'>, 'id'>;
 
 /**
  * ダイアログのタイトル。
@@ -219,7 +236,7 @@ export type DialogTitleProps = Omit<ComponentPropsWithRef<'h2'>, 'id'>;
  * 1 つの Dialog につき 1 つだけ描画することを想定している
  * （複数描画した場合、`aria-labelledby` にはすべての id が並ぶ）
  */
-const DialogTitle = ({ className, ...props }: DialogTitleProps) => {
+const DialogTitle = ({ level = 2, className, ...props }: DialogTitleProps) => {
   const {
     meta: { registerTitle },
   } = useDialogContext();
@@ -229,7 +246,15 @@ const DialogTitle = ({ className, ...props }: DialogTitleProps) => {
   // マウントされている間だけ id を登録する（registerTitle は登録解除用の関数を返す）
   useEffect(() => registerTitle(titleId), [registerTitle, titleId]);
 
-  return <h2 {...props} id={titleId} className={clsx(dialogTitle, className)} />;
+  // 描画するタグが level で変わる。JSX で書くと大文字始まりの変数になり、
+  // レンダーごとにコンポーネントを作っていると誤検知されるため createElement を使う
+  // （実際に渡しているのは 'h2' などのタグ名の文字列で、識別子は毎回同じ）
+  return createElement(headingTag(level), {
+    ...props,
+    // ルートの aria-labelledby から参照される id。型でも Omit していて利用側からは変えられない
+    id: titleId,
+    className: clsx(dialogTitle, className),
+  });
 };
 
 export type DialogBodyProps = ComponentPropsWithRef<'div'>;
