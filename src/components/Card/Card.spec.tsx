@@ -1,7 +1,8 @@
-import { headingLevels } from '@/types';
 import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { headingLevels } from '@/types';
 
 import { Card } from './Card';
 import { cardBody, cardFooter, cardHeader } from './Card.css';

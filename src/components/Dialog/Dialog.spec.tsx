@@ -1,7 +1,8 @@
-import { headingLevels } from '@/types';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef, useState } from 'react';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
+
+import { headingLevels } from '@/types';
 
 import { iconButtonSize, iconButtonVariant } from '../IconButton/IconButton.css';
 
