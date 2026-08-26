@@ -119,9 +119,10 @@ const FooterButton = ({
  */
 const DialogDemo = ({
   children,
+  defaultOpen = false,
   ...props
-}: Omit<ComponentProps<typeof Dialog>, 'open' | 'onClose'>) => {
-  const [open, setOpen] = useState(false);
+}: Omit<ComponentProps<typeof Dialog>, 'open' | 'onClose'> & { defaultOpen?: boolean }) => {
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
     <>
@@ -148,6 +149,14 @@ const meta = {
   },
   tags: ['autodocs'],
   parameters: {
+    // TODO(#86): 配色トークンが WCAG AA のコントラスト比を満たしていない。
+    // 修正は Figma 側のデザイン判断を伴うため #86 で追跡する。
+    // color-contrast だけを外し、他のルールは error のまま維持する
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
     docs: {
       description: {
         component: docsDescription,
@@ -236,6 +245,28 @@ export const Simple: Story = {
   render: () => (
     <DialogDemo aria-label="お知らせ">
       <Dialog.Body>{bodyText}</Dialog.Body>
+    </DialogDemo>
+  ),
+};
+
+/**
+ * 最初から開いた状態で描画する構成。
+ *
+ * 閉じている間はダイアログの中身が DOM に存在せず a11y 検査の対象にならないため、
+ * 開いた状態のストーリーを必ず 1 つ残しておく
+ */
+export const Opened: Story = {
+  render: () => (
+    <DialogDemo defaultOpen>
+      <Dialog.Header>
+        <Dialog.Title>Dialog Title</Dialog.Title>
+        <Dialog.Close />
+      </Dialog.Header>
+      <Dialog.Body>{bodyText}</Dialog.Body>
+      <Dialog.Footer>
+        <FooterButton variant="default">ボタン</FooterButton>
+        <FooterButton variant="primary">ボタン</FooterButton>
+      </Dialog.Footer>
     </DialogDemo>
   ),
 };

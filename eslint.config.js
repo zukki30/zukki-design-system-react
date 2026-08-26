@@ -27,6 +27,9 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // plugins には既に jsx-a11y を登録しているため、flatConfigs.recommended を
+      // そのまま展開すると plugin の再定義エラーになる。ルールセットだけを取り込む。
+      ...eslintPluginJsxA11y.flatConfigs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       // React は名前空間ごと参照せず named import で使う。
       // React.ReactNode のような参照は @types/react の UMD グローバル宣言経由で
