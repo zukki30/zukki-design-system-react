@@ -17,9 +17,22 @@ const meta = {
   title: 'Components/Select',
   component: Select,
   tags: ['autodocs'],
+  parameters: {
+    // TODO(#86): 配色トークンが WCAG AA のコントラスト比を満たしていない。
+    // 修正は Figma 側のデザイン判断を伴うため #86 で追跡する。
+    // color-contrast だけを外し、他のルールは error のまま維持する
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
+  },
   args: {
     placeholder: 'placeholder',
     children: options,
+    // 単体で使うときのアクセシブルな名前は利用側が与える。
+    // FormField の中に置く場合は label と紐付くため不要
+    'aria-label': '項目を選択',
   },
   render: (args) => {
     const groupStyle = {

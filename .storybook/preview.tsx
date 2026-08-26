@@ -42,6 +42,11 @@ const preview: Preview = {
   ],
 
   parameters: {
+    a11y: {
+      // 違反があればストーリーのテストを失敗させる。
+      // 個別に繰り延べたいものは、そのストーリー / meta 側でルールを絞って無効化する
+      test: 'error',
+    },
     docs: {
       toc: { headingSelector: 'h1, h2, h3' },
       theme: prefersDark ? themes.dark : themes.light,
