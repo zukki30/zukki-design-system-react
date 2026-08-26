@@ -46,7 +46,10 @@ updates:
           - vite
           - '@vitejs/*'
           - vitest
+          # @vitest/browser-playwright は vitest のバージョンを完全一致で peer 指定するため、
+          # playwright も含めてこのグループでまとめて更新する
           - '@vitest/*'
+          - playwright
           - jsdom
           - '@testing-library/*'
       design-tokens:

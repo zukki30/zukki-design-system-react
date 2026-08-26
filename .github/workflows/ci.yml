@@ -38,3 +38,38 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm ${{ matrix.task }}
+
+  # ストーリーを実ブラウザで動かして axe-core にかける検査。
+  # ブラウザの用意が要るぶん手順が違うので、check マトリクスとは別ジョブにする
+  a11y:
+    name: a11y
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6.0.10
+
+      - uses: actions/setup-node@v7
+        with:
+          # setup-node は .mise.toml を読めないため直書き。.mise.toml と揃えること
+          node-version: 24.14.1
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Resolve playwright version
+        id: playwright
+        run: |
+          echo "version=$(pnpm ls playwright --depth 0 --json | jq -r '.[0].devDependencies.playwright.version')" >> "$GITHUB_OUTPUT"
+
+      # ブラウザバイナリは 90MB 超あるのでバージョンをキーにキャッシュする
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # 検査に使うのは Chromium だけ。キャッシュヒット時もシステム依存ライブラリのために実行する
+      # （バイナリのダウンロードはスキップされる）
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - run: pnpm test:a11y
