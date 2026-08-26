@@ -188,6 +188,10 @@ export function Dialog({
   return (
     <DialogContext value={contextValue}>
       {/* パーツ間の配線を利用側の props に潰されないよう、{...props} は先に展開する */}
+      {/* onClick はオーバーレイクリックで閉じるためのもの。キーボードでの閉じる操作は
+          ネイティブ <dialog> の ESC（onCancel）が担っており、別途キーハンドラは要らない。
+          jsx-a11y はそこまで追えないため、この 2 ルールに限って抑制する */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <dialog
         {...props}
         ref={mergedRef}

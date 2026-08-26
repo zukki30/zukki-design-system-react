@@ -11,7 +11,7 @@ const moreLinkStyle = {
 };
 
 const MoreLink = () => (
-  <a href="#" style={moreLinkStyle}>
+  <a href="/" style={moreLinkStyle}>
     more
   </a>
 );
