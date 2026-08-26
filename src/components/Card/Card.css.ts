@@ -52,6 +52,8 @@ export const cardTitle = style({
   // 長いタイトルは action を押し出さず 1 行で省略する。
   // cardAction が flex-shrink: 0 なので、縮む余地はこちらに寄る
   ...truncate,
+  // level 指定時は h2〜h6 として描画されるため、UA 既定の余白を打ち消す
+  margin: 0,
   flex: '1 1 auto',
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].bold,

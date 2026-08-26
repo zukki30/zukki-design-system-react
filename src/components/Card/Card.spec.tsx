@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { headingLevels } from '@/types';
+
 import { Card } from './Card';
 import { cardBody, cardFooter, cardHeader } from './Card.css';
 
@@ -123,6 +125,51 @@ describe('Card', () => {
       );
 
       expect(screen.getByText('more')).toBeInTheDocument();
+    });
+
+    it('Card.Title は level 未指定のとき div で描画し、見出しとして扱わない', () => {
+      render(
+        <Card>
+          <Card.Header>
+            <Card.Title data-testid="title">タイトル</Card.Title>
+          </Card.Header>
+        </Card>
+      );
+
+      expect(screen.getByTestId('title').tagName).toBe('DIV');
+      expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    });
+
+    it.each(headingLevels)('Card.Title は level=%i を指定すると見出しで描画する', (level) => {
+      render(
+        <Card>
+          <Card.Header>
+            <Card.Title data-testid="title" level={level}>
+              タイトル
+            </Card.Title>
+          </Card.Header>
+        </Card>
+      );
+
+      const heading = screen.getByRole('heading', { level, name: 'タイトル' });
+
+      expect(heading).toBe(screen.getByTestId('title'));
+      expect(heading.tagName).toBe(`H${level}`);
+    });
+
+    it('Card.Title は level 指定時も ref を見出し要素に転送する', () => {
+      const ref = createRef<HTMLHeadingElement>();
+      render(
+        <Card>
+          <Card.Header>
+            <Card.Title ref={ref} level={3}>
+              タイトル
+            </Card.Title>
+          </Card.Header>
+        </Card>
+      );
+
+      expect(ref.current).toBe(screen.getByRole('heading', { level: 3 }));
     });
 
     it('ref・ネイティブ属性を転送する', () => {
