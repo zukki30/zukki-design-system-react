@@ -274,6 +274,21 @@ Dialog の disable は以下の形とする。
 
 **A を採用する。** URL 判定の置き換えは独立した改善であり、別 Issue として起票する。
 
+#### 【2026-08-26 追記】実測により案 A は不成立と判明
+
+フェーズ 3 の検証（一時ストーリーで実測）の結果、**C-3 の前提が覆った**。
+
+| 項目 | `a11y-light` | `a11y-dark` |
+| --- | --- | --- |
+| `document.documentElement.className` | `light-theme` | `light-theme` |
+| `getComputedStyle(:root).colorScheme` | `light` | `light` |
+| `light-dark(rgb(1,2,3), rgb(4,5,6))` の解決 | `rgb(1, 2, 3)` | `rgb(1, 2, 3)` |
+| `Button` variant=primary の背景 | `rgb(14, 112, 241)` | `rgb(14, 112, 241)` |
+
+`preview-head.html` は **Vitest browser mode でも適用される**。テスト実行時の URL には globals が含まれないため、スクリプトは常に `light-theme` を付与する。これが `color-scheme: light` を強制し、Playwright の `contextOptions.colorScheme` によるエミュレーションを打ち消してしまう。両プロジェクトの計測値が完全に一致しており、案 A ではダーク配色を検査できない。
+
+**したがって案 B（`globalTypes` + decorator）へ切り替える。** 詳細は D-8 に記す。
+
 ### D-4: ストーリー起因のノイズは最小限の無効化にとどめる
 
 無効化するのは、単一コンポーネントを隔離描画するという**ストーリーの性質上、常に違反となるルール**に限る。

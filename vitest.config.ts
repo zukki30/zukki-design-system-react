@@ -10,18 +10,25 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 /**
  * ストーリーを実ブラウザで実行し、axe-core で a11y を検査するプロジェクト。
  *
- * 配色は `light-dark()` で定義されており、その解決は `prefers-color-scheme` に従う。
- * 配色ごとに検査したいため、Playwright 側でエミュレートしたプロジェクトを分けて用意する。
+ * 配色は `light-dark()` で定義されており、解決には `color-scheme` の宣言が要る。
+ * preview の decorator が theme グローバルに応じてルート要素のクラスを付け替えるため、
+ * 配色ごとに `initialGlobals` を変えたプロジェクトを用意する。
+ * ツールバー操作と同じ経路を通るので、Storybook 上の見た目と検査対象が一致する。
  */
-const storybookProject = (name: string, colorScheme: 'light' | 'dark') => ({
+const storybookProject = (name: string, theme: 'light' | 'dark') => ({
   extends: './vite.config.ts',
-  plugins: [storybookTest({ configDir: path.join(dirname, '.storybook') })],
+  plugins: [
+    storybookTest({
+      configDir: path.join(dirname, '.storybook'),
+      initialGlobals: { theme },
+    }),
+  ],
   test: {
     name,
     browser: {
       enabled: true,
       headless: true,
-      provider: playwright({ contextOptions: { colorScheme } }),
+      provider: playwright(),
       instances: [{ browser: 'chromium' as const }],
     },
   },
