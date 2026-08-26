@@ -19,9 +19,10 @@ pnpm format:check    # 修正せず検査のみ（CI と同じ）
 pnpm typecheck       # tsc -b のみ（バンドルなし）
 
 # テスト
-pnpm test           # 単発実行
+pnpm test           # 単発実行（jsdom のユニットテスト）
 pnpm test:watch     # ウォッチモード
 pnpm test:coverage  # カバレッジ付き
+pnpm test:a11y      # 全ストーリーを実ブラウザで動かして a11y を検査（ライト / ダーク両配色）
 
 # デザイントークン（Figma → CSS 変数 → TypeScript）
 pnpm token:transform   # Figma エクスポート → JSON
@@ -229,6 +230,38 @@ src/utils/
 
 - export された関数はすべてテストする。`if/else` は両分岐、`switch` は全 case を網羅する
 - テストファイル: `*.spec.ts` または `*.test.ts`
+- テストは 2 系統に分かれる。`vitest.config.ts` の `projects` で環境ごとに分離している
+  - `pnpm test` … jsdom 上のユニットテスト（`unit` プロジェクト）
+  - `pnpm test:a11y` … 全ストーリーを Chromium で描画し `axe-core` にかける（`a11y-light` / `a11y-dark` プロジェクト）
+
+**a11y の検査:**
+
+静的解析（`pnpm lint:check` の `jsx-a11y`）と実行時検査（`pnpm test:a11y`）の 2 層で見る。どちらも CI でブロックされるため、**実装後は両方を通してから完了とすること**。
+
+- 実行時検査を実ブラウザで行うのは、`color-contrast` やフォーカスの視認性など**レンダリングしないと判定できない領域**があるため。jsdom ではこれらが丸ごと検査対象外になる
+- 配色は `light-dark()` で定義されているため、ライト / ダークの両方を検査する。切り替えは `.storybook/preview.tsx` の `theme` グローバルと decorator が担い、テスト側は `storybookTest({ initialGlobals: { theme } })` で同じ経路を通る
+- **操作しないと現れない状態は、そのままでは検査されない。** ストーリーが既定で描画している状態だけが対象になるため、開いた状態のダイアログなどは専用のストーリーを用意する（`Dialog` の `Opened` が例）
+
+違反が出たときの対処は次の順で判断する。
+
+1. **ストーリーの組み方が原因なら、ストーリーを直す。** 単体で使うと名前が付かないコンポーネントに `aria-label` を与える、複数のランドマークを並べたストーリーで名前を振り分ける、など
+2. **コンポーネントの実装が原因なら、実装を直す**
+3. **デザイン判断を伴うものだけ繰り延べる。** 対象の meta で該当ルールだけを無効化し、理由と追跡先の Issue 番号をコメントに残す。`test: 'todo'` はそのコンポーネントの全ルールを非ブロックにしてしまうため使わない
+
+```ts
+parameters: {
+  // TODO(#86): 配色トークンが WCAG AA のコントラスト比を満たしていない。
+  // 修正は Figma 側のデザイン判断を伴うため #86 で追跡する。
+  // color-contrast だけを外し、他のルールは error のまま維持する
+  a11y: {
+    config: {
+      rules: [{ id: 'color-contrast', enabled: false }],
+    },
+  },
+},
+```
+
+- **`heading-order` は無効化しない。** `Card.Title` / `Dialog.Title` の `level` prop がこのルールの対象そのものであり、切るとコンポーネント自身の欠陥を見逃す。ストーリー側の見出し構成が原因なら、ルールではなくストーリーを直す
 
 **Git コミット:**
 
