@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/react-vite';
 import { themes } from 'storybook/theming';
 import { prefersDark } from './theme';
 
+import './preview.css';
 import './style.css';
 
 const preview: Preview = {

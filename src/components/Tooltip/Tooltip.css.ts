@@ -24,8 +24,8 @@ export const tooltipPopup = style({
   maxWidth: 240,
   padding: vars.spacing.sm,
   borderRadius: vars['border-radius'].sm,
-  backgroundColor: vars.color.grey['900'],
-  color: vars.color.textOnDark.default,
+  backgroundColor: vars.color.surface.inverse,
+  color: vars.color.textOnInverse.default,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,
@@ -95,19 +95,19 @@ export const tooltipArrow = style({
       left: '50%',
       transform: 'translateX(-50%)',
       borderWidth: '8px 6px 0 6px',
-      borderTopColor: vars.color.grey['900'],
+      borderTopColor: vars.color.surface.inverse,
     },
     [`${tooltipPopup}[data-placement="topLeft"] &`]: {
       bottom: `calc(${gap} * -1)`,
       left: edgeOffset,
       borderWidth: '8px 6px 0 6px',
-      borderTopColor: vars.color.grey['900'],
+      borderTopColor: vars.color.surface.inverse,
     },
     [`${tooltipPopup}[data-placement="topRight"] &`]: {
       bottom: `calc(${gap} * -1)`,
       right: edgeOffset,
       borderWidth: '8px 6px 0 6px',
-      borderTopColor: vars.color.grey['900'],
+      borderTopColor: vars.color.surface.inverse,
     },
     // 下方向（上向き矢印）
     [`${tooltipPopup}[data-placement="bottom"] &`]: {
@@ -115,19 +115,19 @@ export const tooltipArrow = style({
       left: '50%',
       transform: 'translateX(-50%)',
       borderWidth: '0 6px 8px 6px',
-      borderBottomColor: vars.color.grey['900'],
+      borderBottomColor: vars.color.surface.inverse,
     },
     [`${tooltipPopup}[data-placement="bottomLeft"] &`]: {
       top: `calc(${gap} * -1)`,
       left: edgeOffset,
       borderWidth: '0 6px 8px 6px',
-      borderBottomColor: vars.color.grey['900'],
+      borderBottomColor: vars.color.surface.inverse,
     },
     [`${tooltipPopup}[data-placement="bottomRight"] &`]: {
       top: `calc(${gap} * -1)`,
       right: edgeOffset,
       borderWidth: '0 6px 8px 6px',
-      borderBottomColor: vars.color.grey['900'],
+      borderBottomColor: vars.color.surface.inverse,
     },
     // 左方向（右向き矢印）
     [`${tooltipPopup}[data-placement="left"] &`]: {
@@ -135,7 +135,7 @@ export const tooltipArrow = style({
       top: '50%',
       transform: 'translateY(-50%)',
       borderWidth: '6px 0 6px 8px',
-      borderLeftColor: vars.color.grey['900'],
+      borderLeftColor: vars.color.surface.inverse,
     },
     // 右方向（左向き矢印）
     [`${tooltipPopup}[data-placement="right"] &`]: {
@@ -143,7 +143,7 @@ export const tooltipArrow = style({
       top: '50%',
       transform: 'translateY(-50%)',
       borderWidth: '6px 8px 6px 0',
-      borderRightColor: vars.color.grey['900'],
+      borderRightColor: vars.color.surface.inverse,
     },
   },
 });

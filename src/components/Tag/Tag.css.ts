@@ -38,37 +38,37 @@ export const tagVariant = styleVariants({
   red: {
     borderColor: vars.color.red[200],
     backgroundColor: vars.color.red[50],
-    color: vars.color.red[300],
+    color: vars.color.red[600],
   },
   blue: {
     borderColor: vars.color.blue[200],
     backgroundColor: vars.color.blue[0],
-    color: vars.color.blue[500],
+    color: vars.color.blue[700],
   },
   green: {
     borderColor: vars.color.green[200],
     backgroundColor: vars.color.green[0],
-    color: vars.color.green[500],
+    color: vars.color.green[700],
   },
   yellow: {
     borderColor: vars.color.yellow[300],
     backgroundColor: vars.color.yellow[50],
-    color: vars.color.yellow[600],
+    color: vars.color.yellow[800],
   },
   profile: {
     borderColor: vars.color.emerald[300],
     backgroundColor: vars.color.emerald[50],
-    color: vars.color.emerald[600],
+    color: vars.color.emerald[700],
   },
   works: {
     borderColor: vars.color.teal[300],
     backgroundColor: vars.color.teal[50],
-    color: vars.color.teal[600],
+    color: vars.color.teal[700],
   },
   outputs: {
     borderColor: vars.color.sky[300],
     backgroundColor: vars.color.sky[50],
-    color: vars.color.sky[600],
+    color: vars.color.sky[700],
   },
 });
 
@@ -112,51 +112,51 @@ export const tagCloseButton = style({
 
 export const tagCloseButtonVariant = styleVariants({
   default: {
-    color: vars.color.grey[500],
+    color: vars.color.grey[700],
     ':hover': {
-      color: vars.color.grey[700],
+      color: vars.color.grey[800],
     },
   },
   red: {
-    color: vars.color.red[300],
+    color: vars.color.red[600],
     ':hover': {
-      color: vars.color.red[500],
+      color: vars.color.red[700],
     },
   },
   blue: {
-    color: vars.color.blue[300],
+    color: vars.color.blue[700],
     ':hover': {
-      color: vars.color.blue[500],
+      color: vars.color.blue[800],
     },
   },
   green: {
-    color: vars.color.green[300],
+    color: vars.color.green[700],
     ':hover': {
-      color: vars.color.green[500],
+      color: vars.color.green[800],
     },
   },
   yellow: {
-    color: vars.color.yellow[300],
+    color: vars.color.yellow[800],
     ':hover': {
-      color: vars.color.yellow[600],
+      color: vars.color.yellow[850],
     },
   },
   profile: {
-    color: vars.color.emerald[300],
+    color: vars.color.emerald[700],
     ':hover': {
-      color: vars.color.emerald[600],
+      color: vars.color.emerald[800],
     },
   },
   works: {
-    color: vars.color.teal[300],
+    color: vars.color.teal[700],
     ':hover': {
-      color: vars.color.teal[600],
+      color: vars.color.teal[800],
     },
   },
   outputs: {
-    color: vars.color.sky[300],
+    color: vars.color.sky[700],
     ':hover': {
-      color: vars.color.sky[600],
+      color: vars.color.sky[800],
     },
   },
 });

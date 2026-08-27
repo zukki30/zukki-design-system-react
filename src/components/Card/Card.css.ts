@@ -8,10 +8,10 @@ export const card = style({
   flexDirection: 'column',
   alignItems: 'stretch',
   overflow: 'hidden',
-  backgroundColor: vars.color.grey['0'],
+  backgroundColor: vars.color.surface.raised,
   borderWidth: 1,
   borderStyle: 'solid',
-  borderColor: vars.color.grey['50'],
+  borderColor: vars.color.surface.subtle,
   borderRadius: vars['border-radius'].lg,
 });
 
@@ -59,7 +59,7 @@ export const cardTitle = style({
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size'].base,
   lineHeight: vars['line-height'].heading,
-  color: vars.color.textOnLight.default,
+  color: vars.color.textOnSurface.default,
 });
 
 export const cardAction = style({
@@ -83,7 +83,7 @@ const cardBodyBase = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,
   lineHeight: vars['line-height'].default,
-  color: vars.color.textOnLight.default,
+  color: vars.color.textOnSurface.default,
 });
 
 export const cardBody = styleVariants({

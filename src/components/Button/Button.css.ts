@@ -56,7 +56,7 @@ export const buttonVariant = styleVariants({
   primary: {
     backgroundColor: vars.color.primary.default,
     borderColor: vars.color.primary.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -76,7 +76,7 @@ export const buttonVariant = styleVariants({
   secondary: {
     backgroundColor: vars.color.secondary.default,
     borderColor: vars.color.secondary.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -96,7 +96,7 @@ export const buttonVariant = styleVariants({
   success: {
     backgroundColor: vars.color.success.default,
     borderColor: vars.color.success.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -116,7 +116,7 @@ export const buttonVariant = styleVariants({
   failure: {
     backgroundColor: vars.color.failure.default,
     borderColor: vars.color.failure.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -136,7 +136,7 @@ export const buttonVariant = styleVariants({
   profile: {
     backgroundColor: vars.color.profile.default,
     borderColor: vars.color.profile.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -156,7 +156,7 @@ export const buttonVariant = styleVariants({
   works: {
     backgroundColor: vars.color.works.default,
     borderColor: vars.color.works.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -176,7 +176,7 @@ export const buttonVariant = styleVariants({
   outputs: {
     backgroundColor: vars.color.outputs.default,
     borderColor: vars.color.outputs.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {

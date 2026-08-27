@@ -12,13 +12,13 @@ export const dialog = style({
   // 余白はルートではなく各パーツが持つ。
   // ヘッダーが任意になったため、ルートに上余白を置くと未合成時に本文の余白と二重になる
   padding: 0,
-  backgroundColor: vars.color.grey['0'],
+  backgroundColor: vars.color.surface.raised,
   borderWidth: 1,
   borderStyle: 'solid',
-  borderColor: vars.color.grey['50'],
+  borderColor: vars.color.surface.subtle,
   borderRadius: vars['border-radius'].xl,
   boxShadow: `${elevation4.x} ${elevation4.y} ${elevation4.blur}px ${elevation4.spread} ${elevation4.color}`,
-  color: vars.color.grey['900'],
+  color: vars.color.textOnSurface.default,
   // モーダル表示中の dialog は UA スタイルで overflow:auto / max-height を持つため、
   // 本文が長いとダイアログ自体がスクロールする。そのスクロールが背景へ連鎖しないようにする
   overscrollBehavior: 'contain',
@@ -31,7 +31,7 @@ export const dialog = style({
   },
 
   '::backdrop': {
-    backgroundColor: vars.color.grey['1000'],
+    backgroundColor: vars.color.black,
     opacity: 0.25,
   },
 });
@@ -54,7 +54,7 @@ export const dialogTitle = style({
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size'].xl,
   lineHeight: vars['line-height'].heading,
-  color: vars.color.grey['900'],
+  color: vars.color.textOnSurface.default,
 });
 
 export const dialogClose = style({
@@ -71,7 +71,7 @@ export const dialogBody = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].base,
   lineHeight: vars['line-height'].default,
-  color: vars.color.grey['900'],
+  color: vars.color.textOnSurface.default,
 });
 
 export const dialogFooter = style({

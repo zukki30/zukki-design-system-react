@@ -12,7 +12,7 @@ export const stepsItemContainer = style({
   minWidth: 0,
 
   '::after': {
-    backgroundColor: vars.color.grey[100],
+    backgroundColor: vars.color.surface.subtle,
     content: '',
   },
 
@@ -103,13 +103,13 @@ export const stepsItemIcon = styleVariants({
   default: [
     stepsItemIconBase,
     {
-      borderColor: vars.color.grey[150],
-      backgroundColor: vars.color.grey[150],
-      color: vars.color.textOnLight.default,
+      borderColor: vars.color.surface.subtle,
+      backgroundColor: vars.color.surface.subtle,
+      color: vars.color.textOnSurface.default,
 
       selectors: {
         [`${stepsItem}:is(button):hover &`]: {
-          borderColor: vars.color.blue[400],
+          borderColor: vars.color.primary.hover,
         },
       },
     },
@@ -117,14 +117,14 @@ export const stepsItemIcon = styleVariants({
   current: [
     stepsItemIconBase,
     {
-      borderColor: vars.color.blue[500],
-      backgroundColor: vars.color.blue[500],
-      color: vars.color.textOnDark.default,
+      borderColor: vars.color.primary.default,
+      backgroundColor: vars.color.primary.default,
+      color: vars.color.textOnAccent.default,
 
       selectors: {
         [`${stepsItem}:is(button):hover &`]: {
-          borderColor: vars.color.blue[300],
-          backgroundColor: vars.color.blue[300],
+          borderColor: vars.color.primary.hover,
+          backgroundColor: vars.color.primary.hover,
         },
       },
     },
@@ -132,9 +132,9 @@ export const stepsItemIcon = styleVariants({
   finished: [
     stepsItemIconBase,
     {
-      borderColor: vars.color.blue[100],
-      backgroundColor: vars.color.blue[100],
-      color: vars.color.blue[500],
+      borderColor: vars.color.primary.subtle,
+      backgroundColor: vars.color.primary.subtle,
+      color: vars.color.primary.default,
     },
   ],
 });
@@ -160,7 +160,7 @@ export const stepsItemStatus = style({
 // 横並びはステップ同士が幅を奪い合うため 1 行で省略する
 const stepsItemLabelBase = style({
   ...truncate,
-  color: vars.color.textOnLight.default,
+  color: vars.color.textOnSurface.default,
   fontFamily: vars['font-family'].default,
   fontSize: vars['font-size'].base,
   lineHeight: vars['line-height'].line,
@@ -172,7 +172,7 @@ const stepsItemLabelBase = style({
       overflowWrap: 'anywhere',
     },
     [`${stepsItem}:is(button):hover &`]: {
-      color: vars.color.blue[400],
+      color: vars.color.primary.hover,
     },
   },
 });

@@ -17,7 +17,7 @@ export const iconButtonSize = styleVariants({
 export const iconButtonVariant = styleVariants({
   primary: {
     backgroundColor: vars.color.primary.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -33,7 +33,7 @@ export const iconButtonVariant = styleVariants({
   },
   secondary: {
     backgroundColor: vars.color.secondary.default,
-    color: vars.color.textOnDark.default,
+    color: vars.color.textOnAccent.default,
 
     selectors: {
       '&:hover': {
@@ -66,7 +66,7 @@ export const iconButtonVariant = styleVariants({
   },
   'secondary-exposed': {
     backgroundColor: vars.color.exposed.default,
-    color: vars.color.grey[500],
+    color: vars.color.textOnSurface.subtle,
 
     selectors: {
       '&:hover': {
@@ -77,7 +77,7 @@ export const iconButtonVariant = styleVariants({
       },
       '&:disabled': {
         backgroundColor: vars.color.exposed.default,
-        color: vars.color.grey[300],
+        color: vars.color.textOnSurface.disabled,
       },
     },
   },
