@@ -56,9 +56,9 @@ const breadcrumbCurrentBase = style({
 
 export const breadcrumbCurrent = styleVariants({
   default: [breadcrumbCurrentBase, { color: vars.color.textOnSurface.strong }],
-  profile: [breadcrumbCurrentBase, { color: vars.color.profile.default }],
-  works: [breadcrumbCurrentBase, { color: vars.color.works.default }],
-  outputs: [breadcrumbCurrentBase, { color: vars.color.outputs.default }],
+  profile: [breadcrumbCurrentBase, { color: vars.color.profile.text }],
+  works: [breadcrumbCurrentBase, { color: vars.color.works.text }],
+  outputs: [breadcrumbCurrentBase, { color: vars.color.outputs.text }],
 });
 
 // アイコンは縮めず、あふれはラベル側で吸収する

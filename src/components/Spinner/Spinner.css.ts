@@ -27,6 +27,9 @@ export const spinnerVariant = styleVariants({
     stroke: vars.color.grey[0],
   },
   primary: {
-    stroke: vars.color.primary.default,
+    stroke: vars.color.primary.text,
+  },
+  accent: {
+    stroke: vars.color.textOnAccent.default,
   },
 });

@@ -235,13 +235,23 @@ src/utils/
 | `surface.page` | `textOnSurface.*` | ページ背景の上に直接置くもの（Breadcrumb / Steps / FormField のラベルなど） |
 | `surface.raised` | `textOnSurface.*` | ページから浮いた面（Card / Dialog） |
 | `surface.inverse` | `textOnInverse.default` | 面を反転させて目立たせるもの（Tooltip） |
-| `{semantic}.default` などのアクセント塗り | `textOnAccent.default` | Button / IconButton / Steps の現在ステップ |
+| `{semantic}.default` / `.hover` / `.seleted`（アクセント塗り） | `textOnAccent.default` | Button / IconButton / Steps の現在ステップ |
+| `surface.page` / `surface.raised` | `{semantic}.text` | 意味カラーを面の上の**文字・アイコン**として使うとき（Breadcrumb の現在ページ、FormField の必須マーク） |
 | `input.background.*` | `textOnLight.*` | `inputColorSchemeLight` でライト固定にした入力面の **内側だけ** |
 
 - **`grey` などの生のプリミティブを面や文字色に使わない。** プリミティブのランプはライトとダークで反転するため、反転しない `textOnLight` / `textOnAccent` と組むと壊れる（Card の `grey.0` × `textOnLight`、Tooltip の `grey.900` × `textOnDark` がこれだった）。区切り線や淡い塗りは `surface.subtle` を使う
 - **`textOnLight.*` はライト固定の面の内側専用。** ライト・ダークで同じ濃色を返すため、ページ面の上で使うとダーク配色で読めなくなる
-- 意味カラー（`primary` / `success` / `profile` …）の段には契約がある。**`default` は `textOnAccent.default` と面の両方に対して 4.5:1 以上**、`hover` は 1 段、`seleted` は 2 段ぶん強い側を指す（`strong` は `hover` と同じ段）。ライトでは濃く、ダークでは明るくなる方向が「強い側」にあたる
-- そのため同じ `{semantic}.default` が、塗りとしても面の上のアクセント文字としても使える（Breadcrumb の現在ページがこれ）
+- **意味カラー（`primary` / `success` / `profile` …）は「塗り」と「文字」で段が分かれている。** 同じ色を両方に使い回さない。塗りは濃色ラベルを載せる前提で明るく、文字は面に対して読める濃さが要るため、必要な明度が逆になる
+
+  | ロール | 契約 | ライト / ダーク |
+  | --- | --- | --- |
+  | `default` | 塗り。`textOnAccent.default`（両配色とも `#15171a`）に対して 4.5:1 以上 | 同じ値。**塗りは配色で変わらない** |
+  | `hover` / `seleted` | `default` の 1 段 / 2 段明るい側 | 同じ値 |
+  | `strong` | `hover` と同じ段 | 同じ値 |
+  | `text` | 面の上の文字・アイコン。`surface.page` と `surface.raised` の**両方**に対して 4.5:1 以上 | ライトは濃く、ダークは明るい |
+
+- 塗りが両配色とも明るいため、`hover` / `seleted` は**明るくなる方向**にしか動かせない（濃くするとラベルが 4.5:1 を割る）。ライト配色では選択状態が淡く見えるが、ラベルのコントラストは保たれる
+- Button のように塗りの上へ重ねるスピナーは `Spinner` の `accent` バリアントを使う。`light` / `dark` は背景の明暗に合わせるもので、アクセント塗りには合わない
 - **配色を変えるときは `figma/tokens.json` を直す。** `src/design-tokens/*` と `src/styles/variables*.css` は `pnpm token:transform && pnpm build:tokens` の生成物で、直接編集しても次回の生成で巻き戻る
 
 **テスト:**

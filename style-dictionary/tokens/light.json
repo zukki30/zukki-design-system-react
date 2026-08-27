@@ -68,15 +68,15 @@
     },
     "primary": {
       "default": {
-        "value": "#0c5eca",
+        "value": "#3587f3",
         "type": "color"
       },
       "hover": {
-        "value": "#0a4ca4",
+        "value": "#5b9ef5",
         "type": "color"
       },
       "seleted": {
-        "value": "#073a7d",
+        "value": "#82b4f8",
         "type": "color"
       },
       "disabled": {
@@ -84,21 +84,25 @@
         "type": "color"
       },
       "strong": {
-        "value": "#0a4ca4",
+        "value": "#5b9ef5",
         "type": "color"
       },
       "subtle": {
         "value": "#95c0f9",
         "type": "color"
+      },
+      "text": {
+        "value": "#0c5eca",
+        "type": "color"
       }
     },
     "secondary": {
       "default": {
-        "value": "#565b66",
+        "value": "#898e99",
         "type": "color"
       },
       "strong": {
-        "value": "#40444d",
+        "value": "#a6aab3",
         "type": "color"
       },
       "subtle": {
@@ -106,25 +110,29 @@
         "type": "color"
       },
       "hover": {
-        "value": "#40444d",
+        "value": "#a6aab3",
         "type": "color"
       },
       "seleted": {
-        "value": "#2b2e33",
+        "value": "#c4c7cc",
         "type": "color"
       },
       "disabled": {
         "value": "#c4c7cc",
         "type": "color"
+      },
+      "text": {
+        "value": "#565b66",
+        "type": "color"
       }
     },
     "success": {
       "default": {
-        "value": "#01640c",
+        "value": "#01a714",
         "type": "color"
       },
       "strong": {
-        "value": "#004308",
+        "value": "#2bb93b",
         "type": "color"
       },
       "subtle": {
@@ -132,25 +140,29 @@
         "type": "color"
       },
       "hover": {
-        "value": "#004308",
+        "value": "#2bb93b",
         "type": "color"
       },
       "seleted": {
-        "value": "#003206",
+        "value": "#54ca62",
         "type": "color"
       },
       "disabled": {
         "value": "#7edc88",
         "type": "color"
+      },
+      "text": {
+        "value": "#01640c",
+        "type": "color"
       }
     },
     "failure": {
       "default": {
-        "value": "#c80c0c",
+        "value": "#f23434",
         "type": "color"
       },
       "strong": {
-        "value": "#a20a0a",
+        "value": "#f45a5a",
         "type": "color"
       },
       "subtle": {
@@ -158,25 +170,29 @@
         "type": "color"
       },
       "hover": {
-        "value": "#a20a0a",
+        "value": "#f45a5a",
         "type": "color"
       },
       "seleted": {
-        "value": "#7b0707",
+        "value": "#f78181",
         "type": "color"
       },
       "disabled": {
         "value": "#f78181",
         "type": "color"
+      },
+      "text": {
+        "value": "#c80c0c",
+        "type": "color"
       }
     },
     "warning": {
       "default": {
-        "value": "#5e4803",
+        "value": "#eab308",
         "type": "color"
       },
       "strong": {
-        "value": "#463602",
+        "value": "#eec239",
         "type": "color"
       },
       "subtle": {
@@ -184,25 +200,29 @@
         "type": "color"
       },
       "hover": {
-        "value": "#463602",
+        "value": "#eec239",
         "type": "color"
       },
       "seleted": {
-        "value": "#2f2402",
+        "value": "#f2d16b",
         "type": "color"
       },
       "disabled": {
         "value": "#f7e19c",
         "type": "color"
+      },
+      "text": {
+        "value": "#5e4803",
+        "type": "color"
       }
     },
     "info": {
       "default": {
-        "value": "#0c5eca",
+        "value": "#3587f3",
         "type": "color"
       },
       "strong": {
-        "value": "#0a4ca4",
+        "value": "#5b9ef5",
         "type": "color"
       },
       "subtle": {
@@ -210,25 +230,29 @@
         "type": "color"
       },
       "hover": {
-        "value": "#0a4ca4",
+        "value": "#5b9ef5",
         "type": "color"
       },
       "seleted": {
-        "value": "#073a7d",
+        "value": "#82b4f8",
         "type": "color"
       },
       "disabled": {
         "value": "#82b4f8",
         "type": "color"
+      },
+      "text": {
+        "value": "#0c5eca",
+        "type": "color"
       }
     },
     "profile": {
       "default": {
-        "value": "#147638",
+        "value": "#22c55e",
         "type": "color"
       },
       "strong": {
-        "value": "#0e4f26",
+        "value": "#4ad07b",
         "type": "color"
       },
       "subtle": {
@@ -236,25 +260,29 @@
         "type": "color"
       },
       "hover": {
-        "value": "#0e4f26",
+        "value": "#4ad07b",
         "type": "color"
       },
       "seleted": {
-        "value": "#0a3b1c",
+        "value": "#72db99",
         "type": "color"
       },
       "disabled": {
         "value": "#9be5b6",
         "type": "color"
+      },
+      "text": {
+        "value": "#147638",
+        "type": "color"
       }
     },
     "works": {
       "default": {
-        "value": "#0c6e64",
+        "value": "#14b8a6",
         "type": "color"
       },
       "strong": {
-        "value": "#084a42",
+        "value": "#3ac5b6",
         "type": "color"
       },
       "subtle": {
@@ -262,25 +290,29 @@
         "type": "color"
       },
       "hover": {
-        "value": "#084a42",
+        "value": "#3ac5b6",
         "type": "color"
       },
       "seleted": {
-        "value": "#063732",
+        "value": "#60d2c6",
         "type": "color"
       },
       "disabled": {
         "value": "#85e0d5",
         "type": "color"
+      },
+      "text": {
+        "value": "#0c6e64",
+        "type": "color"
       }
     },
     "outputs": {
       "default": {
-        "value": "#08638c",
+        "value": "#0ea5e9",
         "type": "color"
       },
       "strong": {
-        "value": "#06425d",
+        "value": "#3db6ed",
         "type": "color"
       },
       "subtle": {
@@ -288,15 +320,19 @@
         "type": "color"
       },
       "hover": {
-        "value": "#06425d",
+        "value": "#3db6ed",
         "type": "color"
       },
       "seleted": {
-        "value": "#043246",
+        "value": "#6bc8f2",
         "type": "color"
       },
       "disabled": {
         "value": "#9ad9f6",
+        "type": "color"
+      },
+      "text": {
+        "value": "#08638c",
         "type": "color"
       }
     },
@@ -540,7 +576,7 @@
     },
     "textOnAccent": {
       "default": {
-        "value": "#f0f1f2",
+        "value": "#15171a",
         "type": "color"
       }
     },

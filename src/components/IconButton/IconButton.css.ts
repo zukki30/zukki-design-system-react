@@ -49,7 +49,7 @@ export const iconButtonVariant = styleVariants({
   },
   'primary-exposed': {
     backgroundColor: vars.color.exposed.default,
-    color: vars.color.primary.default,
+    color: vars.color.primary.text,
 
     selectors: {
       '&:hover': {

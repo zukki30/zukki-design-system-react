@@ -13,7 +13,11 @@ const TRACK_PATH = (
 const ARC_PATH = <path d="M12 1C18.0752 1 23 5.92487 23 12" />;
 
 type Props = {
-  variant?: 'light' | 'dark' | 'primary';
+  /**
+   * light / dark は背景の明暗に合わせる。accent は意味カラーの塗り（Button の
+   * primary など）に重ねるためのもので、`textOnAccent` と同じ色を描く
+   */
+  variant?: 'light' | 'dark' | 'primary' | 'accent';
   /**
    * The aria-label attribute providing the accessible name of the icon.
    */

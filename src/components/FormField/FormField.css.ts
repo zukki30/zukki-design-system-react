@@ -68,7 +68,7 @@ export const formFieldRequiredAsterisk = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,
   lineHeight: vars['line-height'].heading,
-  color: vars.color.failure.default,
+  color: vars.color.failure.text,
 });
 
 export const formFieldRequiredBadge = style({

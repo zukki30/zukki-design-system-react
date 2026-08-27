@@ -109,7 +109,7 @@ export const stepsItemIcon = styleVariants({
 
       selectors: {
         [`${stepsItem}:is(button):hover &`]: {
-          borderColor: vars.color.primary.hover,
+          borderColor: vars.color.primary.text,
         },
       },
     },
@@ -134,7 +134,7 @@ export const stepsItemIcon = styleVariants({
     {
       borderColor: vars.color.primary.subtle,
       backgroundColor: vars.color.primary.subtle,
-      color: vars.color.primary.default,
+      color: vars.color.primary.text,
     },
   ],
 });
@@ -172,7 +172,7 @@ const stepsItemLabelBase = style({
       overflowWrap: 'anywhere',
     },
     [`${stepsItem}:is(button):hover &`]: {
-      color: vars.color.primary.hover,
+      color: vars.color.primary.text,
     },
   },
 });

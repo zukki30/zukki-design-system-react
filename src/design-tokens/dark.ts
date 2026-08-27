@@ -30,6 +30,7 @@ export const darkDesignTokens = {
       disabled: '#bcd7fb',
       strong: '#5b9ef5',
       subtle: '#a8cbfa',
+      text: '#5b9ef5',
     },
     secondary: {
       default: '#898e99',
@@ -38,6 +39,7 @@ export const darkDesignTokens = {
       hover: '#a6aab3',
       seleted: '#c4c7cc',
       disabled: '#d3d5d9',
+      text: '#898e99',
     },
     success: {
       default: '#01a714',
@@ -46,22 +48,25 @@ export const darkDesignTokens = {
       hover: '#2bb93b',
       seleted: '#54ca62',
       disabled: '#bcf6c3',
+      text: '#01a714',
     },
     failure: {
-      default: '#f45a5a',
-      strong: '#f78181',
+      default: '#f23434',
+      strong: '#f45a5a',
       subtle: '#f9a7a7',
-      hover: '#f78181',
-      seleted: '#f89494',
+      hover: '#f45a5a',
+      seleted: '#f78181',
       disabled: '#fbbaba',
+      text: '#f45a5a',
     },
     warning: {
-      default: '#bb8f06',
-      strong: '#eab308',
+      default: '#eab308',
+      strong: '#eec239',
       subtle: '#fbf0ce',
-      hover: '#eab308',
-      seleted: '#eec239',
+      hover: '#eec239',
+      seleted: '#f2d16b',
       disabled: '#fdf7e6',
+      text: '#bb8f06',
     },
     info: {
       default: '#3587f3',
@@ -70,6 +75,7 @@ export const darkDesignTokens = {
       hover: '#5b9ef5',
       seleted: '#82b4f8',
       disabled: '#bcd7fb',
+      text: '#5b9ef5',
     },
     profile: {
       default: '#22c55e',
@@ -78,6 +84,7 @@ export const darkDesignTokens = {
       hover: '#4ad07b',
       seleted: '#72db99',
       disabled: '#d7f6e2',
+      text: '#22c55e',
     },
     works: {
       default: '#14b8a6',
@@ -86,6 +93,7 @@ export const darkDesignTokens = {
       hover: '#3ac5b6',
       seleted: '#60d2c6',
       disabled: '#bef3ed',
+      text: '#14b8a6',
     },
     outputs: {
       default: '#0ea5e9',
@@ -94,6 +102,7 @@ export const darkDesignTokens = {
       hover: '#3db6ed',
       seleted: '#6bc8f2',
       disabled: '#e0f3fd',
+      text: '#0ea5e9',
     },
     default: {
       default: '#ffffff',
