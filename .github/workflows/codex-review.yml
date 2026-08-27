@@ -52,16 +52,8 @@ jobs:
 
             - 正確性: 境界値・null/undefined 処理、競合状態、`await` 抜け、バグ
             - コード品質: 可読性、保守性、DRY、長大関数や深いネストの有無
-            - 規約準拠:
-              - 型定義は `interface` ではなく `type`、`any` 禁止
-              - ネイティブ属性は `ComponentPropsWithoutRef<'tag'>`
-              - 条件付き className は `clsx()`
-              - `useEffect` は最小限、宣言的パターンを優先
-              - 深い if/else を避け、複数条件は `switch`
-              - スタイルは `ComponentName.css.ts` に記述し、クラス名は BEM
-              - 色・余白などのハードコード禁止（`src/styles/theme.css.ts` の `vars` を使う）
-              - バリアントは `styleVariants()`
-              - 生成物（`src/design-tokens/`、`src/styles/` の生成 CSS）を手編集していないか
+            - 規約準拠: AGENTS.md の「コーディング規約」に沿っているか（型 / import の使い分け / ref-as-prop / compound components / スタイリング / 配色トークンの使い分け / テスト / a11y）
+            - 生成物を手編集していないか（`src/design-tokens/`、`src/styles/` の生成 CSS、`figma/tokens.json` からの生成物）
             - テスト: export された関数にテストがあるか、if/else の両分岐と switch の全 case を網羅しているか
             - アクセシビリティ: ARIA、キーボード操作、フォーカス管理、色のみでの情報伝達
 
