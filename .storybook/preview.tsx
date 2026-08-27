@@ -3,7 +3,6 @@ import { themes } from 'storybook/theming';
 import { prefersDark } from './theme';
 
 import './preview.css';
-import './style.css';
 
 const preview: Preview = {
   // 配色は theme グローバルで切り替える。
