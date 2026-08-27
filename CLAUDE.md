@@ -226,6 +226,34 @@ src/utils/
 - すべての値に `src/styles/theme.css.ts` の `vars` を使用する（色・余白などのハードコード禁止）
 - コンポーネントのバリアントには `styleVariants()` を使用する
 
+**配色トークンの使い分け:**
+
+配色は「面」と「その上に載るテキスト」を **必ず対で** 選ぶ。ライト・ダークで反転する側としない側を混ぜると、片方の配色で文字が背景に沈む。
+
+| 面 | その上のテキスト | 使う場所 |
+| --- | --- | --- |
+| `surface.page` | `textOnSurface.*` | ページ背景の上に直接置くもの（Breadcrumb / Steps / FormField のラベルなど） |
+| `surface.raised` | `textOnSurface.*` | ページから浮いた面（Card / Dialog） |
+| `surface.inverse` | `textOnInverse.default` | 面を反転させて目立たせるもの（Tooltip） |
+| `{semantic}.default` / `.hover` / `.seleted`（アクセント塗り） | `textOnAccent.default` | Button / IconButton / Steps の現在ステップ |
+| `surface.page` / `surface.raised` | `{semantic}.text` | 意味カラーを面の上の**文字・アイコン**として使うとき（Breadcrumb の現在ページ、FormField の必須マーク） |
+| `input.background.*` | `textOnLight.*` | `inputColorSchemeLight` でライト固定にした入力面の **内側だけ** |
+
+- **`grey` などの生のプリミティブを面や文字色に使わない。** プリミティブのランプはライトとダークで反転するため、反転しない `textOnLight` / `textOnAccent` と組むと壊れる（Card の `grey.0` × `textOnLight`、Tooltip の `grey.900` × `textOnDark` がこれだった）。区切り線や淡い塗りは `surface.subtle` を使う
+- **`textOnLight.*` はライト固定の面の内側専用。** ライト・ダークで同じ濃色を返すため、ページ面の上で使うとダーク配色で読めなくなる
+- **意味カラー（`primary` / `success` / `profile` …）は「塗り」と「文字」で段が分かれている。** 同じ色を両方に使い回さない。塗りは濃色ラベルを載せる前提で明るく、文字は面に対して読める濃さが要るため、必要な明度が逆になる
+
+  | ロール | 契約 | ライト / ダーク |
+  | --- | --- | --- |
+  | `default` | 塗り。`textOnAccent.default`（両配色とも `#15171a`）に対して 4.5:1 以上 | 同じ値。**塗りは配色で変わらない** |
+  | `hover` / `seleted` | `default` の 1 段 / 2 段明るい側 | 同じ値 |
+  | `strong` | `hover` と同じ段 | 同じ値 |
+  | `text` | 面の上の文字・アイコン。`surface.page` と `surface.raised` の**両方**に対して 4.5:1 以上 | ライトは濃く、ダークは明るい |
+
+- 塗りが両配色とも明るいため、`hover` / `seleted` は**明るくなる方向**にしか動かせない（濃くするとラベルが 4.5:1 を割る）。ライト配色では選択状態が淡く見えるが、ラベルのコントラストは保たれる
+- Button のように塗りの上へ重ねるスピナーは `Spinner` の `accent` バリアントを使う。`light` / `dark` は背景の明暗に合わせるもので、アクセント塗りには合わない
+- **配色を変えるときは `figma/tokens.json` を直す。** `src/design-tokens/*` と `src/styles/variables*.css` は `pnpm token:transform && pnpm build:tokens` の生成物で、直接編集しても次回の生成で巻き戻る
+
 **テスト:**
 
 - export された関数はすべてテストする。`if/else` は両分岐、`switch` は全 case を網羅する
@@ -240,6 +268,7 @@ src/utils/
 
 - 実行時検査を実ブラウザで行うのは、`color-contrast` やフォーカスの視認性など**レンダリングしないと判定できない領域**があるため。jsdom ではこれらが丸ごと検査対象外になる
 - 配色は `light-dark()` で定義されているため、ライト / ダークの両方を検査する。切り替えは `.storybook/preview.tsx` の `theme` グローバルと decorator が担い、テスト側は `storybookTest({ initialGlobals: { theme } })` で同じ経路を通る
+- **キャンバスには `.storybook/preview.css.ts` で `surface.page` を当てている。** これが無いと Storybook 既定の白い背景の上でダーク配色が描画され、ホストアプリと違う面でコントラストが測られてしまう。ライブラリ側で `body` にスタイルを当てるわけにはいかないため、Storybook 専用に置いている
 - **操作しないと現れない状態は、そのままでは検査されない。** ストーリーが既定で描画している状態だけが対象になるため、開いた状態のダイアログなどは専用のストーリーを用意する（`Dialog` の `Opened` が例）
 
 違反が出たときの対処は次の順で判断する。
@@ -250,8 +279,8 @@ src/utils/
 
 ```ts
 parameters: {
-  // TODO(#86): 配色トークンが WCAG AA のコントラスト比を満たしていない。
-  // 修正は Figma 側のデザイン判断を伴うため #86 で追跡する。
+  // TODO(#123): 〈何が基準を満たしていないか〉。
+  // 修正は Figma 側のデザイン判断を伴うため #123 で追跡する。
   // color-contrast だけを外し、他のルールは error のまま維持する
   a11y: {
     config: {

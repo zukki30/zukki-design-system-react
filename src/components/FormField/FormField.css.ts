@@ -48,7 +48,7 @@ export const formFieldLabel = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,
   lineHeight: vars['line-height'].heading,
-  color: vars.color.textOnLight.default,
+  color: vars.color.textOnSurface.default,
 
   selectors: {
     // 横並びのときは入力欄の上下パディングに合わせてラベルを下げる
@@ -57,7 +57,7 @@ export const formFieldLabel = style({
     },
     // data-disabled も複数コンポーネントが使う共有属性のため、同様にルートへ限定する
     [`${formField}[data-disabled="true"] &`]: {
-      color: vars.color.textOnLight.disabled,
+      color: vars.color.textOnSurface.disabled,
     },
   },
 });
@@ -68,7 +68,7 @@ export const formFieldRequiredAsterisk = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,
   lineHeight: vars['line-height'].heading,
-  color: vars.color.red['400'],
+  color: vars.color.failure.text,
 });
 
 export const formFieldRequiredBadge = style({
@@ -79,12 +79,12 @@ export const formFieldRequiredBadge = style({
   paddingInline: vars.spacing.xs,
   paddingBlock: vars.spacing['2xs'],
   borderRadius: vars['border-radius'].xs,
-  backgroundColor: vars.color.red['400'],
+  backgroundColor: vars.color.failure.default,
   fontFamily: vars['font-family'].default,
   fontWeight: vars['font-weight'].bold,
   fontSize: vars['font-size']['2xs'],
   lineHeight: vars['line-height'].line,
-  color: vars.color.white,
+  color: vars.color.textOnAccent.default,
   whiteSpace: 'nowrap',
 });
 
@@ -105,7 +105,7 @@ export const formFieldHelperText = style([
     fontWeight: vars['font-weight'].normal,
     fontSize: vars['font-size'].xs,
     lineHeight: vars['line-height'].default,
-    color: vars.color.grey['400'],
+    color: vars.color.textOnSurface.subtle,
   },
 ]);
 

@@ -2,7 +2,7 @@ import type { Preview } from '@storybook/react-vite';
 import { themes } from 'storybook/theming';
 import { prefersDark } from './theme';
 
-import './style.css';
+import './preview.css';
 
 const preview: Preview = {
   // 配色は theme グローバルで切り替える。

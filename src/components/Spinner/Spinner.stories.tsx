@@ -1,4 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
+import { vars } from '@/styles/theme.css';
+
 import { Spinner } from './Spinner';
 
 const meta = {
@@ -40,4 +43,19 @@ export const Primary: Story = {
     'aria-label': 'Loading Spinner...',
   },
   render: (args) => <Spinner {...args} />,
+};
+
+/**
+ * 意味カラーの塗りに重ねるバリアント。Button の loading で使われる
+ */
+export const Accent: Story = {
+  args: {
+    variant: 'accent',
+    'aria-label': 'Loading Spinner...',
+  },
+  render: (args) => (
+    <div style={{ backgroundColor: vars.color.primary.default, padding: '12px' }}>
+      <Spinner {...args} />
+    </div>
+  ),
 };

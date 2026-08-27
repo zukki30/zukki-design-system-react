@@ -26,7 +26,8 @@ describe('Spinner', () => {
   it.each([
     ['light', 'dark'],
     ['dark', 'primary'],
-    ['primary', 'light'],
+    ['primary', 'accent'],
+    ['accent', 'light'],
   ] as const)('variant=%s と variant=%s でスタイルが変わる', (variant, otherVariant) => {
     const { rerender } = render(<Spinner aria-label="読み込み中" variant={variant} />);
     const className = screen.getByRole('img', { name: '読み込み中' }).getAttribute('class');

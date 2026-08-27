@@ -33,12 +33,12 @@ export const breadcrumbLink = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].sm,
   lineHeight: vars['line-height'].line,
-  color: vars.color.grey['500'],
+  color: vars.color.textOnSurface.subtle,
   textDecoration: 'underline',
 
   selectors: {
     'a&:hover': {
-      color: vars.color.grey['700'],
+      color: vars.color.textOnSurface.default,
     },
   },
 });
@@ -55,10 +55,10 @@ const breadcrumbCurrentBase = style({
 });
 
 export const breadcrumbCurrent = styleVariants({
-  default: [breadcrumbCurrentBase, { color: vars.color.grey['1000'] }],
-  profile: [breadcrumbCurrentBase, { color: vars.color.profile.default }],
-  works: [breadcrumbCurrentBase, { color: vars.color.works.default }],
-  outputs: [breadcrumbCurrentBase, { color: vars.color.outputs.default }],
+  default: [breadcrumbCurrentBase, { color: vars.color.textOnSurface.strong }],
+  profile: [breadcrumbCurrentBase, { color: vars.color.profile.text }],
+  works: [breadcrumbCurrentBase, { color: vars.color.works.text }],
+  outputs: [breadcrumbCurrentBase, { color: vars.color.outputs.text }],
 });
 
 // アイコンは縮めず、あふれはラベル側で吸収する
@@ -75,5 +75,5 @@ export const breadcrumbLabel = style({
 export const breadcrumbSeparator = style({
   display: 'block',
   flexShrink: 0,
-  color: vars.color.grey['500'],
+  color: vars.color.textOnSurface.subtle,
 });

@@ -104,12 +104,12 @@ export const radioLabel = style({
   fontWeight: vars['font-weight'].normal,
   fontSize: vars['font-size'].base,
   lineHeight: vars['line-height'].line,
-  color: vars.color.textOnLight.default,
+  color: vars.color.textOnSurface.default,
   wordBreak: 'break-word',
 
   selectors: {
     [`${radio}[data-disabled="true"] &`]: {
-      color: vars.color.textOnLight.disabled,
+      color: vars.color.textOnSurface.disabled,
     },
   },
 });

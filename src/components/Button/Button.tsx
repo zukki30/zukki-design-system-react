@@ -69,7 +69,7 @@ export const Button = ({
   ...props
 }: Props) => {
   const spinnerVariant: ComponentProps<typeof Spinner>['variant'] =
-    variant === 'default' ? 'light' : 'dark';
+    variant === 'default' ? 'light' : 'accent';
   const spinnerSize = SPINNER_SIZES[size];
 
   // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
