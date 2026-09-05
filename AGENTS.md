@@ -82,7 +82,7 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 
 | 成果物 | 備考 |
 | --- | --- |
-| `zukki-design-system.es.js` / `.umd.js` | React は外部化され、バンドルに含みません |
+| `zukki-design-system.js`（ESM） / `.cjs`（CJS） | React は外部化され、バンドルに含みません |
 | `main.d.ts` ほか型宣言 | `vite-plugin-dts` が `@/` エイリアスを相対パスへ解決します |
 | `styles.css` | 既定。`light-dark()` を保持します |
 | `styles-light.css` / `styles-dark.css` | `scripts/build-css-variants.ts` が既定版から派生生成します |
@@ -92,7 +92,8 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 次の 2 つは**ビルドが成功したままでも壊れる**ため、設定を触るときは特に注意してください。
 
 - **React の外部化**（`build.rollupOptions.external`）— 外れると React がバンドルに同梱され、利用側で二重に読み込まれて `Invalid hook call` になります
-- **`build.cssTarget`** — 外れると `light-dark()` がポリフィルへ変換されます。ポリフィルは `prefers-color-scheme` にしか反応せず、要素の `color-scheme` による切り替えができなくなります
+- **`build.cssTarget`** — 外れると `light-dark()` がポリフィルへ変換されます。ポリフィルは `prefers-color-scheme` にしか反応せず、要素の `color-scheme` による切り替えができなくなります。値は README の対応ブラウザと揃えてください
+- **CJS の拡張子** — `package.json` が `type: module` なので、CJS を `.js` で出すと Node が ESM として解釈します。`require()` は例外を投げないまま **export が空になる**ため気づきにくく、`.cjs` である必要があります
 
 配色を固定した CSS は、`--color-*` のような意味的な変数ではなく、`createGlobalTheme` が生成するハッシュ変数（`--_xxx`）まで解決する必要があります。コンポーネントが実際に参照しているのはハッシュ変数のほうで、意味的な変数を差し替えても見た目は変わりません。
 

@@ -80,6 +80,33 @@
 
 これにより配布ファイル数が 205 → 106 に減った。
 
+### UMD をやめて CJS（`.cjs`）にした
+
+レビューでの指摘を受けて検証したところ、**`require()` が中身を取り出せていなかった**。
+
+```
+require('zukki-design-system') → export 数 0
+```
+
+例外は投げないため気づきにくい。原因は `type: module` 配下の `.js` が ESM として解釈されることで、UMD の `module` / `exports` を見る分岐が通らず、グローバルへ代入する経路に落ちていた。
+
+そもそも UMD の利点である「`<script>` タグでのグローバル読み込み」は、React 本体と `react/jsx-runtime` をグローバルとして用意する必要があり、このライブラリでは現実的でない。CJS へ置き換えた。
+
+```
+require('zukki-design-system') → export 数 25 / Button は関数
+import { Button } from 'zukki-design-system' → function
+```
+
+### `cssTarget` を対応ブラウザの下限に揃えた
+
+当初 `'chrome123'` のみを指定していたが、これでは lightningcss の最適化が Chrome 基準になり、README に記載した Safari / Firefox の下限で動かない構文が出力されうる。3 つとも並べる形にした。
+
+```ts
+cssTarget: ['chrome123', 'safari17.5', 'firefox120'],
+```
+
+`light-dark()` は 348 箇所とも保持されたままであることを確認済み。
+
 ### `"type": "module"` は採用した
 
 設計では「壊れる場合は入れない」としていたリスク項目だが、実測で次がすべて成功した。

@@ -25,12 +25,14 @@ const read = (name: string) => readFileSync(join(DIST, name), 'utf8');
 
 const countOf = (haystack: string, needle: string) => haystack.split(needle).length - 1;
 
+type Scheme = 'light' | 'dark';
+
 console.log('配布物の検査');
 
 // 1. 必要なファイルが揃っている
 const required = [
-  'zukki-design-system.es.js',
-  'zukki-design-system.umd.js',
+  'zukki-design-system.js',
+  'zukki-design-system.cjs',
   'main.d.ts',
   'styles.css',
   'styles-light.css',
@@ -46,20 +48,21 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-const es = read('zukki-design-system.es.js');
-const umd = read('zukki-design-system.umd.js');
+const esm = read('zukki-design-system.js');
+const cjs = read('zukki-design-system.cjs');
 
 // 2. React が外部化されている。
-// useSyncExternalStore は React 本体の実装にしか現れないため、混入の指標になる
-check('ES に React 実装が混入していない', countOf(es, 'useSyncExternalStore') === 0, '');
-check('UMD に React 実装が混入していない', countOf(umd, 'useSyncExternalStore') === 0, '');
-check('ES が react を import している', es.includes('from "react"'), '');
-check('UMD が react を require している', umd.includes('require("react")'), '');
+// useSyncExternalStore は React 本体の実装にしか現れないため、混入の指標になる。
+// クォートや空白は最適化の設定で変わりうるため、参照の検出は正規表現で行う
+check('ESM に React 実装が混入していない', countOf(esm, 'useSyncExternalStore') === 0, '');
+check('CJS に React 実装が混入していない', countOf(cjs, 'useSyncExternalStore') === 0, '');
+check('ESM が react を import している', /from\s*["']react["']/.test(esm), '');
+check('CJS が react を require している', /require\(\s*["']react["']\s*\)/.test(cjs), '');
 
 // 3. 型宣言が @/ エイリアスを残していない（利用側で解決できなくなる）
 const dts = read('main.d.ts');
 
-check('main.d.ts にエイリアスが残っていない', !dts.includes("from '@/"), '');
+check('main.d.ts にエイリアスが残っていない', !/from\s*["']@\//.test(dts), '');
 
 // 4. 配色の 3 種類が意図どおりになっている
 const styles = read('styles.css');
@@ -70,12 +73,17 @@ check('既定 CSS が light-dark() を保持している', countOf(styles, 'ligh
 check('light 版に light-dark() が残っていない', countOf(light, 'light-dark(') === 0, '');
 check('dark 版に light-dark() が残っていない', countOf(dark, 'light-dark(') === 0, '');
 
-// 固定版は color-scheme も固定していないと、UA が描画する部分だけ OS 設定に従ってしまう
-check('light 版の color-scheme が light に固定されている', light.includes('color-scheme:light') && !light.includes('color-scheme:light dark'), '');
-check('dark 版の color-scheme が dark に固定されている', dark.includes('color-scheme:dark'), '');
+// 固定版は color-scheme も固定していないと、UA が描画する部分だけ OS 設定に従ってしまう。
+// 空白の入り方は最適化の設定で変わりうるので正規表現で見る
+const hasFixedScheme = (css: string, scheme: Scheme) =>
+  new RegExp(`color-scheme\\s*:\\s*${scheme}\\s*[;}]`).test(css) &&
+  !/color-scheme\s*:\s*light\s+dark/.test(css);
+
+check('light 版の color-scheme が light に固定されている', hasFixedScheme(light, 'light'), '');
+check('dark 版の color-scheme が dark に固定されている', hasFixedScheme(dark, 'dark'), '');
 
 // 5. 固定版が実際に異なる値を持っている（同じなら派生生成が効いていない）
-const surfaceOf = (css: string) => /--color-surface-raised:([^;}]*)/.exec(css)?.[1]?.trim();
+const surfaceOf = (css: string) => /--color-surface-raised\s*:\s*([^;}]*)/.exec(css)?.[1]?.trim();
 
 check(
   'light 版と dark 版で値が異なる',

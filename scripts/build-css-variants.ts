@@ -87,8 +87,9 @@ const resolveLightDark = (css: string, scheme: Scheme): string => {
  * UA が描画する部分だけが OS の設定に従い、指定した配色と食い違う。
  */
 const buildVariant = (css: string, scheme: Scheme): string => {
-  const resolved = resolveLightDark(css, scheme).replaceAll(
-    'color-scheme:light dark',
+  // 出力の空白は最適化の設定で変わりうるため、完全一致ではなく空白を許容して置換する
+  const resolved = resolveLightDark(css, scheme).replace(
+    /color-scheme\s*:\s*light\s+dark/g,
     `color-scheme:${scheme}`
   );
 

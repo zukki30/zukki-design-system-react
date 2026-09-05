@@ -4,14 +4,14 @@
   "private": true,
   "version": "3.0.0",
   "description": "デザインシステム",
-  "main": "./dist/zukki-design-system.umd.js",
-  "module": "./dist/zukki-design-system.es.js",
+  "main": "./dist/zukki-design-system.cjs",
+  "module": "./dist/zukki-design-system.js",
   "types": "./dist/main.d.ts",
   "exports": {
     ".": {
       "types": "./dist/main.d.ts",
-      "import": "./dist/zukki-design-system.es.js",
-      "require": "./dist/zukki-design-system.umd.js"
+      "import": "./dist/zukki-design-system.js",
+      "require": "./dist/zukki-design-system.cjs"
     },
     "./styles.css": "./dist/styles.css",
     "./styles-light.css": "./dist/styles-light.css",
