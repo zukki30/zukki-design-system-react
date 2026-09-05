@@ -26,6 +26,7 @@
     "dev": "pnpm storybook",
     "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts",
     "typecheck": "tsc -b",
+    "verify:dist": "tsx scripts/verify-dist.ts",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "lint:check": "eslint \"src/**/*.{ts,tsx}\"",
     "preview": "vite preview",
