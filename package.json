@@ -5,7 +5,7 @@
   "description": "デザインシステム",
   "scripts": {
     "dev": "pnpm storybook",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts",
     "typecheck": "tsc -b",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "lint:check": "eslint \"src/**/*.{ts,tsx}\"",
