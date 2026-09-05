@@ -1,8 +1,27 @@
 {
   "name": "zukki-design-system",
+  "type": "module",
   "private": true,
   "version": "3.0.0",
   "description": "デザインシステム",
+  "main": "./dist/zukki-design-system.umd.js",
+  "module": "./dist/zukki-design-system.es.js",
+  "types": "./dist/main.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/main.d.ts",
+      "import": "./dist/zukki-design-system.es.js",
+      "require": "./dist/zukki-design-system.umd.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./styles-light.css": "./dist/styles-light.css",
+    "./styles-dark.css": "./dist/styles-dark.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "pnpm storybook",
     "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts",
@@ -23,6 +42,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "prepare": "pnpm build",
     "test": "vitest run --project unit",
     "test:watch": "vitest --project unit",
     "test:ui": "vitest --ui --project unit",
@@ -33,11 +53,15 @@
   "license": "ISC",
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
-    "clsx": "^2.1.1",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "clsx": "^2.1.1"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "@chromatic-com/storybook": "^5.3.0",
     "@eslint/js": "^10.0.1",
     "@storybook/addon-a11y": "10.5.10",

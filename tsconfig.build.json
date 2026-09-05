@@ -6,7 +6,9 @@
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationMap": true,
+    // declarationMap は出さない。参照先の src を配布物に含めないため、
+    // 出しても利用側からは全てリンク切れになる
+    "declarationMap": false,
     // テスト用のグローバル型を配布物の型に混ぜない
     "types": []
   },
