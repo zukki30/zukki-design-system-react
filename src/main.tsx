@@ -6,8 +6,9 @@ import './design-tokens/token';
 import './design-tokens/typography';
 
 // styles
-import './styles/variables-dark-only.css';
-import './styles/variables-light-only.css';
+// 配色を固定した CSS は dist で派生生成するため、ここでは両対応版だけを読む。
+// 3 ファイルは同じ変数を同じ :root に定義しており、まとめて読むと後勝ちで
+// variables.css だけが効き、前の 2 つは到達しない宣言として残るだけになる
 import './styles/variables.css';
 
 // 複数コンポーネントで共有する型
