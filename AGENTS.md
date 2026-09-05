@@ -36,7 +36,7 @@
 # 開発（Storybook をポート 6006 で起動）
 pnpm dev
 
-# ビルド（TypeScript コンパイル + Vite バンドル）
+# ビルド（型宣言 + Vite バンドル + 配布用 CSS 3 種類）
 pnpm build
 
 # Lint & フォーマット
@@ -45,6 +45,9 @@ pnpm format          # 自動修正あり
 pnpm lint:check      # 修正せず検査のみ（CI と同じ）
 pnpm format:check    # 修正せず検査のみ（CI と同じ）
 pnpm typecheck       # tsc -b のみ（バンドルなし）
+
+# 配布物
+pnpm verify:dist     # dist が利用側から使える形かを検査（CI と同じ）
 
 # テスト
 pnpm test           # 単発実行（jsdom のユニットテスト）
@@ -70,6 +73,28 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 すべてのコンポーネントスタイルは、`src/styles/theme.css.ts` から export される `vars` オブジェクト経由で CSS 変数を参照します。
 
 **その他の置き場所:** `figma/tokens.json` は Tokens Studio のエクスポートで、変換は `style-dictionary/` が担います。Vitest の環境設定は `test/setup.ts` です。生成物（`src/design-tokens/`、`src/styles/` の CSS）は手編集しません。
+
+## 配布物
+
+このライブラリは git 経由で install して使われます。`dist/` はリポジトリに含めず、`prepare` スクリプトが install 時にビルドします。
+
+**`pnpm build` が作るもの:**
+
+| 成果物 | 備考 |
+| --- | --- |
+| `zukki-design-system.es.js` / `.umd.js` | React は外部化され、バンドルに含みません |
+| `main.d.ts` ほか型宣言 | `vite-plugin-dts` が `@/` エイリアスを相対パスへ解決します |
+| `styles.css` | 既定。`light-dark()` を保持します |
+| `styles-light.css` / `styles-dark.css` | `scripts/build-css-variants.ts` が既定版から派生生成します |
+
+**公開 API やビルド設定を変えたら `pnpm verify:dist` を通してから完了とすること。** CI でも同じ検査が走ります。
+
+次の 2 つは**ビルドが成功したままでも壊れる**ため、設定を触るときは特に注意してください。
+
+- **React の外部化**（`build.rollupOptions.external`）— 外れると React がバンドルに同梱され、利用側で二重に読み込まれて `Invalid hook call` になります
+- **`build.cssTarget`** — 外れると `light-dark()` がポリフィルへ変換されます。ポリフィルは `prefers-color-scheme` にしか反応せず、要素の `color-scheme` による切り替えができなくなります
+
+配色を固定した CSS は、`--color-*` のような意味的な変数ではなく、`createGlobalTheme` が生成するハッシュ変数（`--_xxx`）まで解決する必要があります。コンポーネントが実際に参照しているのはハッシュ変数のほうで、意味的な変数を差し替えても見た目は変わりません。
 
 ## コンポーネント構成
 
