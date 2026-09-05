@@ -1,0 +1,15 @@
+{
+  // 配布する型宣言を出力するための設定。
+  // typecheck（tsc -b）の経路は変えず、vite-plugin-dts からのみ参照する
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    // テスト用のグローバル型を配布物の型に混ぜない
+    "types": []
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.spec.tsx", "src/**/*.stories.tsx"]
+}
