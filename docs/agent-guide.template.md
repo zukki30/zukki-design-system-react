@@ -100,8 +100,12 @@ React 19 以上が必要です（peer dependency）。
 ### 覚えておくこと
 
 - **`Dialog` の開閉は `open` prop だけで制御します。** `ref` から `showModal()` / `close()` を呼ばないでください。`onClose` は「閉じる要求」で、実際に閉じるかどうかは `open` が決めます
-- **`FormField` の状態は子へ自動的に伝わります。** `required` / `disabled` / エラー状態は context で入力要素に渡るため、`<Input error disabled>` と書き直す必要はありません
+- **`FormField` の状態は子へ自動的に伝わります。** `disabled` とエラー状態は context で入力要素に渡るため、`<Input error disabled>` と書き直す必要はありません
+- **ただし `FormField` の `required` が注入するのは `aria-required` だけです。** 支援技術には必須と伝わりますが、**ブラウザのネイティブ検証（送信時のブロック）は効きません。** 必要な場合は `<Input required>` を自分で指定してください
+- **`FormField.Control` が注入するのは子が単一の要素のときだけです。** 複数の入力を並べる場合（ラジオグループなど）は `id` と `aria-required` を自分で指定してください
 - **`Steps` のステップ番号は並び順から自動で採番されます。** `Steps.Item` に番号を渡す prop はありません。現在位置はルートの `current` で指定します
+- **カードの右上に置くものは `Card.Action` に入れます。** `Card.Header` は横並びで、`Card.Action` が右端に寄ります。自分で絶対配置する必要はありません
+- **`Card.Body` は横並びの flex です。** 中の要素を幅いっぱいに広げたいときは、子に `flex: 1` を与えてください。フォームや縦積みの内容を入れると、指定しない限り内容ぶんの幅で止まります
 - **`Card.Title` / `Dialog.Title` の見出しレベルは `level` prop で指定します。** `role="heading"` と `aria-level` を自分で組まないでください。`Card.Title` は `level` を省くと見出しにならない `div` になります（カードが文書構造のどこに置かれるかはライブラリ側から分からないため）。`Dialog.Title` は省略時に `h2` になります
 
 ## 4. アイコン
