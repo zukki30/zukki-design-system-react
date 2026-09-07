@@ -227,6 +227,19 @@ check(
   missingIcons.length === 0 ? `${iconNames.length} 件` : `不足: ${missingIcons.join(', ')}`
 );
 
+// 9. README の一覧が古くなっていない。
+//
+// README は開発者向けの節も含むため生成の対象にしない。代わりに、追加した
+// コンポーネントを書き忘れたときに落ちるようにする
+const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+const missingInReadme = componentNames.filter((name) => !readme.includes(`\`${name}\``));
+
+check(
+  'README に全コンポーネントが載っている',
+  missingInReadme.length === 0,
+  missingInReadme.length === 0 ? `${componentNames.length} 件` : `不足: ${missingInReadme.join(', ')}`
+);
+
 if (failures.length > 0) {
   console.error(`\n${failures.length} 件の問題があります:`);
   failures.forEach((f) => console.error(`  - ${f}`));
