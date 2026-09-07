@@ -38,6 +38,7 @@ const required = [
   'styles.css',
   'styles-light.css',
   'styles-dark.css',
+  'AGENTS.md',
 ];
 
 for (const file of required) {
@@ -194,6 +195,37 @@ if (!typeProbeOk) {
       .join('\n')
   );
 }
+
+// 8. 利用側エージェント向けのガイドが、現在のソースを反映している。
+//
+// 生成物なので理屈のうえでは常に最新だが、build の実行順が崩れて古いものが
+// 残る事故はありうる。中身がソースと揃っているかまで見る
+const guide = read('AGENTS.md');
+
+check('AGENTS.md にプレースホルダが残っていない', !/\{\{[A-Z_]+\}\}/.test(guide), '');
+
+const missingInGuide = componentNames.filter((name) => !guide.includes(`\`${name}\``));
+
+check(
+  'AGENTS.md に全コンポーネントが載っている',
+  missingInGuide.length === 0,
+  missingInGuide.length === 0 ? `${componentNames.length} 件` : `不足: ${missingInGuide.join(', ')}`
+);
+
+const iconNames = [
+  ...readFileSync(join(ROOT, 'src', 'components', 'Icon', 'types.ts'), 'utf8')
+    .replace(/[\s\S]*export const iconNames = \[/, '')
+    .replace(/\][\s\S]*/, '')
+    .matchAll(/'([^']+)'/g),
+].map((m) => m[1]);
+
+const missingIcons = iconNames.filter((name) => !guide.includes(`\`${name}\``));
+
+check(
+  'AGENTS.md に全アイコン名が載っている',
+  missingIcons.length === 0,
+  missingIcons.length === 0 ? `${iconNames.length} 件` : `不足: ${missingIcons.join(', ')}`
+);
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} 件の問題があります:`);

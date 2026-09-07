@@ -16,6 +16,7 @@
     "./styles.css": "./dist/styles.css",
     "./styles-light.css": "./dist/styles-light.css",
     "./styles-dark.css": "./dist/styles-dark.css",
+    "./AGENTS.md": "./dist/AGENTS.md",
     "./package.json": "./package.json"
   },
   "files": [
@@ -24,7 +25,8 @@
   ],
   "scripts": {
     "dev": "pnpm storybook",
-    "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts",
+    "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts && tsx scripts/build-agent-guide.ts",
+    "build:agent-guide": "tsx scripts/build-agent-guide.ts",
     "typecheck": "tsc -b",
     "verify:dist": "tsx scripts/verify-dist.ts",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
