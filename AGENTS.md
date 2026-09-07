@@ -86,6 +86,8 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 | `main.d.ts` ほか型宣言 | `vite-plugin-dts` が `@/` エイリアスを相対パスへ解決します |
 | `styles.css` | 既定。`light-dark()` を保持します |
 | `styles-light.css` / `styles-dark.css` | `scripts/build-css-variants.ts` が既定版から派生生成します |
+| `styles*.css.d.ts` | CSS の副作用 import 用。TypeScript 6 は型解決を検査するため、無いと利用側が `TS2882` になります |
+| `AGENTS.md` | 利用側の AI エージェント向けガイド。`scripts/build-agent-guide.ts` が生成します |
 
 **公開 API やビルド設定を変えたら `pnpm verify:dist` を通してから完了とすること。** CI でも同じ検査が走ります。
 
@@ -96,6 +98,19 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 - **CJS の拡張子** — `package.json` が `type: module` なので、CJS を `.js` で出すと Node が ESM として解釈します。`require()` は例外を投げないまま **export が空になる**ため気づきにくく、`.cjs` である必要があります
 
 配色を固定した CSS は、`--color-*` のような意味的な変数ではなく、`createGlobalTheme` が生成するハッシュ変数（`--_xxx`）まで解決する必要があります。コンポーネントが実際に参照しているのはハッシュ変数のほうで、意味的な変数を差し替えても見た目は変わりません。
+
+### 利用側に届ける情報
+
+利用側のプロジェクトで動くエージェントが参照できるのは、`node_modules` の `.d.ts` と `README.md`、そして同梱した `dist/AGENTS.md` だけです。3 つを揃えておくこと。
+
+- **公開する型はコンポーネント固有の名前にする。** props は `ComponentNameProps`、選択肢を持つ prop の union は `ButtonVariant` のように名前を付けて公開します。`SizeType` のような汎用的な名前は利用側の型と衝突するため公開しません
+- **`dist/AGENTS.md` は生成物です。手編集しないこと。** 内容を変えるときは `docs/agent-guide.template.md` を編集し、`pnpm build:agent-guide` で生成し直します。コンポーネント一覧・アイコン名・公開している型はソースから差し込まれるため、手で書き写しません
+
+**コンポーネントを追加したときに要る作業は 3 つ**で、いずれも忘れると `pnpm verify:dist` が落ちます。
+
+1. Props 型を `src/main.tsx` まで公開する
+2. `docs/agent-guide.template.md` の `descriptions` に説明を書く
+3. `README.md` のコンポーネント一覧に足す
 
 ## コンポーネント構成
 
