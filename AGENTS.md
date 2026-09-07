@@ -64,9 +64,9 @@ pnpm build:tokens      # JSON → CSS + TypeScript ファイル
 
 TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポーネントライブラリ**（デザインシステム）です。コンポーネントは Storybook 上でドキュメント化・開発します。
 
-**技術スタック:** React 19 / TypeScript 6 / Vite 8 / Vanilla Extract / Vitest 4 / Storybook 10
+**技術スタック:** React 19 / TypeScript 6 / Vite 8 / Vanilla Extract / Vitest 5 / Storybook 10
 
-**ライブラリのエントリポイント:** `src/main.tsx` で全コンポーネントを export します。Vite は UMD と ES モジュール（`zukki-design-system.umd.js`、`zukki-design-system.es.js`）の両方を出力します。
+**ライブラリのエントリポイント:** `src/main.tsx` で全コンポーネントを export します。Vite は ES モジュール（`zukki-design-system.js`）と CJS（`zukki-design-system.cjs`）の両方を出力します。配布物の詳細は「配布物」の節を参照してください。
 
 **デザイントークンのパイプライン:** Figma（tokens.json）→ `pnpm token:transform` → `style-dictionary/tokens/*.json` → `pnpm build:tokens` → `src/design-tokens/*.ts` ＋ `src/styles/theme.css.ts` 内のグローバル CSS 変数。
 
