@@ -38,6 +38,11 @@ const required = [
   'styles.css',
   'styles-light.css',
   'styles-dark.css',
+  // TypeScript 6 は副作用 import の型解決を既定で検査する。
+  // 宣言が無いと利用側で `import 'zukki-design-system/styles.css'` が TS2882 になる
+  'styles.css.d.ts',
+  'styles-light.css.d.ts',
+  'styles-dark.css.d.ts',
   'AGENTS.md',
 ];
 
