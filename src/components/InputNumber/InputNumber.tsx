@@ -14,7 +14,7 @@ import {
   inputNumberSpinDivider,
 } from './InputNumber.css';
 
-type Props = {
+export type InputNumberProps = {
   /**
    * 数値入力のエラー状態。未指定のときは FormField のエラー状態を引き継ぐ
    */
@@ -45,7 +45,10 @@ const isFractional = (value: string | number | undefined): boolean => {
  * 小数なら有効値は小数になる。判定には step と min の両方を見る。
  * value / defaultValue は入力中に変わりキーパッドが切り替わってしまうため見ない
  */
-const resolveInputMode = (step: Props['step'], min: Props['min']): 'numeric' | 'decimal' => {
+const resolveInputMode = (
+  step: InputNumberProps['step'],
+  min: InputNumberProps['min']
+): 'numeric' | 'decimal' => {
   // step 未指定時の既定値は 1（整数）
   if (step === 'any' || isFractional(step)) {
     return 'decimal';
@@ -72,7 +75,7 @@ export const InputNumber = ({
   className,
   ref,
   ...props
-}: Props) => {
+}: InputNumberProps) => {
   const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
 
   // スピンボタンの操作には DOM 要素が必要なため、内部で保持しつつ利用側の ref にも転送する

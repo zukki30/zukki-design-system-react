@@ -14,7 +14,25 @@ import {
   buttonVariant,
 } from './Button.css';
 
-type Props = {
+/**
+ * ボタンのバリアント。
+ *
+ * `default` は面の上に置く既定の見た目。`primary` / `secondary` / `success` /
+ * `failure` は意味カラーの塗り。`profile` / `works` / `outputs` は zukki サイト
+ * 固有のバリアント（{@link ZukkiVariantType}）
+ */
+export type ButtonVariant =
+  'default' | 'primary' | 'secondary' | 'success' | 'failure' | ZukkiVariantType;
+
+/**
+ * ボタンのサイズ。`sm` / `md` の 2 段階。
+ *
+ * `lg` は意図的に持たない。大きく見せたいボタンはサイズではなく、置く側で
+ * 幅を与えて表現する
+ */
+export type ButtonSize = Exclude<SizeType, 'lg'>;
+
+export type ButtonProps = {
   /**
    * ボタンの中身
    */
@@ -30,11 +48,11 @@ type Props = {
   /**
    * ボタンのバリアント
    */
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'failure' | ZukkiVariantType;
+  variant?: ButtonVariant;
   /**
    * ボタンのサイズ
    */
-  size?: Exclude<SizeType, 'lg'>;
+  size?: ButtonSize;
   /**
    * ボタンの selected 属性
    */
@@ -52,7 +70,7 @@ type Props = {
 const SPINNER_SIZES = {
   sm: '14px',
   md: '24px',
-} as const satisfies Record<NonNullable<Props['size']>, ComponentProps<typeof Spinner>['width']>;
+} as const satisfies Record<ButtonSize, ComponentProps<typeof Spinner>['width']>;
 
 export const Button = ({
   children,
@@ -67,7 +85,7 @@ export const Button = ({
   className,
   onClick,
   ...props
-}: Props) => {
+}: ButtonProps) => {
   const spinnerVariant: ComponentProps<typeof Spinner>['variant'] =
     variant === 'default' ? 'light' : 'accent';
   const spinnerSize = SPINNER_SIZES[size];

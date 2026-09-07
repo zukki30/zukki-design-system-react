@@ -8,7 +8,7 @@ import { skeleton } from './Skeleton.css';
  */
 export type SkeletonShape = 'rect' | 'circle';
 
-type Props = {
+export type SkeletonProps = {
   /**
    * シェイプの幅。
    * `style` にも `width` を指定した場合はそちらが優先される
@@ -41,7 +41,7 @@ export const Skeleton = ({
   shape = 'rect',
   style,
   ...props
-}: Props) => {
+}: SkeletonProps) => {
   return (
     <span
       {...props}

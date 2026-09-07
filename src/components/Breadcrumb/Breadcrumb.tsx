@@ -47,7 +47,7 @@ export type BreadcrumbItem = {
   icon?: ReactNode;
 };
 
-type Props = {
+export type BreadcrumbProps = {
   /**
    * パンくずの項目。配列の末尾が現在地として扱われる
    */
@@ -70,7 +70,7 @@ export const Breadcrumb = ({
   'aria-label': ariaLabel = 'パンくずリスト',
   className,
   ...props
-}: Props) => {
+}: BreadcrumbProps) => {
   return (
     <nav className={clsx(breadcrumb, className)} aria-label={ariaLabel} {...props}>
       <ol className={breadcrumbList}>

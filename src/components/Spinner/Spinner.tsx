@@ -12,19 +12,31 @@ const TRACK_PATH = (
 );
 const ARC_PATH = <path d="M12 1C18.0752 1 23 5.92487 23 12" />;
 
-type Props = {
+/**
+ * スピナーのバリアント。
+ *
+ * `light` / `dark` は背景の明暗に合わせる。`accent` は意味カラーの塗り
+ * （Button の primary など）に重ねるためのもので、`textOnAccent` と同じ色を描く。
+ * アクセント塗りの上に `light` / `dark` を重ねてはいけない
+ */
+export type SpinnerVariant = 'light' | 'dark' | 'primary' | 'accent';
+
+export type SpinnerProps = {
   /**
-   * light / dark は背景の明暗に合わせる。accent は意味カラーの塗り（Button の
-   * primary など）に重ねるためのもので、`textOnAccent` と同じ色を描く
+   * スピナーのバリアント
    */
-  variant?: 'light' | 'dark' | 'primary' | 'accent';
+  variant?: SpinnerVariant;
   /**
    * The aria-label attribute providing the accessible name of the icon.
    */
   'aria-label'?: string;
 } & Omit<ComponentPropsWithRef<'svg'>, 'role' | 'name' | 'aria-label'>;
 
-export const Spinner = ({ 'aria-label': ariaLabel, variant = 'light', ...restProps }: Props) => {
+export const Spinner = ({
+  'aria-label': ariaLabel,
+  variant = 'light',
+  ...restProps
+}: SpinnerProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

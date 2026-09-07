@@ -1,11 +1,9 @@
 import { render } from '@testing-library/react';
-import { createRef, type ComponentProps, type ReactElement } from 'react';
+import { createRef, type ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Skeleton } from './Skeleton';
+import { Skeleton, type SkeletonProps } from './Skeleton';
 import { skeleton as skeletonClass } from './Skeleton.css';
-
-type SkeletonProps = ComponentProps<typeof Skeleton>;
 
 const renderSkeleton = (ui: ReactElement) => {
   const { container } = render(ui);

@@ -23,7 +23,7 @@ const INVALID_CUSTOM_IDENT_CHARS = /[^a-zA-Z0-9_-]/g;
 export type TooltipPlacement =
   'top' | 'topLeft' | 'topRight' | 'bottom' | 'bottomLeft' | 'bottomRight' | 'left' | 'right';
 
-type Props = {
+export type TooltipProps = {
   /**
    * 吹き出しに表示する内容
    */
@@ -51,7 +51,7 @@ export const Tooltip = ({
   className,
   style,
   ...props
-}: Props) => {
+}: TooltipProps) => {
   const rawId = useId();
   // useId が返す文字列には CSS カスタム識別子として使えない文字（`:` など）が含まれるため除去する
   const anchorName = `--tooltip-anchor-${rawId.replace(INVALID_CUSTOM_IDENT_CHARS, '')}`;
