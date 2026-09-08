@@ -1,15 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { createRef, type ComponentProps, type ReactElement } from 'react';
+import { createRef, type ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Icon } from '../Icon';
-import { Spinner } from '../Spinner';
+import { Spinner, type SpinnerVariant } from '../Spinner';
 
-import { IconButton } from './IconButton';
+import { IconButton, type IconButtonProps, type IconButtonVariant } from './IconButton';
 
 const icon = <Icon name="home" width={16} height={16} />;
-
-type IconButtonProps = ComponentProps<typeof IconButton>;
 
 /**
  * 描画結果の Spinner のクラス名を取り出す。
@@ -156,18 +154,19 @@ describe('IconButton', () => {
     ['secondary', 'dark'],
     ['primary-exposed', 'primary'],
     ['secondary-exposed', 'light'],
-  ] as const satisfies ReadonlyArray<
-    readonly [NonNullable<IconButtonProps['variant']>, ComponentProps<typeof Spinner>['variant']]
-  >)('variant=%s のとき Spinner は %s の配色になる', (variant, spinnerVariant) => {
-    const actual = getSpinnerClassName(
-      <IconButton aria-label="ホーム" variant={variant} loading>
-        <span data-testid="icon" />
-      </IconButton>
-    );
-    const expected = getSpinnerClassName(<Spinner variant={spinnerVariant} />);
+  ] as const satisfies ReadonlyArray<readonly [IconButtonVariant, SpinnerVariant]>)(
+    'variant=%s のとき Spinner は %s の配色になる',
+    (variant, spinnerVariant) => {
+      const actual = getSpinnerClassName(
+        <IconButton aria-label="ホーム" variant={variant} loading>
+          <span data-testid="icon" />
+        </IconButton>
+      );
+      const expected = getSpinnerClassName(<Spinner variant={spinnerVariant} />);
 
-    expect(actual).toBe(expected);
-  });
+      expect(actual).toBe(expected);
+    }
+  );
 
   it.each([
     ['md', 'sm'],

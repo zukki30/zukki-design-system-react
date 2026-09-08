@@ -14,14 +14,28 @@ import {
 
 export type TagVariant = 'default' | 'red' | 'blue' | 'green' | 'yellow' | ZukkiVariantType;
 
-type Props = {
+export type TagProps = {
+  /**
+   * タグに表示するテキスト。
+   * 閉じるボタンのアクセシブルネーム（`〜を閉じる`）にも使う
+   */
   label: string;
+  /**
+   * タグのバリアント
+   */
   variant?: TagVariant;
+  /**
+   * 追加のクラス名
+   */
   className?: string;
+  /**
+   * 閉じるボタンを押したときに呼ばれる。
+   * 渡さないと閉じるボタン自体を描画しない
+   */
   onClose?: () => void;
 };
 
-export const Tag = ({ label, variant = 'default', className, onClose }: Props) => {
+export const Tag = ({ label, variant = 'default', className, onClose }: TagProps) => {
   return (
     <span className={clsx(tag, tagVariant[variant], className)}>
       <span className={tagLabel}>{label}</span>

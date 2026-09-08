@@ -6,10 +6,11 @@
  * 壊れるため機械で見る。
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
 
-const DIST = join(import.meta.dirname, '..', 'dist');
+const ROOT = join(import.meta.dirname, '..');
+const DIST = join(ROOT, 'dist');
 
 const failures: string[] = [];
 
@@ -37,6 +38,12 @@ const required = [
   'styles.css',
   'styles-light.css',
   'styles-dark.css',
+  // TypeScript 6 は副作用 import の型解決を既定で検査する。
+  // 宣言が無いと利用側で `import 'zukki-design-system/styles.css'` が TS2882 になる
+  'styles.css.d.ts',
+  'styles-light.css.d.ts',
+  'styles-dark.css.d.ts',
+  'AGENTS.md',
 ];
 
 for (const file of required) {
@@ -95,7 +102,7 @@ check(
 const packed = JSON.parse(
   execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], {
     encoding: 'utf8',
-    cwd: join(import.meta.dirname, '..'),
+    cwd: ROOT,
   })
 ) as [{ files: { path: string }[] }];
 
@@ -110,6 +117,143 @@ check('配布物に開発用のファイルが混ざっていない', unwanted.l
 if (unwanted.length > 0) {
   console.log(`     混入: ${unwanted.slice(0, 10).join(', ')}`);
 }
+
+// 7. 公開している型が利用側から名指しできる。
+//
+// 文字列一致では足りない。「main.d.ts に名前が現れる」ことと「利用側から
+// 解決できる」ことは別物で、barrel の再 export が抜けていれば前者は通ってしまう。
+// そのため tsc に実際に解決させる
+const componentNames = readdirSync(join(ROOT, 'src', 'components'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort();
+
+const probeDir = join(ROOT, 'node_modules', '.tmp', 'probes');
+mkdirSync(probeDir, { recursive: true });
+
+// probe は node_modules 配下に置くため、dist への相対パスを算出する
+const distMainSpecifier = relative(probeDir, join(DIST, 'main')).split(sep).join('/');
+
+// コンポーネントが増えれば probe も自動的に増えるため、公開し忘れが必ず落ちる
+const propsTypes = componentNames.map((name) => `${name}Props`);
+const generatedProbe = [
+  '// scripts/verify-dist.ts が生成する。手で編集しない',
+  `import type {\n${propsTypes.map((t) => `  ${t},`).join('\n')}\n} from '${distMainSpecifier}';`,
+  '',
+  ...propsTypes.map((t, i) => `type _${i} = ${t};`),
+  '',
+  `export type Probe = [${propsTypes.map((_, i) => `_${i}`).join(', ')}];`,
+  '',
+].join('\n');
+
+const generatedProbePath = join(probeDir, 'props.ts');
+writeFileSync(generatedProbePath, generatedProbe);
+
+// 手で書いた probe。受け入れ条件を @ts-expect-error で固定している
+const usageProbePath = join(ROOT, 'scripts', 'probes', 'usage.tsx');
+
+// --ignoreConfig が無いと、ファイルを直接指定したときに repo の tsconfig.json を
+// 見つけて TS5112 になる（TypeScript 6）
+const tscArgs = [
+  'tsc',
+  '--ignoreConfig',
+  '--noEmit',
+  '--skipLibCheck',
+  '--strict',
+  '--jsx',
+  'react-jsx',
+  '--moduleResolution',
+  'bundler',
+  '--module',
+  'esnext',
+  '--target',
+  'es2022',
+  '--lib',
+  'es2022,dom,dom.iterable',
+  generatedProbePath,
+  usageProbePath,
+];
+
+let typeProbeOutput = '';
+let typeProbeOk = true;
+
+try {
+  execFileSync('pnpm', ['exec', ...tscArgs], { encoding: 'utf8', cwd: ROOT, stdio: 'pipe' });
+} catch (error) {
+  typeProbeOk = false;
+
+  // tsc は診断を stdout に書くが、起動そのものに失敗したときは stderr にしか出ない。
+  // 両方拾わないと「下記参照」と出したまま中身が空になり、原因が分からなくなる。
+  // spawn 自体が失敗した場合はどちらも undefined なので、例外の文言へ落とす
+  const { stdout, stderr } = error as { stdout?: unknown; stderr?: unknown };
+
+  typeProbeOutput =
+    [stdout, stderr]
+      .filter((stream) => stream !== undefined && stream !== null && stream !== '')
+      .map(String)
+      .join('\n') || String(error);
+}
+
+check(
+  `${componentNames.length} コンポーネントの Props 型が利用側から解決できる`,
+  typeProbeOk,
+  typeProbeOk ? '' : '下記参照'
+);
+
+if (!typeProbeOk) {
+  console.log(
+    typeProbeOutput
+      .split('\n')
+      .filter(Boolean)
+      .slice(0, 20)
+      .map((line) => `     ${line}`)
+      .join('\n')
+  );
+}
+
+// 8. 利用側エージェント向けのガイドが、現在のソースを反映している。
+//
+// 生成物なので理屈のうえでは常に最新だが、build の実行順が崩れて古いものが
+// 残る事故はありうる。中身がソースと揃っているかまで見る
+const guide = read('AGENTS.md');
+
+check('AGENTS.md にプレースホルダが残っていない', !/\{\{[A-Z_]+\}\}/.test(guide), '');
+
+const missingInGuide = componentNames.filter((name) => !guide.includes(`\`${name}\``));
+
+check(
+  'AGENTS.md に全コンポーネントが載っている',
+  missingInGuide.length === 0,
+  missingInGuide.length === 0 ? `${componentNames.length} 件` : `不足: ${missingInGuide.join(', ')}`
+);
+
+const iconNames = [
+  ...readFileSync(join(ROOT, 'src', 'components', 'Icon', 'types.ts'), 'utf8')
+    .replace(/[\s\S]*export const iconNames = \[/, '')
+    .replace(/\][\s\S]*/, '')
+    .matchAll(/'([^']+)'/g),
+].map((m) => m[1]);
+
+const missingIcons = iconNames.filter((name) => !guide.includes(`\`${name}\``));
+
+check(
+  'AGENTS.md に全アイコン名が載っている',
+  missingIcons.length === 0,
+  missingIcons.length === 0 ? `${iconNames.length} 件` : `不足: ${missingIcons.join(', ')}`
+);
+
+// 9. README の一覧が古くなっていない。
+//
+// README は開発者向けの節も含むため生成の対象にしない。代わりに、追加した
+// コンポーネントを書き忘れたときに落ちるようにする
+const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+const missingInReadme = componentNames.filter((name) => !readme.includes(`\`${name}\``));
+
+check(
+  'README に全コンポーネントが載っている',
+  missingInReadme.length === 0,
+  missingInReadme.length === 0 ? `${componentNames.length} 件` : `不足: ${missingInReadme.join(', ')}`
+);
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} 件の問題があります:`);

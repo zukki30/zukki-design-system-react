@@ -17,7 +17,7 @@ import {
   checkboxMinusIcon,
 } from './Checkbox.css';
 
-type Props = {
+export type CheckboxProps = {
   /**
    * チェックボックスのラベル
    */
@@ -41,7 +41,7 @@ export const Checkbox = ({
   className,
   ref,
   ...props
-}: Props) => {
+}: CheckboxProps) => {
   const { disabled } = useFormFieldState({ disabled: disabledProp });
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergedRef(ref, inputRef);

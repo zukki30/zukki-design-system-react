@@ -5,7 +5,7 @@ import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import { input, inputField, inputIcon } from './Input.css';
 
-type Props = {
+export type InputProps = {
   /**
    * 入力の前に表示する装飾アイコン。
    * 支援技術からは隠されるため、操作要素や意味のあるテキストは渡さないこと。
@@ -35,7 +35,7 @@ export const Input = ({
   disabled: disabledProp,
   className,
   ...props
-}: Props) => {
+}: InputProps) => {
   const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
 
   return (

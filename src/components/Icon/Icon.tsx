@@ -3,7 +3,7 @@ import type { ComponentPropsWithRef } from 'react';
 import * as svgPaths from './svg';
 import type { IconName } from './types';
 
-type Props = {
+export type IconProps = {
   /**
    * Icon name.
    */
@@ -14,7 +14,7 @@ type Props = {
   'aria-label'?: string;
 } & Omit<ComponentPropsWithRef<'svg'>, 'role' | 'name' | 'aria-label'>;
 
-export const Icon = ({ name, 'aria-label': ariaLabel, ...restProps }: Props) => {
+export const Icon = ({ name, 'aria-label': ariaLabel, ...restProps }: IconProps) => {
   const svgPath = svgPaths[name];
 
   return (

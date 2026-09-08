@@ -1,11 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { createRef, type ComponentProps } from 'react';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button } from './Button';
+import { Button, type ButtonSize } from './Button';
 import { buttonLoading } from './Button.css';
-
-type ButtonProps = ComponentProps<typeof Button>;
 
 describe('Button', () => {
   it('children をアクセシブルネームとして描画する', () => {
@@ -118,7 +116,7 @@ describe('Button', () => {
   it.each([
     ['sm', '14px'],
     ['md', '24px'],
-  ] as const satisfies ReadonlyArray<readonly [NonNullable<ButtonProps['size']>, string]>)(
+  ] as const satisfies ReadonlyArray<readonly [ButtonSize, string]>)(
     'size=%s のとき Spinner を %s で描画する',
     (size, spinnerSize) => {
       const { container } = render(

@@ -13,9 +13,19 @@
       "import": "./dist/zukki-design-system.js",
       "require": "./dist/zukki-design-system.cjs"
     },
-    "./styles.css": "./dist/styles.css",
-    "./styles-light.css": "./dist/styles-light.css",
-    "./styles-dark.css": "./dist/styles-dark.css",
+    "./styles.css": {
+      "types": "./dist/styles.css.d.ts",
+      "default": "./dist/styles.css"
+    },
+    "./styles-light.css": {
+      "types": "./dist/styles-light.css.d.ts",
+      "default": "./dist/styles-light.css"
+    },
+    "./styles-dark.css": {
+      "types": "./dist/styles-dark.css.d.ts",
+      "default": "./dist/styles-dark.css"
+    },
+    "./AGENTS.md": "./dist/AGENTS.md",
     "./package.json": "./package.json"
   },
   "files": [
@@ -24,7 +34,8 @@
   ],
   "scripts": {
     "dev": "pnpm storybook",
-    "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts",
+    "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts && tsx scripts/build-agent-guide.ts",
+    "build:agent-guide": "tsx scripts/build-agent-guide.ts",
     "typecheck": "tsc -b",
     "verify:dist": "tsx scripts/verify-dist.ts",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",

@@ -7,7 +7,7 @@ import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import { radio, radioBox, radioControl, radioDot, radioInput, radioLabel } from './Radio.css';
 
-type Props = {
+export type RadioProps = {
   /**
    * ラジオボタンのラベル
    */
@@ -18,7 +18,7 @@ type Props = {
   disabled?: boolean;
 } & Omit<ComponentPropsWithRef<'input'>, 'type' | 'children' | 'size'>;
 
-export const Radio = ({ children, disabled: disabledProp, className, ...props }: Props) => {
+export const Radio = ({ children, disabled: disabledProp, className, ...props }: RadioProps) => {
   const { disabled } = useFormFieldState({ disabled: disabledProp });
 
   return (

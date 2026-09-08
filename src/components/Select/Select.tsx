@@ -8,7 +8,7 @@ import { Icon } from '../Icon/Icon';
 
 import { select, selectField, selectIcon } from './Select.css';
 
-type Props = {
+export type SelectProps = {
   /**
    * 未選択時に表示するプレースホルダー
    */
@@ -38,7 +38,7 @@ export const Select = ({
   value,
   defaultValue,
   ...props
-}: Props) => {
+}: SelectProps) => {
   const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
 
   // 初期選択の行き先が消えないよう、option の描画と初期値の算出は同じ判定を使う

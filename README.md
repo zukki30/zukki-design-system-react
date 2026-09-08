@@ -33,6 +33,66 @@ export const App = () => (
 );
 ```
 
+### コンポーネント
+
+| コンポーネント | 説明 |
+| --- | --- |
+| `Breadcrumb` | 現在地までの階層を示すパンくずリスト |
+| `Button` | ラベルを持つボタン |
+| `Card` | 情報のまとまりを載せる面（合成） |
+| `Checkbox` | 複数選択のチェックボックス |
+| `Dialog` | モーダルダイアログ（合成） |
+| `FormField` | ラベル・補助テキスト・エラーをまとめるフォームフィールド（合成） |
+| `Icon` | 組み込みのアイコン |
+| `IconButton` | アイコンだけのボタン |
+| `Input` | 1 行のテキスト入力 |
+| `InputNumber` | 数値入力 |
+| `Radio` | 単一選択のラジオボタン |
+| `Select` | ドロップダウンの選択 |
+| `Skeleton` | 読み込み中のプレースホルダー |
+| `Spinner` | 読み込み中のスピナー |
+| `Steps` | 手順の進捗を示すステップ |
+| `Switch` | オン / オフの切り替え |
+| `Tag` | 短いラベルを示すタグ |
+| `TextArea` | 複数行のテキスト入力 |
+| `Tooltip` | 補足を示す吹き出し |
+
+「合成」と書いたものは compound components で、**パーツを子として組み立てる**。`title` や `footer` に ReactNode を渡すスロット prop は持たない。
+
+```tsx
+<Dialog open={open} onClose={() => setOpen(false)}>
+  <Dialog.Header>
+    <Dialog.Title>確認</Dialog.Title>
+    <Dialog.Close />
+  </Dialog.Header>
+  <Dialog.Body>削除しますか？</Dialog.Body>
+  <Dialog.Footer>
+    <Button variant="failure">削除</Button>
+  </Dialog.Footer>
+</Dialog>
+```
+
+props の型はすべて公開しているので、ラッパーを作るときに使える。
+
+```tsx
+import { Button, type ButtonProps } from 'zukki-design-system';
+
+export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
+  <Button {...props} type="submit" />
+);
+```
+
+### AI エージェントで使う場合
+
+型から読み取れないこと（CSS の import が必須であること・compound components の組み方・アイコン名の一覧・やりがちな間違い）をまとめたガイドを配布物に同梱している。**エージェントが `node_modules` を自力で探すとは限らないため、利用側の設定ファイルから読み込ませる。**
+
+```markdown
+<!-- 利用側の AGENTS.md / CLAUDE.md -->
+@./node_modules/zukki-design-system/dist/AGENTS.md
+```
+
+ガイドは install したバージョンの実際の中身から生成されているため、ライブラリを更新すれば内容も追従する。
+
 ### 配色の選び方
 
 3 種類の CSS を配布している。用途に応じて 1 つだけ読み込む。

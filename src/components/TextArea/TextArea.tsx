@@ -5,7 +5,7 @@ import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import { textArea } from './TextArea.css';
 
-type Props = {
+export type TextAreaProps = {
   /**
    * テキストエリアのエラー状態。未指定のときは FormField のエラー状態を引き継ぐ
    */
@@ -21,7 +21,7 @@ export const TextArea = ({
   disabled: disabledProp,
   className,
   ...props
-}: Props) => {
+}: TextAreaProps) => {
   const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
 
   return (

@@ -14,7 +14,7 @@ import {
   switchTrack,
 } from './Switch.css';
 
-type Props = {
+export type SwitchProps = {
   /**
    * スイッチのラベル
    */
@@ -25,7 +25,7 @@ type Props = {
   disabled?: boolean;
 } & Omit<ComponentPropsWithRef<'input'>, 'type' | 'children' | 'size' | 'role'>;
 
-export const Switch = ({ children, disabled: disabledProp, className, ...props }: Props) => {
+export const Switch = ({ children, disabled: disabledProp, className, ...props }: SwitchProps) => {
   const { disabled } = useFormFieldState({ disabled: disabledProp });
 
   return (

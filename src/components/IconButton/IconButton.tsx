@@ -13,7 +13,23 @@ import {
   iconButtonVariant,
 } from './IconButton.css';
 
-type Props = {
+/**
+ * アイコンボタンのバリアント。
+ *
+ * `primary` / `secondary` は塗りのある見た目。`-exposed` は塗りを持たず、
+ * 面の上に直接アイコンを置く見た目
+ */
+export type IconButtonVariant = 'primary' | 'secondary' | 'primary-exposed' | 'secondary-exposed';
+
+/**
+ * アイコンボタンのサイズ。`sm` / `md` の 2 段階。
+ *
+ * `lg` は意図的に持たない。タッチ領域は `md` で確保しているため、
+ * それ以上に大きくする必要がない
+ */
+export type IconButtonSize = Exclude<SizeType, 'lg'>;
+
+export type IconButtonProps = {
   /**
    * ボタンの中身
    */
@@ -21,11 +37,11 @@ type Props = {
   /**
    * ボタンのバリアント
    */
-  variant?: 'primary' | 'secondary' | 'primary-exposed' | 'secondary-exposed';
+  variant?: IconButtonVariant;
   /**
    * ボタンのサイズ
    */
-  size?: Exclude<SizeType, 'lg'>;
+  size?: IconButtonSize;
   /**
    * ボタンの selected 属性
    */
@@ -52,10 +68,7 @@ const SPINNER_VARIANTS = {
   secondary: 'dark',
   'primary-exposed': 'primary',
   'secondary-exposed': 'light',
-} as const satisfies Record<
-  NonNullable<Props['variant']>,
-  ComponentProps<typeof Spinner>['variant']
->;
+} as const satisfies Record<IconButtonVariant, ComponentProps<typeof Spinner>['variant']>;
 
 export const IconButton = ({
   children,
@@ -68,7 +81,7 @@ export const IconButton = ({
   className,
   onClick,
   ...props
-}: Props) => {
+}: IconButtonProps) => {
   const spinnerVariant = SPINNER_VARIANTS[variant];
 
   // CSS の pointer-events: none はマウスしか塞がないため、キーボード（Enter / Space）からの
