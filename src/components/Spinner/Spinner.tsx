@@ -13,11 +13,16 @@ const TRACK_PATH = (
 const ARC_PATH = <path d="M12 1C18.0752 1 23 5.92487 23 12" />;
 
 /**
- * スピナーのバリアント。
+ * スピナーのバリアント。**下地に何があるかで選ぶ。**
  *
- * `light` / `dark` は背景の明暗に合わせる。`accent` は意味カラーの塗り
- * （Button の primary など）に重ねるためのもので、`textOnAccent` と同じ色を描く。
- * アクセント塗りの上に `light` / `dark` を重ねてはいけない
+ * - `light` / `dark` … 背景の明暗に合わせる無彩色
+ * - `primary` … ページやカードの面の上でブランド色を見せたいとき。`primary.text`
+ *   （面に対して読める濃さの段）を描くので、面の上で単体のローディング表示に使う
+ * - `accent` … 意味カラーの**塗り**（Button の primary など）に重ねるとき。
+ *   `textOnAccent` と同じ色を描く
+ *
+ * アクセント塗りの上に `light` / `dark` / `primary` を重ねてはいけない。
+ * 塗りは両配色とも明るいため、コントラストが足りなくなる
  */
 export type SpinnerVariant = 'light' | 'dark' | 'primary' | 'accent';
 

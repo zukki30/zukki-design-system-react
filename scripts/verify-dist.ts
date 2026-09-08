@@ -181,7 +181,17 @@ try {
   execFileSync('pnpm', ['exec', ...tscArgs], { encoding: 'utf8', cwd: ROOT, stdio: 'pipe' });
 } catch (error) {
   typeProbeOk = false;
-  typeProbeOutput = (error as { stdout?: string }).stdout ?? String(error);
+
+  // tsc は診断を stdout に書くが、起動そのものに失敗したときは stderr にしか出ない。
+  // 両方拾わないと「下記参照」と出したまま中身が空になり、原因が分からなくなる。
+  // spawn 自体が失敗した場合はどちらも undefined なので、例外の文言へ落とす
+  const { stdout, stderr } = error as { stdout?: unknown; stderr?: unknown };
+
+  typeProbeOutput =
+    [stdout, stderr]
+      .filter((stream) => stream !== undefined && stream !== null && stream !== '')
+      .map(String)
+      .join('\n') || String(error);
 }
 
 check(
