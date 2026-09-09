@@ -119,7 +119,10 @@ for (const scheme of ['light', 'dark'] as const) {
 // （vite/client など）を読んでいない利用側では、README のとおりに書いただけで
 // 型エラーになってしまう。package.json の exports から types として引かせる
 for (const name of ['styles.css', 'styles-light.css', 'styles-dark.css']) {
-  writeFileSync(join(DIST, `${name}.d.ts`), '// 副作用 import 専用。値は export しない\nexport {};\n');
+  writeFileSync(
+    join(DIST, `${name}.d.ts`),
+    '// 副作用 import 専用。値は export しない\nexport {};\n'
+  );
 }
 
 console.log('styles.css / styles-light.css / styles-dark.css を出力しました');

@@ -6,6 +6,8 @@
 
   プレースホルダはビルド時にソースから差し込まれる。
   - {{COMPONENTS}}      … 下の descriptions ブロックと src/components/ から生成
+  - {{COMPOUND_NAMES}}  … `Card.Header = ...` のような代入から生成
+  - {{COMPOUND_PARTS}}  … 同上。パーツの一覧を手で書き写さない
   - {{ICON_NAMES}}      … src/components/Icon/types.ts から生成
   - {{EXPORTED_TYPES}}  … src/main.tsx から生成
 
@@ -54,7 +56,7 @@ import 'zukki-design-system/styles.css';
 import { Button, Card } from 'zukki-design-system';
 ```
 
-React 19 以上が必要です（peer dependency）。
+React 19（`^19.0.0`）が必要です（peer dependency）。
 
 ## 2. コンポーネント一覧
 
@@ -64,7 +66,7 @@ React 19 以上が必要です（peer dependency）。
 
 ## 3. compound components の組み方
 
-`Card` / `Dialog` / `FormField` / `Steps` は、**パーツを子として合成して組み立てます。**
+{{COMPOUND_NAMES}} は、**パーツを子として合成して組み立てます。**
 
 **スロット prop はありません。** `title` や `footer` に ReactNode を渡す API ではないため、次は型エラーになります。
 
@@ -90,12 +92,7 @@ React 19 以上が必要です（peer dependency）。
 
 各コンポーネントのパーツ。
 
-| ルート | パーツ |
-| --- | --- |
-| `Card` | `Card.Image` / `Card.Header` / `Card.Title` / `Card.Action` / `Card.Body` / `Card.Footer` |
-| `Dialog` | `Dialog.Header` / `Dialog.Title` / `Dialog.Body` / `Dialog.Footer` / `Dialog.Close` |
-| `FormField` | `FormField.Label` / `FormField.Control` / `FormField.HelperText` / `FormField.ErrorText` |
-| `Steps` | `Steps.Item` |
+{{COMPOUND_PARTS}}
 
 ### 覚えておくこと
 

@@ -91,11 +91,14 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 
 **公開 API やビルド設定を変えたら `pnpm verify:dist` を通してから完了とすること。** CI でも同じ検査が走ります。
 
-次の 2 つは**ビルドが成功したままでも壊れる**ため、設定を触るときは特に注意してください。
+次の 4 つは**ビルドが成功したままでも壊れる**ため、設定を触るときは特に注意してください。
 
 - **React の外部化**（`build.rollupOptions.external`）— 外れると React がバンドルに同梱され、利用側で二重に読み込まれて `Invalid hook call` になります
 - **`build.cssTarget`** — 外れると `light-dark()` がポリフィルへ変換されます。ポリフィルは `prefers-color-scheme` にしか反応せず、要素の `color-scheme` による切り替えができなくなります。値は README の対応ブラウザと揃えてください
 - **CJS の拡張子** — `package.json` が `type: module` なので、CJS を `.js` で出すと Node が ESM として解釈します。`require()` は例外を投げないまま **export が空になる**ため気づきにくく、`.cjs` である必要があります
+- **`exports` の `types` 条件** — 外れると利用側が `TS2882`（CSS の副作用 import）や `TS7016`（本体）で落ちます。ファイル自体は出力されているため、存在だけを見る検査では気づけません
+
+最後の 1 つがあるため、**`scripts/probes/` の probe は import 元をパッケージ名（`zukki-design-system`）で書きます。** `../../dist/main` のような相対パスにすると `exports` を一度も通らず、壊れていても検査が通ってしまいます。自分自身をパッケージ名で解決できるのは Node / TypeScript の self-reference によるもので、`name` と `exports` があれば効くため symlink も一時的な install も要りません。
 
 配色を固定した CSS は、`--color-*` のような意味的な変数ではなく、`createGlobalTheme` が生成するハッシュ変数（`--_xxx`）まで解決する必要があります。コンポーネントが実際に参照しているのはハッシュ変数のほうで、意味的な変数を差し替えても見た目は変わりません。
 
@@ -104,13 +107,14 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 利用側のプロジェクトで動くエージェントが参照できるのは、`node_modules` の `.d.ts` と `README.md`、そして同梱した `dist/AGENTS.md` だけです。3 つを揃えておくこと。
 
 - **公開する型はコンポーネント固有の名前にする。** props は `ComponentNameProps`、選択肢を持つ prop の union は `ButtonVariant` のように名前を付けて公開します。`SizeType` のような汎用的な名前は利用側の型と衝突するため公開しません
-- **`dist/AGENTS.md` は生成物です。手編集しないこと。** 内容を変えるときは `docs/agent-guide.template.md` を編集し、`pnpm build:agent-guide` で生成し直します。コンポーネント一覧・アイコン名・公開している型はソースから差し込まれるため、手で書き写しません
+- **`dist/AGENTS.md` は生成物です。手編集しないこと。** 内容を変えるときは `docs/agent-guide.template.md` を編集し、`pnpm build:agent-guide` で生成し直します。コンポーネント一覧・アイコン名・公開している型・compound components とそのパーツはソースから差し込まれるため、手で書き写しません
+- **compound components の一覧を手で持たないこと。** どれが合成かとパーツの顔ぶれは `Card.Header = CardHeader;` のような代入から読んでいます（`scripts/lib/sources.ts`）。手書きの一覧を足すと、コンポーネントを追加したときにそこだけが古くなり、しかも名前は載っているぶん網羅性の検査は通ってしまいます
 
-**コンポーネントを追加したときに要る作業は 3 つ**で、いずれも忘れると `pnpm verify:dist` が落ちます。
+**コンポーネントを追加したときに要る作業は 3 つ**で、compound かどうかによらず同じです。いずれも忘れると `pnpm verify:dist` が落ちます。
 
 1. Props 型を `src/main.tsx` まで公開する
 2. `docs/agent-guide.template.md` の `descriptions` に説明を書く
-3. `README.md` のコンポーネント一覧に足す
+3. `README.md` のコンポーネント一覧に足す（compound なら説明に `（合成）` を付ける）
 
 ## コンポーネント構成
 

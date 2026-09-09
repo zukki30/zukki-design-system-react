@@ -13,6 +13,9 @@ dist-ssr
 storybook-static
 *.local
 
+# verify-dist が生成する型 probe の置き場
+.tmp
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
