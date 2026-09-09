@@ -25,6 +25,7 @@
       "types": "./dist/styles-dark.css.d.ts",
       "default": "./dist/styles-dark.css"
     },
+    "./AGENTS.md": "./dist/AGENTS.md",
     "./package.json": "./package.json"
   },
   "files": [

@@ -7,6 +7,7 @@
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
 
 import { ROOT, readComponentNames, readCompoundParts, readIconNames } from './lib/sources';
@@ -220,7 +221,31 @@ if (!typeProbeOk) {
   );
 }
 
-// 8. 利用側エージェント向けのガイドが、現在のソースを反映している。
+// 8. 利用側エージェント向けのガイドが、exports のサブパスから解決できる。
+//
+// README が案内しているのは node_modules の実パスだが、そちらはレイアウトに
+// 依存するため、パスが変わらない経路として exports のエントリも維持している。
+// ファイル自体は出力されているので、「AGENTS.md がある」の検査では
+// exports から外れたことに気づけない
+const nodeRequire = createRequire(import.meta.url);
+
+const resolvesFromExports = (specifier: string) => {
+  try {
+    nodeRequire.resolve(specifier);
+
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+check(
+  'zukki-design-system/AGENTS.md が exports から解決できる',
+  resolvesFromExports('zukki-design-system/AGENTS.md'),
+  ''
+);
+
+// 9. ガイドの中身が、現在のソースを反映している。
 //
 // 生成物なので理屈のうえでは常に最新だが、build の実行順が崩れて古いものが
 // 残る事故はありうる。中身がソースと揃っているかまで見る
@@ -248,7 +273,7 @@ check(
   missingIcons.length === 0 ? `${iconNames.length} 件` : `不足: ${missingIcons.join(', ')}`
 );
 
-// 9. README の一覧が古くなっていない。
+// 10. README の一覧が古くなっていない。
 //
 // README は開発者向けの節も含むため生成の対象にしない。代わりに、追加した
 // コンポーネントを書き忘れたときに落ちるようにする
