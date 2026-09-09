@@ -6,10 +6,11 @@
  * 壊れるため機械で見る。
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-const ROOT = join(import.meta.dirname, '..');
+import { ROOT, readComponentNames, readCompoundParts, readIconNames } from './lib/sources';
+
 const DIST = join(ROOT, 'dist');
 
 const failures: string[] = [];
@@ -76,7 +77,11 @@ const styles = read('styles.css');
 const light = read('styles-light.css');
 const dark = read('styles-dark.css');
 
-check('既定 CSS が light-dark() を保持している', countOf(styles, 'light-dark(') > 0, `${countOf(styles, 'light-dark(')} 箇所`);
+check(
+  '既定 CSS が light-dark() を保持している',
+  countOf(styles, 'light-dark(') > 0,
+  `${countOf(styles, 'light-dark(')} 箇所`
+);
 check('light 版に light-dark() が残っていない', countOf(light, 'light-dark(') === 0, '');
 check('dark 版に light-dark() が残っていない', countOf(dark, 'light-dark(') === 0, '');
 
@@ -112,7 +117,11 @@ const ALWAYS_PACKED = ['README.md', 'package.json'];
 const paths = packed[0].files.map((f) => f.path);
 const unwanted = paths.filter((p) => !p.startsWith('dist/') && !ALWAYS_PACKED.includes(p));
 
-check('配布物に開発用のファイルが混ざっていない', unwanted.length === 0, `${paths.length} ファイル`);
+check(
+  '配布物に開発用のファイルが混ざっていない',
+  unwanted.length === 0,
+  `${paths.length} ファイル`
+);
 
 if (unwanted.length > 0) {
   console.log(`     混入: ${unwanted.slice(0, 10).join(', ')}`);
@@ -122,23 +131,23 @@ if (unwanted.length > 0) {
 //
 // 文字列一致では足りない。「main.d.ts に名前が現れる」ことと「利用側から
 // 解決できる」ことは別物で、barrel の再 export が抜けていれば前者は通ってしまう。
-// そのため tsc に実際に解決させる
-const componentNames = readdirSync(join(ROOT, 'src', 'components'), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort();
+// そのため tsc に実際に解決させる。
+//
+// **import 元は必ずパッケージ名にする。** dist/main.d.ts を相対パスで直接読むと
+// package.json の exports を一度も通らず、exports の types 条件が外れても検査が
+// 通ってしまう（利用側は TS2882 / TS7016 で落ちているのに気づけない）。
+// 自分自身をパッケージ名で解決できるのは Node / TypeScript の self-reference による。
+// name と exports があれば効くため、symlink も一時的な install も要らない
+const componentNames = readComponentNames();
 
-const probeDir = join(ROOT, 'node_modules', '.tmp', 'probes');
+const probeDir = join(ROOT, '.tmp', 'probes');
 mkdirSync(probeDir, { recursive: true });
-
-// probe は node_modules 配下に置くため、dist への相対パスを算出する
-const distMainSpecifier = relative(probeDir, join(DIST, 'main')).split(sep).join('/');
 
 // コンポーネントが増えれば probe も自動的に増えるため、公開し忘れが必ず落ちる
 const propsTypes = componentNames.map((name) => `${name}Props`);
 const generatedProbe = [
   '// scripts/verify-dist.ts が生成する。手で編集しない',
-  `import type {\n${propsTypes.map((t) => `  ${t},`).join('\n')}\n} from '${distMainSpecifier}';`,
+  `import type {\n${propsTypes.map((t) => `  ${t},`).join('\n')}\n} from 'zukki-design-system';`,
   '',
   ...propsTypes.map((t, i) => `type _${i} = ${t};`),
   '',
@@ -195,7 +204,7 @@ try {
 }
 
 check(
-  `${componentNames.length} コンポーネントの Props 型が利用側から解決できる`,
+  `${componentNames.length} コンポーネントの Props 型と CSS の import が利用側から解決できる`,
   typeProbeOk,
   typeProbeOk ? '' : '下記参照'
 );
@@ -227,12 +236,9 @@ check(
   missingInGuide.length === 0 ? `${componentNames.length} 件` : `不足: ${missingInGuide.join(', ')}`
 );
 
-const iconNames = [
-  ...readFileSync(join(ROOT, 'src', 'components', 'Icon', 'types.ts'), 'utf8')
-    .replace(/[\s\S]*export const iconNames = \[/, '')
-    .replace(/\][\s\S]*/, '')
-    .matchAll(/'([^']+)'/g),
-].map((m) => m[1]);
+// 読み取りは scripts/lib/sources.ts に集約している。ここで独自に正規表現を
+// 書くと、読めなかったときに空配列となり、検査が空振りしたまま ✅ になる
+const iconNames = readIconNames();
 
 const missingIcons = iconNames.filter((name) => !guide.includes(`\`${name}\``));
 
@@ -252,7 +258,25 @@ const missingInReadme = componentNames.filter((name) => !readme.includes(`\`${na
 check(
   'README に全コンポーネントが載っている',
   missingInReadme.length === 0,
-  missingInReadme.length === 0 ? `${componentNames.length} 件` : `不足: ${missingInReadme.join(', ')}`
+  missingInReadme.length === 0
+    ? `${componentNames.length} 件`
+    : `不足: ${missingInReadme.join(', ')}`
+);
+
+// ガイドの「合成」列はソースから生成されるが、README の「（合成）」は手書きなので
+// 書き忘れうる。行ごとに突き合わせて、印の付け忘れと付けすぎの両方を見る
+const compoundNames = [...readCompoundParts().keys()];
+
+const mismarked = componentNames.filter((name) => {
+  const row = readme.split('\n').find((line) => line.startsWith(`| \`${name}\` |`));
+
+  return row === undefined || row.includes('（合成）') !== compoundNames.includes(name);
+});
+
+check(
+  'README の「（合成）」が compound components と一致している',
+  mismarked.length === 0,
+  mismarked.length === 0 ? `合成 ${compoundNames.length} 件` : `不一致: ${mismarked.join(', ')}`
 );
 
 if (failures.length > 0) {

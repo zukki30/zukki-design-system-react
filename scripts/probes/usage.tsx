@@ -12,8 +12,15 @@
  *
  * `scripts/` は tsconfig の include に入っていないため、`pnpm typecheck` の
  * 対象にはならない（dist が無い状態で落ちない）。
+ *
+ * **import 元はパッケージ名で書くこと。** `../../dist/main` のような相対パスで
+ * 書くと package.json の exports を通らず、exports が壊れていても通ってしまう。
+ * 自分自身をパッケージ名で解決できるのは Node / TypeScript の self-reference による
  */
 import type { ReactNode } from 'react';
+
+// 利用側が README のとおりに書く形。exports の types 条件が外れると TS2882 で落ちる
+import 'zukki-design-system/styles.css';
 
 import {
   Button,
@@ -35,7 +42,7 @@ import {
   type SpinnerVariant,
   type TagVariant,
   type ZukkiVariantType,
-} from '../../dist/main';
+} from 'zukki-design-system';
 
 /* ------------------------------------------------------------------ *
  * 書けるべきもの
@@ -56,6 +63,12 @@ const TAG_VARIANTS: TagVariant[] = ['default', 'red', 'works'];
 // zukki サイト固有のバリアントを利用側の型に組み込める
 type SectionTheme = { variant: ZukkiVariantType; label: string };
 const SECTIONS: SectionTheme[] = [{ variant: 'profile', label: 'プロフィール' }];
+
+// 配色を固定した CSS も同じ経路で解決できる。
+// 3 つ同時に import すると「1 つだけ読み込む」という案内と矛盾するため、
+// 副作用 import ではなく型参照で確かめる
+export type LightCss = typeof import('zukki-design-system/styles-light.css');
+export type DarkCss = typeof import('zukki-design-system/styles-dark.css');
 
 // アイコン名を型でも値でも扱える
 const renderIcon = (name: IconName) => <Icon name={name} width={16} height={16} />;
@@ -146,9 +159,12 @@ const SlotProp = () => <Dialog open title="確認" />;
 // @ts-expect-error level に 1 は含まれない
 const WrongHeadingLevel = () => <Card.Title level={1}>タイトル</Card.Title>;
 
-// 内部専用のものは公開しない
+// 内部専用のものは公開しない。
+// inline import 型で書く。`import type { SizeType }` にすると未使用の import が
+// 同じ行に残り、`noUnusedLocals` を足したときに @ts-expect-error がそちらで
+// 満たされて、このアサーションが黙って無効になる
 // @ts-expect-error SizeType は汎用的すぎるため公開していない（ButtonSize を使う）
-import type { SizeType } from '../../dist/main';
+export type NoSizeType = import('zukki-design-system').SizeType;
 
 /* 未使用エラーを避けるためにまとめて参照する（実行はしない） */
 export const PROBE = {

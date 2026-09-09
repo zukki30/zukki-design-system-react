@@ -7,7 +7,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'index.html'] },
+  { ignores: ['dist', '.tmp', 'index.html'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
@@ -61,6 +61,14 @@ export default tseslint.config(
     // ライブラリのエントリポイントは再 export しかしないため、
     // Fast Refresh（コンポーネント以外を export しない）の制約は当てはまらない
     files: ['src/main.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    // 配布物の型を利用側と同じ書き方で使ってみる probe。型が通ること自体がテストで、
+    // 描画もしなければ Fast Refresh にも載らないため、その制約は当てはまらない
+    files: ['scripts/probes/**/*.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

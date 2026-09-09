@@ -4,20 +4,22 @@
  * 散文は docs/agent-guide.template.md に手で書き、コンポーネント一覧・アイコン名・
  * 公開している型はソースから差し込む。**ビルドのたびに作り直すため古くならない。**
  *
+ * compound components の扱い（どれが合成か・どんなパーツを持つか）もソースから
+ * 読む。手書きの一覧を持つと、コンポーネントを足したときに一覧だけが古くなり、
+ * しかも網羅性の検査は名前が載っているぶん通ってしまう。
+ *
  * repo 直下ではなく dist/ に出すのは 2 つの理由による。
  * - 直下の AGENTS.md はこのリポジトリで作業する人向けの規約で、配るものではない
  * - verify-dist.ts が「配布物に dist/ 以外が混ざっていないこと」を検査している。
  *   直下に置くとその例外を増やすことになり、開発用ファイルの混入を検知する力が落ちる
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ROOT = join(import.meta.dirname, '..');
+import { ROOT, readComponentNames, readCompoundParts, readIconNames } from './lib/sources';
+
 const TEMPLATE = join(ROOT, 'docs', 'agent-guide.template.md');
 const OUTPUT = join(ROOT, 'dist', 'AGENTS.md');
-
-/** compound components。パーツを合成して組み立てるもの */
-const COMPOUND = new Set(['Card', 'Dialog', 'FormField', 'Steps']);
 
 const template = readFileSync(TEMPLATE, 'utf8');
 
@@ -47,11 +49,8 @@ const readDescriptions = () => {
   return descriptions;
 };
 
-const componentNames = readdirSync(join(ROOT, 'src', 'components'), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort();
-
+const componentNames = readComponentNames();
+const compoundParts = readCompoundParts();
 const descriptions = readDescriptions();
 
 // テンプレートに説明が無いコンポーネントがあれば止める。
@@ -76,20 +75,19 @@ const componentTable = [
   '| コンポーネント | 説明 | 合成 |',
   '| --- | --- | --- |',
   ...componentNames.map(
-    (name) => `| \`${name}\` | ${descriptions.get(name)} | ${COMPOUND.has(name) ? '✓' : '' } |`
+    (name) => `| \`${name}\` | ${descriptions.get(name)} | ${compoundParts.has(name) ? '✓' : ''} |`
   ),
 ].join('\n');
 
-/** src/components/Icon/types.ts の iconNames をそのまま読む */
-const readIconNames = () => {
-  const source = readFileSync(join(ROOT, 'src', 'components', 'Icon', 'types.ts'), 'utf8');
-  const block = /export const iconNames = \[([\s\S]*?)\] as const;/.exec(source);
-  if (block === null) {
-    throw new Error('src/components/Icon/types.ts から iconNames を読めません');
-  }
+const compoundNames = [...compoundParts.keys()].map((name) => `\`${name}\``).join(' / ');
 
-  return [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
-};
+const compoundPartsTable = [
+  '| ルート | パーツ |',
+  '| --- | --- |',
+  ...[...compoundParts].map(
+    ([name, parts]) => `| \`${name}\` | ${parts.map((part) => `\`${name}.${part}\``).join(' / ')} |`
+  ),
+].join('\n');
 
 const iconNames = readIconNames();
 const iconList = iconNames.map((name) => `\`${name}\``).join(' / ');
@@ -142,6 +140,8 @@ const rendered = template
   // 先頭の管理用コメントは配布物に出さない
   .replace(/^<!--[\s\S]*?-->\n+/, '')
   .replace('{{COMPONENTS}}', componentTable)
+  .replace('{{COMPOUND_NAMES}}', compoundNames)
+  .replace('{{COMPOUND_PARTS}}', compoundPartsTable)
   .replace('{{ICON_NAMES}}', iconList)
   .replace('{{EXPORTED_TYPES}}', exportedTypes);
 
@@ -159,5 +159,5 @@ if (!existsSync(distDir)) {
 writeFileSync(OUTPUT, rendered);
 
 console.log(
-  `AGENTS.md を出力しました（${componentNames.length} コンポーネント / ${iconNames.length} アイコン / 型 ${types.length} 件）`
+  `AGENTS.md を出力しました（${componentNames.length} コンポーネント / うち合成 ${compoundParts.size} / ${iconNames.length} アイコン / 型 ${types.length} 件）`
 );
