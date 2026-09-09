@@ -20,5 +20,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts", "vitest.config.ts"]
+  "include": ["vite.config.ts", "vitest.config.ts", "scripts"],
+  // probes は配布物（dist）の型を検査するためのもので、verify-dist.ts が tsc に
+  // 直接渡す。ここに入れると dist が無い状態の pnpm typecheck が落ちる
+  "exclude": ["scripts/probes"]
 }

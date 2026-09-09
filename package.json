@@ -71,8 +71,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
     "@chromatic-com/storybook": "^5.3.1",
     "@eslint/js": "^10.0.1",
     "@storybook/addon-a11y": "10.6.0",
@@ -83,6 +81,7 @@
     "@storybook/react-vite": "^10.6.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.13.3",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "@vanilla-extract/css": "^1.21.2",
@@ -100,6 +99,8 @@
     "jsdom": "^30.0.1",
     "playwright": "^1.62.1",
     "prettier": "^3.9.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "storybook": "^10.6.0",
     "style-dictionary": "^5.5.2",
     "token-transformer": "^0.0.33",

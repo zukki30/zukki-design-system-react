@@ -10,8 +10,8 @@
  * - 書けないべきもの … `@ts-expect-error` を付ける。エラーが出なくなると
  *   「未使用の @ts-expect-error」として逆に落ちるため、型が緩んだことを検知できる
  *
- * `scripts/` は tsconfig の include に入っていないため、`pnpm typecheck` の
- * 対象にはならない（dist が無い状態で落ちない）。
+ * `scripts/probes` は tsconfig.node.json の exclude に入れてあるため、`pnpm typecheck`
+ * の対象にはならない（dist が無い状態で落ちない）。scripts/ の他のファイルは対象。
  *
  * **import 元はパッケージ名で書くこと。** `../../dist/main` のような相対パスで
  * 書くと package.json の exports を通らず、exports が壊れていても通ってしまう。
