@@ -94,13 +94,15 @@ export const IconButton = ({
       onClick={handleClick}
       className={clsx(styles.iconButton, className)}
       disabled={disabled}
+      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
+      aria-busy={loading}
+      {...props}
+      // data-* は CSS が見た目を引くためのもの。props と常に一致させたいので、
+      // 利用側の props より後に指定して上書きさせない
       data-variant={variant}
       data-size={size}
       data-selected={selected}
       data-loading={loading}
-      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
-      aria-busy={loading}
-      {...props}
     >
       <span className={styles.iconButton__inner} data-loading={loading}>
         {children}

@@ -179,6 +179,31 @@ describe('IconButton', () => {
     expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('data-size', size);
   });
 
+  it('見た目を決める data-* は利用側から上書きできない', () => {
+    // data-* はスタイルの分岐に使うため、props と食い違わせない。
+    // 食い違わせられると、variant は primary なのに secondary の見た目になる
+    render(
+      <IconButton
+        aria-label="ホーム"
+        variant="primary"
+        size="md"
+        data-variant="secondary"
+        data-size="sm"
+        data-selected="true"
+        data-loading="true"
+      >
+        {icon}
+      </IconButton>
+    );
+
+    const button = screen.getByRole('button', { name: 'ホーム' });
+
+    expect(button).toHaveAttribute('data-variant', 'primary');
+    expect(button).toHaveAttribute('data-size', 'md');
+    expect(button).not.toHaveAttribute('data-selected');
+    expect(button).not.toHaveAttribute('data-loading');
+  });
+
   it.each(['primary', 'secondary', 'primary-exposed', 'secondary-exposed'] as const)(
     'variant=%s を data-variant に反映する',
     (variant) => {

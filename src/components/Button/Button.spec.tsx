@@ -156,6 +156,30 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: '送信' })).toHaveAttribute('data-variant', variant);
   });
 
+  it('見た目を決める data-* は利用側から上書きできない', () => {
+    // data-* はスタイルの分岐に使うため、props と食い違わせない。
+    // 食い違わせられると、variant は default なのに primary の見た目になる
+    render(
+      <Button
+        variant="default"
+        size="md"
+        data-variant="primary"
+        data-size="sm"
+        data-selected="true"
+        data-loading="true"
+      >
+        送信
+      </Button>
+    );
+
+    const button = screen.getByRole('button', { name: '送信' });
+
+    expect(button).toHaveAttribute('data-variant', 'default');
+    expect(button).toHaveAttribute('data-size', 'md');
+    expect(button).not.toHaveAttribute('data-selected');
+    expect(button).not.toHaveAttribute('data-loading');
+  });
+
   it('size / variant を省略すると md / default になる', () => {
     render(<Button>送信</Button>);
 
