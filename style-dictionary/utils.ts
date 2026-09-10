@@ -1,5 +1,7 @@
 import StyleDictionary from 'style-dictionary';
 import type { Config, Token } from 'style-dictionary';
+import { propertyFormatNames } from 'style-dictionary/enums';
+import { formattedVariables } from 'style-dictionary/utils';
 
 type ColorTokenJsonFileNameType = 'light' | 'dark';
 
@@ -24,7 +26,8 @@ export const cssFileDefaultCofig = (colorTokenJsonFileName: ColorTokenJsonFileNa
         files: [
           {
             destination: `variables-${colorTokenJsonFileName}-only.css`,
-            format: 'css/variables',
+            format: 'css/variables-with-color-scheme',
+            options: { colorScheme: colorTokenJsonFileName },
           },
         ],
       },
@@ -78,6 +81,22 @@ export const buildTokens = async (
 ): Promise<void> => {
   const styleDictionary = new StyleDictionary(cssFileDefaultCofig(colorTokenJsonFileName));
   await styleDictionary.hasInitialized;
+
+  // 配色を固定した変数一式に color-scheme も含める。
+  //
+  // このファイルは配布する styles-light.css / styles-dark.css の土台になる。
+  // color-scheme が抜けていると、CSS で色を指定していない UA 描画のパーツ
+  // （フォームコントロールやスクロールバー）だけが OS 設定に従い、
+  // 指定した配色と食い違う
+  styleDictionary.registerFormat({
+    name: 'css/variables-with-color-scheme',
+    format: ({ dictionary, file, options }) =>
+      `:root {\n  color-scheme: ${options.colorScheme};\n}\n\n:root {\n${formattedVariables({
+        format: propertyFormatNames.css,
+        dictionary,
+        outputReferences: file.options?.outputReferences,
+      })}\n}\n`,
+  });
 
   // font-size を rem に変換するトランスフォーム
   styleDictionary.registerTransform({

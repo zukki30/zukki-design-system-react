@@ -1,4 +1,8 @@
 :root {
+  color-scheme: light;
+}
+
+:root {
   --color-focus: #0e70f1;
   --color-text-on-light-default: #15171a;
   --color-text-on-light-strong: #000000;

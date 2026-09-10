@@ -1,0 +1,75 @@
+/*
+ * 複数のコンポーネントで共有するスタイル。`composes:` で引く。
+ *
+ *   .tag__label {
+ *     composes: truncate from '@/styles/mixins.module.css';
+ *   }
+ *
+ * ここに置くのは「宣言だけで、引く側の宣言と衝突しないもの」に限る。
+ * 衝突しうるものを置くと、勝敗が出力順（＝どのファイルが先に import されたか）に
+ * 依存してしまう。モーション低減（`prefers-reduced-motion`）を共有クラスにしていない
+ * のはこのためで、あちらは各コンポーネントのルール内に `@media` を直接書く。
+ * 同一ルール内ならベース宣言より後に置かれ、出力順によらず上書きできる。
+ */
+
+/*
+ * 入力系コンポーネントを UA 描画のパーツごとライト配色に固定する。
+ *
+ * `variables.css` の `:root` は `color-scheme: light dark` を宣言している一方、
+ * 入力面のトークンはライト・ダークとも白背景 + 濃色テキストで実質ライト固定になっている
+ * （`--color-input-background-default` / `--color-text-on-light-default`）。
+ * そのため OS がダークだと、CSS で色を指定していない UA 描画のパーツだけが暗く描画され、
+ * 明るいフィールドの上に暗い選択ハイライトやネイティブウィジェット（`type="date"` の
+ * ピッカーなど）、スクロールバー、オートフィル背景が載ってしまう。
+ *
+ * `color-scheme` は継承プロパティなので、フィールド単体ではなくコンポーネントのルート要素
+ * に置く。そうしないとフィールドと装飾要素で `light-dark()` の解決側がずれる
+ * （Select ではエラー状態のときシェブロンだけダーク解決になりコントラストが落ちた）。
+ *
+ * 副作用として、適用した要素の内側で参照する `light-dark()` はすべてライト側に固定される。
+ * パレット系トークンにダーク値を持たせたまま入力系だけを揃えたいので、`:root` ではなく
+ * コンポーネント単位でスコープを絞って適用する。
+ *
+ * この副作用が唯一フィールドの外に及ぶのがフォーカスリングで、`--color-focus` は
+ * `light-dark(#0e70f1, #5b9ef5)` とライト・ダークで値が異なる。入力系はいずれも
+ * `outline-offset` を持つため、リングはホストアプリのページ背景の上に載り、ダーク背景
+ * （例: `#15171a`）でのコントラストは約 6.5:1 から約 3.9:1 に下がる。WCAG 1.4.11 の
+ * 非テキスト 3:1 は満たしており、リングの色がコンポーネント間でぶれないほうを優先する。
+ * なお `color-scheme` は要素単位のプロパティなので、`:focus-visible` の宣言だけ解決側を
+ * 戻すことはできない（フォーカス中だけ UA 描画のパーツが暗転してしまう）。
+ */
+.inputColorSchemeLight {
+  color-scheme: light;
+}
+
+/*
+ * インタラクティブ要素（ボタン・クリック可能な領域）向けのタッチ操作最適化。
+ *
+ * - `touch-action: manipulation` — ダブルタップズームを無効化し、モバイルブラウザの
+ *   タップ後 約 300ms の遅延をなくす
+ * - `-webkit-tap-highlight-color: transparent` — iOS Safari / Android Chrome の
+ *   既定のタップハイライトを消し、hover / focus-visible の表現に統一する
+ */
+.interactiveTouch {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * 1 行に収め、あふれたぶんを省略記号（…）で示す。
+ *
+ * - `min-width: 0` — flex / grid アイテムの自動最小サイズ（`min-content`）を解除する。
+ *   これがないとコンテンツ幅より縮まないため、以降の宣言が発動しない
+ * - `overflow: hidden` / `text-overflow: ellipsis` / `white-space: nowrap` — 省略表示の 3 点セット
+ *
+ * `text-overflow` は flex / grid コンテナ自身には効かないため、テキストを直接持つ要素
+ * （多くの場合はラベル専用の要素）に適用する。
+ *
+ * 省略してもテキストは DOM に残るため、スクリーンリーダーは全文を読み上げる。
+ */
+.truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

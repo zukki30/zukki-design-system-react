@@ -34,8 +34,10 @@
   ],
   "scripts": {
     "dev": "pnpm storybook",
-    "build": "tsc -b && vite build && tsx scripts/build-css-variants.ts && tsx scripts/build-agent-guide.ts",
+    "build": "pnpm build:css-types && tsc -b && vite build && tsx scripts/build-css-variants.ts && tsx scripts/build-agent-guide.ts",
     "build:agent-guide": "tsx scripts/build-agent-guide.ts",
+    "build:css-types": "tsx scripts/build-css-module-types.ts",
+    "check:css-types": "tsx scripts/build-css-module-types.ts --check",
     "typecheck": "tsc -b",
     "verify:dist": "tsx scripts/verify-dist.ts",
     "lint": "eslint \"{src,scripts}/**/*.{ts,tsx}\" --fix",
