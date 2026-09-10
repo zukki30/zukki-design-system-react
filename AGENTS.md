@@ -55,24 +55,30 @@ pnpm test:watch     # ウォッチモード
 pnpm test:coverage  # カバレッジ付き
 pnpm test:a11y      # 全ストーリーを実ブラウザで動かして a11y を検査（ライト / ダーク両配色）
 
-# デザイントークン（Figma → CSS 変数 → TypeScript）
+# デザイントークン（Figma → CSS 変数）
 pnpm token:transform   # Figma エクスポート → JSON
-pnpm build:tokens      # JSON → CSS + TypeScript ファイル
+pnpm build:tokens      # JSON → CSS 変数（両対応版 + 配色固定版 2 種）
+
+# CSS Modules のクラス名の型
+pnpm build:css-types   # *.module.css.d.ts を生成する
+pnpm check:css-types   # 生成物が最新かを検査する（CI と同じ）
 ```
 
 ## アーキテクチャ
 
-TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポーネントライブラリ**（デザインシステム）です。コンポーネントは Storybook 上でドキュメント化・開発します。
+TypeScript と CSS Modules で構築した **React コンポーネントライブラリ**（デザインシステム）です。コンポーネントは Storybook 上でドキュメント化・開発します。
 
-**技術スタック:** React 19 / TypeScript 6 / Vite 8 / Vanilla Extract / Vitest 5 / Storybook 10
+**技術スタック:** React 19 / TypeScript 6 / Vite 8 / CSS Modules / Vitest 5 / Storybook 10
 
 **ライブラリのエントリポイント:** `src/main.tsx` で全コンポーネントを export します。Vite は ES モジュール（`zukki-design-system.js`）と CJS（`zukki-design-system.cjs`）の両方を出力します。配布物の詳細は「配布物」の節を参照してください。
 
-**デザイントークンのパイプライン:** Figma（tokens.json）→ `pnpm token:transform` → `style-dictionary/tokens/*.json` → `pnpm build:tokens` → `src/design-tokens/*.ts` ＋ `src/styles/theme.css.ts` 内のグローバル CSS 変数。
+**デザイントークンのパイプライン:** Figma（tokens.json）→ `pnpm token:transform` → `style-dictionary/tokens/*.json` → `pnpm build:tokens` → `src/styles/variables*.css`。
 
-すべてのコンポーネントスタイルは、`src/styles/theme.css.ts` から export される `vars` オブジェクト経由で CSS 変数を参照します。
+生成されるのは 3 つです。`variables.css` が `light-dark()` を保持した両対応版、`variables-light-only.css` / `variables-dark-only.css` が配色を固定した版で、後者 2 つは配布 CSS の固定版を作るときに使います。
 
-**その他の置き場所:** `figma/tokens.json` は Tokens Studio のエクスポートで、変換は `style-dictionary/` が担います。Vitest の環境設定は `test/setup.ts` です。生成物（`src/design-tokens/`、`src/styles/` の CSS）は手編集しません。
+すべてのコンポーネントスタイルは、この意味的な CSS 変数を `var(--color-primary-default)` の形で直接参照します。
+
+**その他の置き場所:** `figma/tokens.json` は Tokens Studio のエクスポートで、変換は `style-dictionary/` が担います。Vitest の環境設定は `test/setup.ts` です。生成物（`src/styles/variables*.css`、`*.module.css.d.ts`）は手編集しません。
 
 ## 配布物
 
@@ -100,7 +106,9 @@ TypeScript と Vanilla Extract（CSS-in-JS）で構築した **React コンポ�
 
 最後の 1 つがあるため、**`scripts/probes/` の probe は import 元をパッケージ名（`zukki-design-system`）で書きます。** `../../dist/main` のような相対パスにすると `exports` を一度も通らず、壊れていても検査が通ってしまいます。自分自身をパッケージ名で解決できるのは Node / TypeScript の self-reference によるもので、`name` と `exports` があれば効くため symlink も一時的な install も要りません。
 
-配色を固定した CSS は、`--color-*` のような意味的な変数ではなく、`createGlobalTheme` が生成するハッシュ変数（`--_xxx`）まで解決する必要があります。コンポーネントが実際に参照しているのはハッシュ変数のほうで、意味的な変数を差し替えても見た目は変わりません。
+配色を固定した CSS は、ビルド済み CSS から `:root { … }` を丸ごと落とし、`src/styles/variables-{light,dark}-only.css` を前置して作ります（`scripts/build-css-variants.ts`）。コンポーネントは `:root` を使わないため、これで変数定義だけを正確に切り離せます。
+
+**落とし残しと落としすぎの両方を検査しています。** 残せば固定版に `light-dark()` が残り、落としすぎれば固定版から変数が消えます。後者はファイルが出力されているぶん気づきにくいため、`verify:dist` が「固定版に既定 CSS と同じ変数がそろっている」ことを見ています。
 
 ### 利用側に届ける情報
 
@@ -128,7 +136,8 @@ ComponentName/
 │   └── index.ts
 ├── ComponentName.tsx         # コンポーネント実装
 ├── ComponentName.stories.tsx # Storybook ストーリー
-├── ComponentName.css.ts      # Vanilla Extract スタイル
+├── ComponentName.module.css      # CSS Modules スタイル
+├── ComponentName.module.css.d.ts # 生成物。手編集しない
 └── index.ts                  # バレルエクスポート
 ```
 
@@ -144,11 +153,12 @@ ComponentName/
 ├── ComponentNameContext.ts       # context の定義と取得フック
 ├── ComponentNameContext.spec.tsx # context のテスト
 ├── ComponentName.stories.tsx
-├── ComponentName.css.ts
+├── ComponentName.module.css
+├── ComponentName.module.css.d.ts
 └── index.ts
 ```
 
-パーツはルートと同じ `ComponentName.tsx` に置きます。ただし専用の `.css.ts` を持つパーツは、スタイルとセットで独立させたほうが見通しがよいため別ファイルに分けます（例: `StepsItem.tsx` と `StepsItem.css.ts`）。
+パーツはルートと同じ `ComponentName.tsx` に置きます。ただし専用の `.module.css` を持つパーツは、スタイルとセットで独立させたほうが見通しがよいため別ファイルに分けます（例: `StepsItem.tsx` と `StepsItem.module.css`）。
 
 複数のコンポーネントで共有するフックは `src/hooks/` 直下に置きます（例: `src/hooks/useMergedRef.ts`）。単一コンポーネントでしか使わないフックは、上記のとおりそのコンポーネント配下の `hooks/` に置きます。
 
@@ -179,7 +189,7 @@ src/utils/
 - 条件付き className の結合には `clsx()` を使用する
 - `useEffect` の使用は最小限に抑え、宣言的なパターンを優先する
 - 深い `if/else` のネストを避け、条件が複数ある場合は `switch` を使用する
-- **相互排他な見た目の選択肢は boolean ではなく文字列 union で表す**（`circle?: boolean` ではなく `shape?: 'rect' | 'circle'`）。選択肢が 3 つ目に増えても破壊的変更にならず、`data-*` 属性や `styleVariants()` のキーにそのまま使える。union は `SkeletonShape` のように名前付きで export する
+- **相互排他な見た目の選択肢は boolean ではなく文字列 union で表す**（`circle?: boolean` ではなく `shape?: 'rect' | 'circle'`）。選択肢が 3 つ目に増えても破壊的変更にならず、`data-*` 属性の値にそのまま使える。union は `SkeletonShape` のように名前付きで export する
   - ただし真偽で意味が完結する状態（`disabled` / `loading` / `error` / `required` など）は boolean のままでよい
 
 **任意 prop の条件描画:**
@@ -292,12 +302,70 @@ src/utils/
   - ESLint の `no-restricted-imports` で機械的に担保している
 - `*.stories.tsx` / `*.spec.tsx` は例外として barrel 経由を許容する。配布物に含まれず、利用者と同じ経路で import するほうがドキュメント・テストとして妥当なため
 
-**スタイリング（Vanilla Extract）:**
+**スタイリング（CSS Modules）:**
 
-- スタイルはすべて `ComponentName.css.ts` 内に `@vanilla-extract/css` を用いて記述する
-- クラスセレクタは BEM 命名に従う
-- すべての値に `src/styles/theme.css.ts` の `vars` を使用する（色・余白などのハードコード禁止）
-- コンポーネントのバリアントには `styleVariants()` を使用する
+- スタイルはすべて `ComponentName.module.css` に書く。TSX からは `import styles from './ComponentName.module.css'` で読む
+- **クラス名は BEM に従い、修飾子（`--`）は使わない。** ブロックはコンポーネント名の camelCase、要素は `__` で継ぐ（`.button` / `.button__inner` / `.button__label`）。`__` を含む名前は JavaScript の識別子として妥当なので `styles.button__inner` とドットで引ける。`-` を含む名前を作らないのはこのため
+- 値は意味的な CSS 変数を `var(--color-primary-default)` の形で直接参照する（色・余白などのハードコード禁止）
+- **相互排他な見た目の選択肢は `data-*` 属性で表す。** 既存の `data-selected` / `data-error` / `data-loading` と書き味が揃い、パーツの出し分けを親セレクタから書けるため TSX 側で `buttonLabel[size]` のような受け渡しが要らなくなる
+
+  ```tsx
+  <button className={styles.button} data-variant={variant} data-size={size}>
+    <span className={styles.button__label}>{children}</span>
+  </button>
+  ```
+
+  ```css
+  .button[data-variant='primary'] {
+    background-color: var(--color-primary-default);
+  }
+  .button[data-size='sm'] .button__label {
+    font-size: var(--font-size-xs);
+  }
+  ```
+
+- **入れ子にできるコンポーネントは、子孫セレクタで値を配らない。** `Card` のように自身の内側へ自身を置けるものは、`.card[data-size='sm'] .card__body` が内側のパーツにも同じ詳細度で当たり、勝敗が出力順で決まってしまう。**継承するカスタムプロパティに値を持たせ**、内側が上書きする形にする。パーツがルート直下にあるかどうかにも依存しなくなる
+
+  ```css
+  .card {
+    --zds-card-padding: var(--spacing-2xl);
+  }
+  .card[data-size='sm'] {
+    --zds-card-padding: var(--spacing-xl);
+  }
+  .card__body {
+    padding: var(--zds-card-padding);
+  }
+  ```
+
+- **CSS で持つ独自のカスタムプロパティには `--zds-<component>-` を前置する。** 変数名は CSS Modules のスコープ対象外で、利用側の変数と衝突しうる。ファイルローカルな定数（サイズや導出値）はこの形で持ち、`calc()` の中で意図が読めるようにする
+- **数値には必ず単位を書く。** `border-width: 1` は無効値で、宣言ごと破棄される
+- 共有 mixin は `src/styles/mixins.module.css` から `composes:` で引く。**パスは相対で書く**（`@/` エイリアスは `composes … from` の解決経路を通らず、`fileResolve` の戻り値が絶対パスでないとしてビルドが落ちる）
+
+  ```css
+  .tag__label {
+    composes: truncate from '../../styles/mixins.module.css';
+  }
+  ```
+
+- **モーション低減（`prefers-reduced-motion`）は共有せず、各ルールの中に直接書く。** 別クラスにすると `transition: none` とベースの `transition` が別ルールの宣言になり、勝敗が出力順（＝どのファイルが先に import されたか）に依存する。同一ルール内ならベース宣言より後に置かれ、順序によらず上書きできる
+
+  ```css
+  .button {
+    transition: background-color 0.2s ease-in-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+      animation: none;
+    }
+  }
+  ```
+
+  同じ理由で、`mixins.module.css` に置いてよいのは「宣言だけで、引く側の宣言と衝突しないもの」に限る
+
+- **要素セレクタはスコープされない。** `option` や `svg` は素の要素セレクタとして書ける（`.select__field option { … }`）。グローバルへ書き出す仕掛けは要らない
+- **サイズなど、CSS と TSX の両方が知る必要のある値は CSS に寄せる。** 例えば `Tag` の閉じるアイコンは `.tag__closeButton > svg { width: 100% }` で大きさを決め、`<Icon>` に `width` / `height` を渡さない。両方に数値を書くと必ず片方が古くなる
+- **クラス名の型は生成物。** `*.module.css.d.ts` を `pnpm build:css-types` で生成してコミットする。これが無いと `vite/client` の索引シグネチャが効き、`styles.buttonn` のような綴り違いが型エラーにならず黙って「クラス未適用」になる。クラス名は Vite の `css.modules.getJSON` から受け取っているので、`composes` の扱いも含めて実ビルドと必ず一致する
 
 **配色トークンの使い分け:**
 
@@ -325,7 +393,7 @@ src/utils/
 
 - 塗りが両配色とも明るいため、`hover` / `seleted` は**明るくなる方向**にしか動かせない（濃くするとラベルが 4.5:1 を割る）。ライト配色では選択状態が淡く見えるが、ラベルのコントラストは保たれる
 - Button のように塗りの上へ重ねるスピナーは `Spinner` の `accent` バリアントを使う。`light` / `dark` は背景の明暗に合わせるもので、アクセント塗りには合わない
-- **配色を変えるときは `figma/tokens.json` を直す。** `src/design-tokens/*` と `src/styles/variables*.css` は `pnpm token:transform && pnpm build:tokens` の生成物で、直接編集しても次回の生成で巻き戻る
+- **配色を変えるときは `figma/tokens.json` を直す。** `src/styles/variables*.css` は `pnpm token:transform && pnpm build:tokens` の生成物で、直接編集しても次回の生成で巻き戻る
 
 **テスト:**
 
@@ -341,7 +409,7 @@ src/utils/
 
 - 実行時検査を実ブラウザで行うのは、`color-contrast` やフォーカスの視認性など**レンダリングしないと判定できない領域**があるため。jsdom ではこれらが丸ごと検査対象外になる
 - 配色は `light-dark()` で定義されているため、ライト / ダークの両方を検査する。切り替えは `.storybook/preview.tsx` の `theme` グローバルと decorator が担い、テスト側は `storybookTest({ initialGlobals: { theme } })` で同じ経路を通る
-- **キャンバスには `.storybook/preview.css.ts` で `surface.page` を当てている。** これが無いと Storybook 既定の白い背景の上でダーク配色が描画され、ホストアプリと違う面でコントラストが測られてしまう。ライブラリ側で `body` にスタイルを当てるわけにはいかないため、Storybook 専用に置いている
+- **キャンバスには `.storybook/preview.css` で `surface.page` を当てている。** これが無いと Storybook 既定の白い背景の上でダーク配色が描画され、ホストアプリと違う面でコントラストが測られてしまう。ライブラリ側で `body` にスタイルを当てるわけにはいかないため、Storybook 専用に置いている
 - **操作しないと現れない状態は、そのままでは検査されない。** ストーリーが既定で描画している状態だけが対象になるため、開いた状態のダイアログなどは専用のストーリーを用意する（`Dialog` の `Opened` が例）
 
 違反が出たときの対処は次の順で判断する。
