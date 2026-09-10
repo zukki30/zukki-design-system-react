@@ -1,0 +1,140 @@
+.iconButton {
+  composes: interactiveTouch from '../../styles/mixins.module.css';
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 0;
+  cursor: pointer;
+  line-height: 0;
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-2xs);
+}
+
+.iconButton[data-selected='true'],
+.iconButton:disabled,
+.iconButton[data-loading='true'] {
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- サイズ */
+
+.iconButton[data-size='sm'] {
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+}
+
+.iconButton[data-size='md'] {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+}
+
+/* ---------------------------------------------------------------- バリアント */
+
+.iconButton[data-variant='primary'] {
+  background-color: var(--color-primary-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.iconButton[data-variant='primary']:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.iconButton[data-variant='primary'][data-selected='true'] {
+  background-color: var(--color-primary-seleted);
+}
+
+.iconButton[data-variant='primary']:disabled {
+  background-color: var(--color-primary-disabled);
+}
+
+.iconButton[data-variant='secondary'] {
+  background-color: var(--color-secondary-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.iconButton[data-variant='secondary']:hover {
+  background-color: var(--color-secondary-hover);
+}
+
+.iconButton[data-variant='secondary'][data-selected='true'] {
+  background-color: var(--color-secondary-seleted);
+}
+
+.iconButton[data-variant='secondary']:disabled {
+  background-color: var(--color-secondary-disabled);
+}
+
+.iconButton[data-variant='primary-exposed'] {
+  background-color: var(--color-exposed-default);
+  color: var(--color-primary-text);
+}
+
+.iconButton[data-variant='primary-exposed']:hover {
+  background-color: var(--color-exposed-hover);
+}
+
+.iconButton[data-variant='primary-exposed'][data-selected='true'] {
+  background-color: var(--color-exposed-selected);
+}
+
+.iconButton[data-variant='primary-exposed']:disabled {
+  background-color: var(--color-exposed-default);
+  color: var(--color-primary-disabled);
+}
+
+.iconButton[data-variant='secondary-exposed'] {
+  background-color: var(--color-exposed-default);
+  color: var(--color-text-on-surface-subtle);
+}
+
+.iconButton[data-variant='secondary-exposed']:hover {
+  background-color: var(--color-exposed-hover);
+}
+
+.iconButton[data-variant='secondary-exposed'][data-selected='true'] {
+  background-color: var(--color-exposed-selected);
+}
+
+.iconButton[data-variant='secondary-exposed']:disabled {
+  background-color: var(--color-exposed-default);
+  color: var(--color-text-on-surface-disabled);
+}
+
+/* ---------------------------------------------------------------- パーツ */
+
+.iconButton__inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+ * Button と違い visibility: hidden のままでよい。IconButton のアクセシブルネームは
+ * 必須の aria-label 由来なので、children がツリーから外れても名前は失われない
+ */
+.iconButton__inner[data-loading='true'] {
+  visibility: hidden;
+}
+
+.iconButton__loading {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

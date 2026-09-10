@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef, CSSProperties } from 'react';
 
-import { skeleton } from './Skeleton.css';
+import styles from './Skeleton.module.css';
 
 /**
  * シェイプの形状
@@ -45,7 +45,7 @@ export const Skeleton = ({
   return (
     <span
       {...props}
-      className={clsx(skeleton, className)}
+      className={clsx(styles.skeleton, className)}
       // data-shape は shape と常に一致させたいので、利用側の props より後に指定する
       data-shape={shape}
       // width / height は style へ組み立てるため、同じプロパティを style でも

@@ -1,0 +1,32 @@
+@keyframes fade {
+  0% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.skeleton {
+  display: inline-block;
+  border-radius: var(--border-radius-xs);
+  background-color: var(--color-grey-200);
+  animation: fade 3s ease-in-out infinite;
+
+  /*
+   * モーション低減時は点滅を止め、プレースホルダーとしての表示のみ残す。
+   * 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる
+   */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.skeleton[data-shape='circle'] {
+  border-radius: var(--border-radius-full);
+}

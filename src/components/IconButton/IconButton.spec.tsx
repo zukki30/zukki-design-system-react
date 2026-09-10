@@ -16,16 +16,16 @@ const icon = <Icon name="home" width={16} height={16} />;
  * Spinner は装飾（aria-hidden）でロールから引けないため DOM を辿る。
  * children に svg を渡さないことで、含まれる svg は Spinner だけになる
  */
-const getSpinnerClassName = (ui: ReactElement) => {
+const getSpinnerVariant = (ui: ReactElement) => {
   const { container, unmount } = render(ui);
-  // SVG 要素の className は SVGAnimatedString のため属性値で取得する
-  const className = container.querySelector('svg')?.getAttribute('class') ?? null;
-  if (className === null) {
-    throw new Error('spinner class not found');
+  // Spinner の配色は data-variant で表される
+  const variant = container.querySelector('svg')?.getAttribute('data-variant') ?? null;
+  if (variant === null) {
+    throw new Error('spinner variant not found');
   }
   unmount();
 
-  return className;
+  return variant;
 };
 
 describe('IconButton', () => {
@@ -157,36 +157,43 @@ describe('IconButton', () => {
   ] as const satisfies ReadonlyArray<readonly [IconButtonVariant, SpinnerVariant]>)(
     'variant=%s のとき Spinner は %s の配色になる',
     (variant, spinnerVariant) => {
-      const actual = getSpinnerClassName(
+      const actual = getSpinnerVariant(
         <IconButton aria-label="ホーム" variant={variant} loading>
           <span data-testid="icon" />
         </IconButton>
       );
-      const expected = getSpinnerClassName(<Spinner variant={spinnerVariant} />);
+      const expected = getSpinnerVariant(<Spinner variant={spinnerVariant} />);
 
       expect(actual).toBe(expected);
     }
   );
 
-  it.each([
-    ['md', 'sm'],
-    ['sm', 'md'],
-  ] as const)('size=%s と size=%s でスタイルが変わる', (size, otherSize) => {
-    const { rerender } = render(
+  // 見た目は data-size / data-variant を CSS が引く形で出し分けている
+  it.each(['sm', 'md'] as const)('size=%s を data-size に反映する', (size) => {
+    render(
       <IconButton aria-label="ホーム" size={size}>
         {icon}
       </IconButton>
     );
-    const className = screen.getByRole('button', { name: 'ホーム' }).className;
 
-    rerender(
-      <IconButton aria-label="ホーム" size={otherSize}>
-        {icon}
-      </IconButton>
-    );
-
-    expect(screen.getByRole('button', { name: 'ホーム' }).className).not.toBe(className);
+    expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute('data-size', size);
   });
+
+  it.each(['primary', 'secondary', 'primary-exposed', 'secondary-exposed'] as const)(
+    'variant=%s を data-variant に反映する',
+    (variant) => {
+      render(
+        <IconButton aria-label="ホーム" variant={variant}>
+          {icon}
+        </IconButton>
+      );
+
+      expect(screen.getByRole('button', { name: 'ホーム' })).toHaveAttribute(
+        'data-variant',
+        variant
+      );
+    }
+  );
 
   it('ref を button に転送する', () => {
     const ref = createRef<HTMLButtonElement>();

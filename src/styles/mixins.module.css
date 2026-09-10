@@ -2,8 +2,12 @@
  * 複数のコンポーネントで共有するスタイル。`composes:` で引く。
  *
  *   .tag__label {
- *     composes: truncate from '@/styles/mixins.module.css';
+ *     composes: truncate from '../../styles/mixins.module.css';
  *   }
+ *
+ * **`@/` エイリアスは使えない。** `composes … from` の解決は Vite の
+ * `resolve.tsconfigPaths` を通らず、「fileResolve の戻り値が絶対パスでない」として
+ * ビルドが落ちる。TS の import 規約とは別物として、相対パスで書く。
  *
  * ここに置くのは「宣言だけで、引く側の宣言と衝突しないもの」に限る。
  * 衝突しうるものを置くと、勝敗が出力順（＝どのファイルが先に import されたか）に

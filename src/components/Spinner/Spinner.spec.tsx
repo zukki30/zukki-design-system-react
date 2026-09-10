@@ -23,19 +23,25 @@ describe('Spinner', () => {
     expect(svg).not.toHaveAttribute('aria-hidden');
   });
 
-  it.each([
-    ['light', 'dark'],
-    ['dark', 'primary'],
-    ['primary', 'accent'],
-    ['accent', 'light'],
-  ] as const)('variant=%s と variant=%s でスタイルが変わる', (variant, otherVariant) => {
-    const { rerender } = render(<Spinner aria-label="読み込み中" variant={variant} />);
-    const className = screen.getByRole('img', { name: '読み込み中' }).getAttribute('class');
+  // 配色は data-variant を CSS が引く形で出し分けている
+  it.each(['light', 'dark', 'primary', 'accent'] as const)(
+    'variant=%s を data-variant に反映する',
+    (variant) => {
+      render(<Spinner aria-label="読み込み中" variant={variant} />);
 
-    rerender(<Spinner aria-label="読み込み中" variant={otherVariant} />);
+      expect(screen.getByRole('img', { name: '読み込み中' })).toHaveAttribute(
+        'data-variant',
+        variant
+      );
+    }
+  );
 
-    expect(screen.getByRole('img', { name: '読み込み中' }).getAttribute('class')).not.toBe(
-      className
+  it('variant を省略すると light になる', () => {
+    render(<Spinner aria-label="読み込み中" />);
+
+    expect(screen.getByRole('img', { name: '読み込み中' })).toHaveAttribute(
+      'data-variant',
+      'light'
     );
   });
 

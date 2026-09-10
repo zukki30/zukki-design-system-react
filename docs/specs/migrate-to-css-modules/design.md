@@ -245,13 +245,15 @@ DOM 上は `width="24"` 属性が残るが、計算後のサイズは 14px で�
 }
 ```
 
-使う側はエイリアス付きのパスで引ける（Vite で解決を確認済み）。
+使う側は **相対パス** で引く。
 
 ```css
 .tag__label {
-  composes: truncate from '@/styles/mixins.module.css';
+  composes: truncate from '../../styles/mixins.module.css';
 }
 ```
+
+`@/` エイリアスは使えない。`composes … from` の解決は Vite の `resolve.tsconfigPaths` を通らず、`The returned path from the "fileResolve" option must be absolute` でビルドが落ちる（実測）。`resolve.alias` を足せば解決できるが、パスの対応を `tsconfig` と `vite.config.ts` の 2 箇所に持つことになるため採らない。TS の import 規約（`@/`）とは別物として扱う。
 
 `composes` した側の JS 値はクラス名 2 つの文字列（`"_tag__label_x _truncate_y"`）になる。`clsx()` に渡しても `toHaveClass()` に渡しても正しく扱われる。
 

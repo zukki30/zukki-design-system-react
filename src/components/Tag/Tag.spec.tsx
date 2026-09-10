@@ -38,12 +38,14 @@ describe('Tag', () => {
     expect(container.firstElementChild).toHaveClass('custom-class');
   });
 
-  it('variant によって適用されるクラスが変わる', () => {
+  // 配色は data-variant を CSS が引く形で出し分けている
+  it('variant を data-variant に反映する', () => {
     const { container, rerender } = render(<Tag label="タグ名" />);
-    const defaultClassName = container.firstElementChild?.className;
+
+    expect(container.firstElementChild).toHaveAttribute('data-variant', 'default');
 
     rerender(<Tag label="タグ名" variant="red" />);
 
-    expect(container.firstElementChild?.className).not.toBe(defaultClassName);
+    expect(container.firstElementChild).toHaveAttribute('data-variant', 'red');
   });
 });

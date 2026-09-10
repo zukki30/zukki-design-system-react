@@ -73,6 +73,8 @@ writeFileSync(
 const collected = new Map<string, string[]>();
 
 await build({
+  // vite.config.ts は読まない。型宣言の生成に不要なプラグイン（dts など）まで走ってしまう。
+  // `composes … from` は相対パスで書く規約なので、エイリアスの設定は要らない
   configFile: false,
   logLevel: 'error',
   css: {

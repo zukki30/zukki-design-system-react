@@ -3,14 +3,8 @@ import { clsx } from 'clsx';
 import type { ZukkiVariantType } from '@/types';
 
 import { Icon } from '../Icon/Icon';
-import {
-  tag,
-  tagLabel,
-  tagVariant,
-  tagCloseButton,
-  tagCloseButtonVariant,
-  CLOSE_BUTTON_SIZE,
-} from './Tag.css';
+
+import styles from './Tag.module.css';
 
 export type TagVariant = 'default' | 'red' | 'blue' | 'green' | 'yellow' | ZukkiVariantType;
 
@@ -37,17 +31,19 @@ export type TagProps = {
 
 export const Tag = ({ label, variant = 'default', className, onClose }: TagProps) => {
   return (
-    <span className={clsx(tag, tagVariant[variant], className)}>
-      <span className={tagLabel}>{label}</span>
+    <span className={clsx(styles.tag, className)} data-variant={variant}>
+      <span className={styles.tag__label}>{label}</span>
 
       {onClose && (
         <button
           type="button"
           aria-label={`${label}を閉じる`}
-          className={clsx(tagCloseButton, tagCloseButtonVariant[variant])}
+          className={styles.tag__closeButton}
           onClick={onClose}
         >
-          <Icon name="close" width={CLOSE_BUTTON_SIZE} height={CLOSE_BUTTON_SIZE} />
+          {/* サイズは CSS が持つ（Tag.module.css の .tag__closeButton）。
+              width / height を props で渡すと持ち主が 2 箇所になる */}
+          <Icon name="close" />
         </button>
       )}
     </span>

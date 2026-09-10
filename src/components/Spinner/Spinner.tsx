@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
-import { spinner, spinnerVariant } from './Spinner.css';
+import styles from './Spinner.module.css';
 
 // 静的な要素は巻き上げる
 const TRACK_PATH = (
@@ -51,9 +51,10 @@ export const Spinner = ({
       role="img"
       aria-hidden={ariaLabel ? undefined : 'true'}
       {...restProps}
+      data-variant={variant}
       // restProps より後ろに置く。前に置くとスプレッドの className に丸ごと
-      // 上書きされ、ベースと variant のクラスが失われる
-      className={clsx(spinner, spinnerVariant[variant], restProps.className)}
+      // 上書きされ、ベースのクラスが失われる
+      className={clsx(styles.spinner, restProps.className)}
     >
       <title>{ariaLabel ?? 'Loading…'}</title>
       {TRACK_PATH}
