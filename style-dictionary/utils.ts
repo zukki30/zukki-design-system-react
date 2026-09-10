@@ -51,15 +51,19 @@ export const transformFontSizeToRem = (token: Token) => {
   return token.value;
 };
 
+// elevation は box-shadow を x / y / blur / spread / color / type に展開したもの。
+// このうち長さで表す 4 つだけが px の対象で、color と type は対象外
+const ELEVATION_LENGTH_SUFFIXES = ['-x', '-y', '-blur', '-spread'] as const;
+
 export const transformSizePx = (token: Token) => {
   const isBorderRadius = token.name?.includes('border-radius') && token.value !== 0;
   const isSpacing = token.name?.includes('spacing') && token.value !== 0 && token.value !== '0%';
-  const isElevationY =
-    token.name?.includes('elevation') && token.name?.includes('-y') && token.value !== 0;
-  const isElevationX =
-    token.name?.includes('elevation') && token.name?.includes('-x') && token.value !== 0;
+  const isElevationLength =
+    token.name?.includes('elevation') &&
+    ELEVATION_LENGTH_SUFFIXES.some((suffix) => token.name?.endsWith(suffix)) &&
+    token.value !== 0;
 
-  if (isBorderRadius || isSpacing || isElevationY || isElevationX) {
+  if (isBorderRadius || isSpacing || isElevationLength) {
     return `${token.value}px`;
   }
 

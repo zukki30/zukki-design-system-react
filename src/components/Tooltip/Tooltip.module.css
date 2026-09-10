@@ -2,13 +2,6 @@
   display: inline-flex;
 }
 
-/*
- * TODO(#104): elevation2 のドロップシャドウを当て直す。
- * --elevation-styles-elevation2-blur は単位なしの 4 で、`var(--…)px` は `4px` にならず
- * （置換はトークン単位で行われる）box-shadow の宣言ごと破棄される。
- * 移行前も計算値は none だったため、見た目を揃えてここでは宣言を置かない。
- * 当て直すときは calc(var(--elevation-styles-elevation2-blur) * 1px) とする
- */
 .tooltip__popup {
   /*
    * 吹き出しとターゲットの間隔（＝矢印の突き出し量）と、端寄せ配置での矢印オフセット。
@@ -33,6 +26,10 @@
   max-width: 240px;
   padding: var(--spacing-sm);
   border-radius: var(--border-radius-sm);
+  box-shadow:
+    var(--elevation-styles-elevation2-x) var(--elevation-styles-elevation2-y)
+    var(--elevation-styles-elevation2-blur) var(--elevation-styles-elevation2-spread)
+    var(--elevation-styles-elevation2-color);
   background-color: var(--color-surface-inverse);
   color: var(--color-text-on-inverse-default);
   font-family: var(--font-family-default);
