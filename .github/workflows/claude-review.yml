@@ -29,7 +29,7 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            このリポジトリは React / TypeScript / Vanilla Extract で作られたデザインシステムです。
+            このリポジトリは React / TypeScript / CSS Modules で作られたデザインシステムです。
             リポジトリ直下の AGENTS.md に規約が集約されているので、まず読んでからレビューしてください。
 
             この Pull Request の差分をレビューし、以下の観点で指摘してください。
