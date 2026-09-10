@@ -3,7 +3,7 @@ import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
-import { input, inputField, inputIcon } from './Input.css';
+import styles from './Input.module.css';
 
 export type InputProps = {
   /**
@@ -39,17 +39,17 @@ export const Input = ({
   const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
 
   return (
-    <div className={clsx(input, className)} data-error={error} data-disabled={disabled}>
+    <div className={clsx(styles.input, className)} data-error={error} data-disabled={disabled}>
       {startIcon ? (
-        <span className={inputIcon} data-position="start" aria-hidden="true">
+        <span className={styles.input__icon} data-position="start" aria-hidden="true">
           {startIcon}
         </span>
       ) : null}
 
-      <input className={inputField} disabled={disabled} aria-invalid={error} {...props} />
+      <input className={styles.input__field} disabled={disabled} aria-invalid={error} {...props} />
 
       {endIcon ? (
-        <span className={inputIcon} data-position="end" aria-hidden="true">
+        <span className={styles.input__icon} data-position="end" aria-hidden="true">
           {endIcon}
         </span>
       ) : null}

@@ -6,13 +6,7 @@ import { useMergedRef } from '@/hooks/useMergedRef';
 import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
-import {
-  inputNumber,
-  inputNumberField,
-  inputNumberSpin,
-  inputNumberSpinButton,
-  inputNumberSpinDivider,
-} from './InputNumber.css';
+import styles from './InputNumber.module.css';
 
 export type InputNumberProps = {
   /**
@@ -104,24 +98,28 @@ export const InputNumber = ({
   };
 
   return (
-    <div className={clsx(inputNumber, className)} data-error={error} data-disabled={disabled}>
+    <div
+      className={clsx(styles.inputNumber, className)}
+      data-error={error}
+      data-disabled={disabled}
+    >
       <input
         ref={mergedRef}
         type="number"
         // props より前に置いて、利用側から上書きできるようにする
         inputMode={resolveInputMode(props.step, props.min)}
-        className={inputNumberField}
+        className={styles.inputNumber__field}
         disabled={disabled}
         aria-invalid={error}
         {...props}
       />
 
-      <div className={inputNumberSpin}>
+      <div className={styles.inputNumber__spin}>
         <button
           type="button"
           tabIndex={-1}
           aria-label="増やす"
-          className={inputNumberSpinButton}
+          className={styles.inputNumber__spinButton}
           disabled={disabled}
           onMouseDown={handleMouseDown}
           onClick={() => handleStep('up')}
@@ -129,13 +127,13 @@ export const InputNumber = ({
           <Icon name="menuUp" width={ARROW_SIZE} height={ARROW_SIZE} />
         </button>
 
-        <span className={inputNumberSpinDivider} />
+        <span className={styles.inputNumber__spinDivider} />
 
         <button
           type="button"
           tabIndex={-1}
           aria-label="減らす"
-          className={inputNumberSpinButton}
+          className={styles.inputNumber__spinButton}
           disabled={disabled}
           onMouseDown={handleMouseDown}
           onClick={() => handleStep('down')}

@@ -1,0 +1,156 @@
+.inputNumber {
+  /*
+   * UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin のコメント）。
+   * ネイティブのスピンボタンは .inputNumber__field 側で非表示にしているため対象外
+   */
+  composes: inputColorSchemeLight from '../../styles/mixins.module.css';
+
+  /* 独自スピンボタンの列幅と、フィールドが縮みきらないための下限 */
+  --zds-input-number-spin-width: 22px;
+  --zds-input-number-field-min-width: 80px;
+
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: stretch;
+  overflow: hidden;
+  background-color: var(--color-input-background-default);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-input-border-default);
+  border-radius: var(--border-radius-lg);
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.inputNumber:hover:not([data-disabled='true']):not([data-error='true']) {
+  border-color: var(--color-input-border-hover);
+}
+
+.inputNumber:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-xs);
+}
+
+.inputNumber[data-error='true'] {
+  background-color: var(--color-input-background-error);
+  border-color: var(--color-input-border-error);
+}
+
+.inputNumber[data-error='true']:hover:not([data-disabled='true']) {
+  border-color: var(--color-input-border-error-hover);
+}
+
+.inputNumber[data-disabled='true'] {
+  background-color: var(--color-input-background-disabled);
+  border-color: var(--color-input-border-disabled);
+}
+
+.inputNumber__field {
+  flex: 1 1 auto;
+  min-width: var(--zds-input-number-field-min-width);
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  padding-inline: var(--spacing-sm);
+  padding-block: var(--spacing-md);
+  font-family: var(--font-family-number);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-line);
+  /* 桁を等幅にして、スピンボタンでの増減時に数値が横揺れしないようにする */
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-on-light-default);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.inputNumber__field::placeholder {
+  color: var(--color-text-on-light-placeholder);
+}
+
+/* ネイティブのスピンボタンを隠す（独自ボタンで代替） */
+.inputNumber__field::-webkit-outer-spin-button,
+.inputNumber__field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inputNumber__field:disabled {
+  color: var(--color-text-on-light-disabled);
+  -webkit-text-fill-color: var(--color-text-on-light-disabled);
+  cursor: not-allowed;
+}
+
+.inputNumber[data-error='true'] .inputNumber__field {
+  color: var(--color-text-on-failure-default);
+}
+
+.inputNumber__spin {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: var(--zds-input-number-spin-width);
+  border-inline-start-width: 1px;
+  border-inline-start-style: solid;
+  border-inline-start-color: var(--color-input-border-default);
+}
+
+.inputNumber[data-error='true'] .inputNumber__spin {
+  border-inline-start-color: var(--color-input-border-error);
+}
+
+.inputNumber[data-disabled='true'] .inputNumber__spin {
+  border-inline-start-color: var(--color-input-border-disabled);
+}
+
+.inputNumber__spinButton {
+  flex: 1 1 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-none);
+  border: none;
+  background-color: transparent;
+  color: var(--color-text-on-light-default);
+  cursor: pointer;
+  line-height: 0;
+  transition: background-color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.inputNumber__spinButton:hover:not(:disabled) {
+  background-color: var(--color-input-spin-button-background-hover);
+}
+
+.inputNumber__spinButton:disabled {
+  color: var(--color-text-on-light-disabled);
+  cursor: not-allowed;
+}
+
+.inputNumber__spinDivider {
+  height: 1px;
+  flex-shrink: 0;
+  background-color: var(--color-input-border-default);
+}
+
+.inputNumber[data-error='true'] .inputNumber__spinDivider {
+  background-color: var(--color-input-border-error);
+}
+
+.inputNumber[data-disabled='true'] .inputNumber__spinDivider {
+  background-color: var(--color-input-border-disabled);
+}

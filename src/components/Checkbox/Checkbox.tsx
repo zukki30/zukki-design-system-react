@@ -7,15 +7,7 @@ import { isRenderable } from '@/utils/renderableNode';
 import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
-import {
-  checkbox,
-  checkboxBox,
-  checkboxCheckIcon,
-  checkboxControl,
-  checkboxInput,
-  checkboxLabel,
-  checkboxMinusIcon,
-} from './Checkbox.css';
+import styles from './Checkbox.module.css';
 
 export type CheckboxProps = {
   /**
@@ -56,32 +48,32 @@ export const Checkbox = ({
   });
 
   return (
-    <label className={clsx(checkbox, className)} data-disabled={disabled}>
-      <span className={checkboxControl}>
+    <label className={clsx(styles.checkbox, className)} data-disabled={disabled}>
+      <span className={styles.checkbox__control}>
         <input
           ref={mergedRef}
           type="checkbox"
-          className={checkboxInput}
+          className={styles.checkbox__input}
           disabled={disabled}
           {...props}
         />
-        <span className={checkboxBox} aria-hidden="true">
+        <span className={styles.checkbox__box} aria-hidden="true">
           <Icon
             name="outlineCheck"
             width={ICON_SIZE}
             height={ICON_SIZE}
-            className={checkboxCheckIcon}
+            className={styles.checkbox__checkIcon}
           />
           <Icon
             name="baselineMinus"
             width={ICON_SIZE}
             height={ICON_SIZE}
-            className={checkboxMinusIcon}
+            className={styles.checkbox__minusIcon}
           />
         </span>
       </span>
 
-      {isRenderable(children) && <span className={checkboxLabel}>{children}</span>}
+      {isRenderable(children) && <span className={styles.checkbox__label}>{children}</span>}
     </label>
   );
 };

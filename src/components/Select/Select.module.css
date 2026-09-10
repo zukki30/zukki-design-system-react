@@ -1,0 +1,132 @@
+.select {
+  /*
+   * UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin のコメント）。
+   * ネイティブの選択肢リストが対象で、ラッパーに置くことでシェブロンとも解決を揃える
+   */
+  composes: inputColorSchemeLight from '../../styles/mixins.module.css';
+
+  /*
+   * シェブロンアイコンの描画サイズ。フィールドの右パディングと、
+   * アイコン自身の大きさの両方をここから決める（持ち主を 1 つにするため）
+   */
+  --zds-select-icon-size: 20px;
+
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+}
+
+.select__field {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding-block: var(--spacing-md);
+  padding-inline-start: var(--spacing-sm);
+  /* 右側はシェブロンアイコンのスペースを確保する（左右パディング + アイコン幅） */
+  padding-inline-end: calc(var(--spacing-sm) * 2 + var(--zds-select-icon-size));
+  background-color: var(--color-input-background-default);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-input-border-default);
+  border-radius: var(--border-radius-lg);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-line);
+  color: var(--color-text-on-light-default);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* 値未選択（placeholder option が選択中）はプレースホルダー色 */
+.select:not([data-error='true'])
+  .select__field:has(option[value='']:checked):not(:disabled) {
+  color: var(--color-text-on-light-placeholder);
+}
+
+.select:not([data-error='true']) .select__field:hover:not(:disabled) {
+  border-color: var(--color-input-border-hover);
+}
+
+.select__field:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-xs);
+}
+
+.select[data-error='true'] .select__field {
+  background-color: var(--color-input-background-error);
+  border-color: var(--color-input-border-error);
+  color: var(--color-text-on-failure-default);
+}
+
+.select[data-error='true'] .select__field:hover:not(:disabled) {
+  border-color: var(--color-input-border-error-hover);
+}
+
+.select__field:disabled {
+  background-color: var(--color-input-background-disabled);
+  border-color: var(--color-input-border-disabled);
+  color: var(--color-text-on-light-disabled);
+  cursor: not-allowed;
+}
+
+/*
+ * ネイティブの選択肢リスト（ブラウザ描画。指定可能な範囲で色を合わせる）。
+ * option は素の要素セレクタなので CSS Modules のスコープ対象にならず、
+ * クラスのスコープの内側にありながらグローバルな要素として書ける。
+ *
+ * background-color を省くと Windows のダークテーマで暗い背景に濃色テキストが載って読めなくなる
+ */
+.select__field option {
+  background-color: var(--color-input-background-default);
+  color: var(--color-text-on-light-default);
+}
+
+/*
+ * エラー時はフィールドと選択肢リストの背景を揃える。
+ * Chrome / Windows は折りたたみ時の描画にも選択中 option の背景を使うことがあり、
+ * 白のままだとエラーの薄赤が消えて見える
+ */
+.select[data-error='true'] .select__field option {
+  background-color: var(--color-input-background-error);
+}
+
+.select__field option:disabled {
+  color: var(--color-text-on-light-disabled);
+}
+
+.select__icon {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: var(--spacing-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--color-text-on-light-subtle);
+}
+
+/* Icon は width/height 属性で 24 を出すが、CSS の指定が優先される */
+.select__icon > svg {
+  width: var(--zds-select-icon-size);
+  height: var(--zds-select-icon-size);
+}
+
+.select[data-error='true'] .select__icon {
+  color: var(--color-text-on-failure-default);
+}
+
+.select[data-disabled='true'] .select__icon {
+  color: var(--color-text-on-light-disabled);
+}

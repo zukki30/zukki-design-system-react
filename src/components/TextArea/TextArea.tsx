@@ -3,7 +3,7 @@ import type { ComponentPropsWithRef } from 'react';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
-import { textArea } from './TextArea.css';
+import styles from './TextArea.module.css';
 
 export type TextAreaProps = {
   /**
@@ -26,7 +26,7 @@ export const TextArea = ({
 
   return (
     <textarea
-      className={clsx(textArea, className)}
+      className={clsx(styles.textArea, className)}
       disabled={disabled}
       data-error={error}
       aria-invalid={error}
