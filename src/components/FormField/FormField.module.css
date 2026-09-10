@@ -1,0 +1,110 @@
+.formField {
+  /* 横並びのときのラベル列の幅 */
+  --zds-form-field-label-column-width: 100px;
+
+  display: grid;
+  gap: var(--spacing-sm);
+  align-items: start;
+}
+
+/*
+ * パーツはルート直下に並ぶため、列の割り当てだけでラベルと入力欄を配置する。
+ * 入力欄の列は minmax(0, 1fr) にして、長いコンテンツで列が広がらないようにする
+ */
+.formField[data-orientation='horizontal'] {
+  grid-template-columns: var(--zds-form-field-label-column-width) minmax(0, 1fr);
+}
+
+.formField[data-orientation='vertical'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/*
+ * 入力欄・補助テキスト・エラーメッセージが並ぶ列。
+ * 横並びのときだけ 2 列目に送る（縦並びでは 1 列しかない）
+ */
+.formField__controlColumn {
+  min-width: 0;
+}
+
+/*
+ * data-orientation は Steps など他コンポーネントも使うため、
+ * 祖先セレクタは FormField のルートに限定する
+ */
+.formField[data-orientation='horizontal'] .formField__controlColumn {
+  grid-column: 2;
+}
+
+.formField__label {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-heading);
+  color: var(--color-text-on-surface-default);
+}
+
+/* 横並びのときは入力欄の上下パディングに合わせてラベルを下げる */
+.formField[data-orientation='horizontal'] .formField__label {
+  padding-top: var(--spacing-md);
+}
+
+/* data-disabled も複数コンポーネントが使う共有属性のため、同様にルートへ限定する */
+.formField[data-disabled='true'] .formField__label {
+  color: var(--color-text-on-surface-disabled);
+}
+
+.formField__requiredAsterisk {
+  flex-shrink: 0;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-heading);
+  color: var(--color-failure-text);
+}
+
+.formField__requiredBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-inline: var(--spacing-xs);
+  padding-block: var(--spacing-2xs);
+  border-radius: var(--border-radius-xs);
+  background-color: var(--color-failure-default);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-line);
+  color: var(--color-text-on-accent-default);
+  white-space: nowrap;
+}
+
+.formField__control {
+  composes: formField__controlColumn;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+}
+
+.formField__helperText {
+  composes: formField__controlColumn;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-default);
+  color: var(--color-text-on-surface-subtle);
+}
+
+.formField__errorText {
+  composes: formField__controlColumn;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-default);
+  color: var(--color-text-on-failure-default);
+}

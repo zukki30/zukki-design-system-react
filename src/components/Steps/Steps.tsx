@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import { Children, Fragment, isValidElement, useMemo } from 'react';
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
-import { steps } from './Steps.css';
+import styles from './Steps.module.css';
 import { StepsItem } from './StepsItem';
 import { StepsContext, StepsItemNumberContext } from './StepsContext';
 import type { StepsContextValue, StepsOrientation } from './StepsContext';
@@ -74,7 +74,7 @@ export function Steps({
 
   return (
     <StepsContext value={contextValue}>
-      <ol {...props} className={clsx(steps[orientation], className)}>
+      <ol {...props} data-orientation={orientation} className={clsx(styles.steps, className)}>
         {items.map((item, index) => {
           // Fragment は複数のステップが 1 つの子にまとまるため、採番が静かにずれる。
           // 独自のパーツは許容したいので、弾くのは採番が必ず壊れる Fragment だけにする

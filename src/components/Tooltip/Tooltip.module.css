@@ -1,0 +1,171 @@
+.tooltip {
+  display: inline-flex;
+}
+
+/*
+ * TODO(#104): elevation2 のドロップシャドウを当て直す。
+ * --elevation-styles-elevation2-blur は単位なしの 4 で、`var(--…)px` は `4px` にならず
+ * （置換はトークン単位で行われる）box-shadow の宣言ごと破棄される。
+ * 移行前も計算値は none だったため、見た目を揃えてここでは宣言を置かない。
+ * 当て直すときは calc(var(--elevation-styles-elevation2-blur) * 1px) とする
+ */
+.tooltip__popup {
+  /*
+   * 吹き出しとターゲットの間隔（＝矢印の突き出し量）と、端寄せ配置での矢印オフセット。
+   * 矢印側（.tooltip__arrow）からも引くため、カスタムプロパティで持つ
+   */
+  --zds-tooltip-gap: var(--spacing-sm);
+  --zds-tooltip-edge-offset: var(--spacing-md);
+
+  /*
+   * Popover API により top layer へ表示される。位置は CSS Anchor Positioning で
+   * ターゲット（.tooltip）に対して決定する
+   */
+  position: fixed;
+  /* ブラウザ既定の popover UA スタイルを打ち消す */
+  inset: auto; /* 既定の `inset: 0` を打ち消し、配置ごとに必要な辺のみ指定する */
+  margin: 0;
+  border: none; /* 既定の `border: solid` を消す */
+  overflow: visible; /* 既定の `overflow: auto` による矢印のクリップを防ぐ */
+  z-index: 10;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: 240px;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-surface-inverse);
+  color: var(--color-text-on-inverse-default);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-default);
+}
+
+/* ---------------------------------------------------------------- 配置 */
+/* anchor() でターゲットの各辺を参照する */
+
+.tooltip__popup[data-placement='top'] {
+  bottom: anchor(top);
+  left: anchor(center);
+  transform: translateX(-50%);
+  margin-bottom: var(--zds-tooltip-gap);
+}
+
+.tooltip__popup[data-placement='topLeft'] {
+  bottom: anchor(top);
+  left: anchor(left);
+  margin-bottom: var(--zds-tooltip-gap);
+}
+
+.tooltip__popup[data-placement='topRight'] {
+  bottom: anchor(top);
+  right: anchor(right);
+  margin-bottom: var(--zds-tooltip-gap);
+}
+
+.tooltip__popup[data-placement='bottom'] {
+  top: anchor(bottom);
+  left: anchor(center);
+  transform: translateX(-50%);
+  margin-top: var(--zds-tooltip-gap);
+}
+
+.tooltip__popup[data-placement='bottomLeft'] {
+  top: anchor(bottom);
+  left: anchor(left);
+  margin-top: var(--zds-tooltip-gap);
+}
+
+.tooltip__popup[data-placement='bottomRight'] {
+  top: anchor(bottom);
+  right: anchor(right);
+  margin-top: var(--zds-tooltip-gap);
+}
+
+.tooltip__popup[data-placement='left'] {
+  right: anchor(left);
+  top: anchor(center);
+  transform: translateY(-50%);
+  margin-right: var(--zds-tooltip-gap);
+}
+
+.tooltip__popup[data-placement='right'] {
+  left: anchor(right);
+  top: anchor(center);
+  transform: translateY(-50%);
+  margin-left: var(--zds-tooltip-gap);
+}
+
+/* ---------------------------------------------------------------- 矢印 */
+
+.tooltip__arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-color: transparent;
+}
+
+/* 上方向（下向き矢印） */
+.tooltip__popup[data-placement='top'] .tooltip__arrow {
+  bottom: calc(var(--zds-tooltip-gap) * -1);
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 6px 0 6px;
+  border-top-color: var(--color-surface-inverse);
+}
+
+.tooltip__popup[data-placement='topLeft'] .tooltip__arrow {
+  bottom: calc(var(--zds-tooltip-gap) * -1);
+  left: var(--zds-tooltip-edge-offset);
+  border-width: 8px 6px 0 6px;
+  border-top-color: var(--color-surface-inverse);
+}
+
+.tooltip__popup[data-placement='topRight'] .tooltip__arrow {
+  bottom: calc(var(--zds-tooltip-gap) * -1);
+  right: var(--zds-tooltip-edge-offset);
+  border-width: 8px 6px 0 6px;
+  border-top-color: var(--color-surface-inverse);
+}
+
+/* 下方向（上向き矢印） */
+.tooltip__popup[data-placement='bottom'] .tooltip__arrow {
+  top: calc(var(--zds-tooltip-gap) * -1);
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 6px 8px 6px;
+  border-bottom-color: var(--color-surface-inverse);
+}
+
+.tooltip__popup[data-placement='bottomLeft'] .tooltip__arrow {
+  top: calc(var(--zds-tooltip-gap) * -1);
+  left: var(--zds-tooltip-edge-offset);
+  border-width: 0 6px 8px 6px;
+  border-bottom-color: var(--color-surface-inverse);
+}
+
+.tooltip__popup[data-placement='bottomRight'] .tooltip__arrow {
+  top: calc(var(--zds-tooltip-gap) * -1);
+  right: var(--zds-tooltip-edge-offset);
+  border-width: 0 6px 8px 6px;
+  border-bottom-color: var(--color-surface-inverse);
+}
+
+/* 左方向（右向き矢印） */
+.tooltip__popup[data-placement='left'] .tooltip__arrow {
+  right: calc(var(--zds-tooltip-gap) * -1);
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px 0 6px 8px;
+  border-left-color: var(--color-surface-inverse);
+}
+
+/* 右方向（左向き矢印） */
+.tooltip__popup[data-placement='right'] .tooltip__arrow {
+  left: calc(var(--zds-tooltip-gap) * -1);
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px 8px 6px 0;
+  border-right-color: var(--color-surface-inverse);
+}

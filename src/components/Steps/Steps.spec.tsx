@@ -2,13 +2,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { vars } from '@/styles/theme.css';
-
 import { Steps, type StepsProps } from './Steps';
-import { steps } from './Steps.css';
 import { StepsItem } from './StepsItem';
 import { useStepsContext, useStepsItemNumber } from './StepsContext';
-import { stepsItem, stepsItemContainer } from './StepsItem.css';
+import styles from './Steps.module.css';
+import itemStyles from './StepsItem.module.css';
 
 const labels = ['カート', '配送先', '確認'];
 
@@ -176,10 +174,11 @@ describe('Steps', () => {
     });
   });
 
-  it('orientation ごとに対応する styleVariants のクラスを適用する', () => {
+  // 並びの見た目は ol の data-orientation を CSS が引く形で出し分けている
+  it('orientation を ol の data-orientation に反映する', () => {
     const { container, rerender } = render(<Steps current={1}>{stepItems()}</Steps>);
 
-    expect(container.querySelector('ol')).toHaveClass(steps.horizontal);
+    expect(container.querySelector('ol')).toHaveAttribute('data-orientation', 'horizontal');
 
     rerender(
       <Steps current={1} orientation="vertical">
@@ -187,7 +186,7 @@ describe('Steps', () => {
       </Steps>
     );
 
-    expect(container.querySelector('ol')).toHaveClass(steps.vertical);
+    expect(container.querySelector('ol')).toHaveAttribute('data-orientation', 'vertical');
   });
 
   it('ネイティブ属性を ol に渡す', () => {
@@ -238,7 +237,7 @@ describe('Steps', () => {
     );
 
     // 上書きではなくマージであることを、ベースのクラスが残っているかで確認する
-    expect(screen.getByTestId('steps')).toHaveClass(steps.horizontal, 'custom');
+    expect(screen.getByTestId('steps')).toHaveClass(styles.steps, 'custom');
   });
 
   it('ラベルが重複していても描画できる', () => {
@@ -257,7 +256,7 @@ describe('Steps', () => {
       </div>
     );
 
-    const item = container.querySelector(`.${stepsItem}`);
+    const item = container.querySelector(`.${itemStyles.stepsItem__control}`);
 
     expect(item).not.toBeNull();
     // 縦並びのときだけ flex-shrink: 0 になる
@@ -271,7 +270,7 @@ describe('Steps', () => {
       </Steps>
     );
 
-    const item = container.querySelector(`.${stepsItem}`);
+    const item = container.querySelector(`.${itemStyles.stepsItem__control}`);
 
     expect(getComputedStyle(item as Element).flexShrink).toBe('0');
   });
@@ -281,20 +280,28 @@ describe('Steps', () => {
       expect(Steps.Item).toBe(StepsItem);
     });
 
-    it('現在ステップは番号のスタイルが変わる', () => {
+    // 円の配色とラベルの太さは data-status を CSS が引く形で出し分けている。
+    // 番号は完了ステップだとチェックアイコンに置き換わるため、ラベルから辿る
+    it('完了・現在・未到達を data-status で表す', () => {
       const { rerender } = render(<Steps current={1}>{stepItems()}</Steps>);
-      const defaultClassName = screen.getByText('2').className;
+      const controlOf = (label: string) =>
+        screen.getByText(label).closest(`.${itemStyles.stepsItem__control}`);
+
+      expect(controlOf('カート')).toHaveAttribute('data-status', 'current');
+      expect(controlOf('配送先')).toHaveAttribute('data-status', 'default');
 
       rerender(<Steps current={2}>{stepItems()}</Steps>);
 
-      expect(screen.getByText('2').className).not.toBe(defaultClassName);
+      expect(controlOf('カート')).toHaveAttribute('data-status', 'finished');
+      expect(controlOf('配送先')).toHaveAttribute('data-status', 'current');
+      expect(controlOf('確認')).toHaveAttribute('data-status', 'default');
     });
 
     // 現在ステップの円は default と形が同じで差が色だけになるため、
     // ラベルの太さを色以外の手がかりにしている（WCAG 1.4.1）
     //
     // jsdom の getComputedStyle はカスタムプロパティを解決せず、宣言値の
-    // var(--font-weight-bold__…) をそのまま返す。そのため vars の値と直接比較できる
+    // var(--font-weight-bold) をそのまま返す
     // （jsdom が var の解決に対応したら 700 / 400 が返って落ちるため、その際は
     // 期待値も getComputedStyle 越しに取る形へ寄せる）
     it('現在ステップのラベルだけを太字にする', () => {
@@ -302,9 +309,9 @@ describe('Steps', () => {
 
       const [finished, current, upcoming] = labels.map((label) => screen.getByText(label));
 
-      expect(getComputedStyle(current).fontWeight).toBe(vars['font-weight'].bold);
-      expect(getComputedStyle(finished).fontWeight).toBe(vars['font-weight'].normal);
-      expect(getComputedStyle(upcoming).fontWeight).toBe(vars['font-weight'].normal);
+      expect(getComputedStyle(current).fontWeight).toBe('var(--font-weight-bold)');
+      expect(getComputedStyle(finished).fontWeight).toBe('var(--font-weight-normal)');
+      expect(getComputedStyle(upcoming).fontWeight).toBe('var(--font-weight-normal)');
     });
 
     it('現在ステップがないときはどのラベルも太字にしない', () => {
@@ -312,7 +319,7 @@ describe('Steps', () => {
 
       labels.forEach((label) => {
         expect(getComputedStyle(screen.getByText(label)).fontWeight).toBe(
-          vars['font-weight'].normal
+          'var(--font-weight-normal)'
         );
       });
     });
@@ -332,7 +339,7 @@ describe('Steps', () => {
       expect(ref.current).toBe(item);
       expect(item).toHaveAttribute('id', 'cart-step');
       // 上書きではなくマージであることを、ベースのクラスが残っているかで確認する
-      expect(item).toHaveClass(stepsItemContainer, 'custom');
+      expect(item).toHaveClass(itemStyles.stepsItem, 'custom');
     });
 
     it('data-orientation は利用側から上書きできない', () => {

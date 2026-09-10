@@ -1,12 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
 
-import { vars } from '@/styles/theme.css';
-
 import { Card } from './Card';
 
 const moreLinkStyle = {
-  color: vars.color.textOnLink.default,
+  color: 'var(--color-text-on-link-default)',
   fontWeight: 700,
   fontSize: '0.875rem',
   textDecoration: 'underline',

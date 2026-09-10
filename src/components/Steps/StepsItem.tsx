@@ -2,20 +2,14 @@ import { clsx } from 'clsx';
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { Icon } from '../Icon/Icon';
-import {
-  stepsItem,
-  stepsItemContainer,
-  stepsItemIcon,
-  stepsItemLabel,
-  stepsItemStatus,
-} from './StepsItem.css';
+import styles from './StepsItem.module.css';
 import { useStepsContext, useStepsItemNumber } from './StepsContext';
 
 const CHECK_ICON_SIZE = 20;
 
 // 静的な要素は巻き上げる
 const FINISHED_ICON = (
-  <span className={stepsItemIcon.finished}>
+  <span className={styles.stepsItem__icon}>
     <Icon name="outlineCheck" width={CHECK_ICON_SIZE} height={CHECK_ICON_SIZE} />
   </span>
 );
@@ -77,27 +71,23 @@ export const StepsItem = ({ children, className, ...props }: StepsItemProps) => 
 
   const statusText = getStatusText();
 
+  // 見た目（円の配色・ラベルの太さ）は CSS がこの属性から引く
+  const status = isFinished ? 'finished' : isCurrent ? 'current' : 'default';
+
   return (
     // data-orientation は context の値と常に一致させたいので、利用側の props より後に指定する
-    <li {...props} data-orientation={orientation} className={clsx(stepsItemContainer, className)}>
+    <li {...props} data-orientation={orientation} className={clsx(styles.stepsItem, className)}>
       {/* 現在ステップは aria-current と状態テキストが重複して読み上げられるが、
           aria-current を読み上げない支援技術のための保険として意図的に併記している */}
       <Component
         {...buttonProps}
-        className={stepsItem}
+        className={styles.stepsItem__control}
+        data-status={status}
         aria-current={isCurrent ? 'step' : undefined}
       >
-        {isFinished ? (
-          FINISHED_ICON
-        ) : (
-          <span className={isCurrent ? stepsItemIcon.current : stepsItemIcon.default}>
-            {stepNumber}
-          </span>
-        )}
-        <span className={isCurrent ? stepsItemLabel.current : stepsItemLabel.default}>
-          {children}
-        </span>
-        {statusText != null && <span className={stepsItemStatus}>{statusText}</span>}
+        {isFinished ? FINISHED_ICON : <span className={styles.stepsItem__icon}>{stepNumber}</span>}
+        <span className={styles.stepsItem__label}>{children}</span>
+        {statusText != null && <span className={styles.stepsItem__status}>{statusText}</span>}
       </Component>
     </li>
   );

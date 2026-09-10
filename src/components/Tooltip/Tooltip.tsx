@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 
-import { tooltip, tooltipArrow, tooltipPopup } from './Tooltip.css';
+import styles from './Tooltip.module.css';
 
 /**
  * CSS カスタム識別子に使えない文字。
@@ -83,7 +83,7 @@ export const Tooltip = ({
 
   return (
     <span
-      className={clsx(tooltip, className)}
+      className={clsx(styles.tooltip, className)}
       style={{ ...style, anchorName } as CSSProperties}
       data-open={open}
       aria-describedby={rawId}
@@ -98,14 +98,14 @@ export const Tooltip = ({
       <span
         ref={popupRef}
         popover="manual"
-        className={tooltipPopup}
+        className={styles.tooltip__popup}
         role="tooltip"
         id={rawId}
         data-placement={placement}
         style={{ positionAnchor: anchorName } as CSSProperties}
       >
         {content}
-        <span className={tooltipArrow} aria-hidden="true" />
+        <span className={styles.tooltip__arrow} aria-hidden="true" />
       </span>
     </span>
   );

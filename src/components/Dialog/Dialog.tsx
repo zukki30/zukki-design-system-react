@@ -20,14 +20,7 @@ import { headingTag } from '@/utils/headingTag';
 import { Icon } from '../Icon/Icon';
 import { IconButton } from '../IconButton/IconButton';
 
-import {
-  dialog,
-  dialogBody,
-  dialogClose,
-  dialogFooter,
-  dialogHeader,
-  dialogTitle,
-} from './Dialog.css';
+import styles from './Dialog.module.css';
 import { DialogContext, type DialogContextValue, useDialogContext } from './DialogContext';
 
 const CLOSE_ICON_SIZE = 20;
@@ -195,7 +188,7 @@ export function Dialog({
       <dialog
         {...props}
         ref={mergedRef}
-        className={clsx(dialog, className)}
+        className={clsx(styles.dialog, className)}
         // 登録されたタイトルがあるときだけ紐付ける（未描画なら参照先が存在しないため）
         aria-labelledby={ariaLabelledBy ?? (titleIds.length > 0 ? titleIds.join(' ') : undefined)}
         onClose={handleNativeClose}
@@ -214,7 +207,7 @@ export type DialogHeaderProps = ComponentPropsWithRef<'div'>;
  * ダイアログのヘッダー。`Dialog.Title` と `Dialog.Close` を並べる
  */
 const DialogHeader = ({ className, ...props }: DialogHeaderProps) => {
-  return <div {...props} className={clsx(dialogHeader, className)} />;
+  return <div {...props} className={clsx(styles.dialog__header, className)} />;
 };
 
 export type DialogTitleProps = {
@@ -257,7 +250,7 @@ const DialogTitle = ({ level = 2, className, ...props }: DialogTitleProps) => {
     ...props,
     // ルートの aria-labelledby から参照される id。型でも Omit していて利用側からは変えられない
     id: titleId,
-    className: clsx(dialogTitle, className),
+    className: clsx(styles.dialog__title, className),
   });
 };
 
@@ -267,7 +260,7 @@ export type DialogBodyProps = ComponentPropsWithRef<'div'>;
  * ダイアログの本文
  */
 const DialogBody = ({ className, ...props }: DialogBodyProps) => {
-  return <div {...props} className={clsx(dialogBody, className)} />;
+  return <div {...props} className={clsx(styles.dialog__body, className)} />;
 };
 
 export type DialogFooterProps = ComponentPropsWithRef<'div'>;
@@ -276,7 +269,7 @@ export type DialogFooterProps = ComponentPropsWithRef<'div'>;
  * ダイアログのフッター。ボタンなどを右寄せで並べる
  */
 const DialogFooter = ({ className, ...props }: DialogFooterProps) => {
-  return <div {...props} className={clsx(dialogFooter, className)} />;
+  return <div {...props} className={clsx(styles.dialog__footer, className)} />;
 };
 
 // type は受け付けない。`type="submit"` を <form method="dialog"> 内で指定すると、
@@ -331,7 +324,7 @@ const DialogClose = ({
   return (
     <IconButton
       {...props}
-      className={clsx(dialogClose, className)}
+      className={clsx(styles.dialog__close, className)}
       variant={variant}
       size={size}
       aria-label={ariaLabel}

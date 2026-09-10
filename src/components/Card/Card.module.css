@@ -1,0 +1,99 @@
+/*
+ * 余白はカスタムプロパティ経由で配る。
+ *
+ * `.card[data-size='sm'] .card__body` のような子孫セレクタにはできない。
+ * Card は入れ子にでき、外側の指定が内側のパーツにも届いてしまうためである
+ * （両方のルールが同じ詳細度で当たり、勝敗が出力順で決まる）。
+ * カスタムプロパティは継承するので、内側の Card が値を上書きすれば
+ * その子孫は必ず内側の値を引く。パーツがルート直下にあるかどうかにも依存しない。
+ */
+.card {
+  --zds-card-padding: var(--spacing-2xl);
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden;
+  background-color: var(--color-surface-raised);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-surface-subtle);
+  border-radius: var(--border-radius-lg);
+}
+
+.card[data-size='sm'] {
+  --zds-card-padding: var(--spacing-xl);
+}
+
+.card__image {
+  display: block;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.card__header {
+  box-sizing: border-box;
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  width: 100%;
+  flex-shrink: 0;
+  padding-top: var(--zds-card-padding);
+  padding-inline: var(--zds-card-padding);
+  padding-bottom: var(--spacing-none);
+}
+
+.card__title {
+  /*
+   * 長いタイトルは action を押し出さず 1 行で省略する。
+   * .card__action が flex-shrink: 0 なので、縮む余地はこちらに寄る
+   */
+  composes: truncate from '../../styles/mixins.module.css';
+  /* level 指定時は h2〜h6 として描画されるため、UA 既定の余白を打ち消す */
+  margin: 0;
+  flex: 1 1 auto;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-heading);
+  color: var(--color-text-on-surface-default);
+}
+
+.card__action {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  /* タイトルの有無にかかわらずヘッダーの右端に寄せる */
+  margin-inline-start: auto;
+}
+
+.card__body {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  flex-shrink: 0;
+  /*
+   * 本文は省略せず折り返す。URL のような分割できない長い語も
+   * カード幅で折り返して .card の overflow: hidden で切られないようにする
+   */
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: var(--zds-card-padding);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-default);
+  color: var(--color-text-on-surface-default);
+}
+
+.card__footer {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex-shrink: 0;
+  padding-top: var(--spacing-none);
+  padding-bottom: var(--zds-card-padding);
+  padding-inline: var(--zds-card-padding);
+}
