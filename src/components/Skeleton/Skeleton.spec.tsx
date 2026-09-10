@@ -3,7 +3,7 @@ import { createRef, type ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Skeleton, type SkeletonProps } from './Skeleton';
-import { skeleton as skeletonClass } from './Skeleton.css';
+import styles from './Skeleton.module.css';
 
 const renderSkeleton = (ui: ReactElement) => {
   const { container } = render(ui);
@@ -49,7 +49,7 @@ describe('Skeleton', () => {
     const skeleton = renderSkeleton(<Skeleton className="custom-class" />);
 
     // 上書きではなくマージであることを、ベースのクラスが残っているかで確認する
-    expect(skeleton).toHaveClass(skeletonClass, 'custom-class');
+    expect(skeleton).toHaveClass(styles.skeleton, 'custom-class');
   });
 
   it('ネイティブ属性を span に渡す', () => {

@@ -4,15 +4,7 @@ import { type ComponentPropsWithRef, useEffect, useId, useMemo } from 'react';
 import { useIdRegistry } from '@/hooks/useIdRegistry';
 import { toTruthyOrUndefined } from '@/utils/dataAttribute';
 
-import {
-  formField,
-  formFieldControl,
-  formFieldErrorText,
-  formFieldHelperText,
-  formFieldLabel,
-  formFieldRequiredAsterisk,
-  formFieldRequiredBadge,
-} from './FormField.css';
+import styles from './FormField.module.css';
 import {
   FormFieldContext,
   type FormFieldContextValue,
@@ -143,7 +135,7 @@ export function FormField({
       {/* data 属性は状態と常に一致させたいので、利用側の props より後に指定する */}
       <div
         {...props}
-        className={clsx(formField, className)}
+        className={clsx(styles.formField, className)}
         role={role ?? (isLabelledGroup ? 'group' : undefined)}
         aria-labelledby={ariaLabelledBy ?? (isLabelledGroup ? labelId : undefined)}
         data-orientation={orientation}
@@ -191,16 +183,16 @@ const FormFieldLabel = ({ className, children, ...props }: FormFieldLabelProps) 
     <label
       {...props}
       id={labelId}
-      className={clsx(formFieldLabel, className)}
+      className={clsx(styles.formField__label, className)}
       htmlFor={meta.labelledControlId}
     >
       {children}
       {showAsterisk && (
-        <span className={formFieldRequiredAsterisk} aria-hidden="true">
+        <span className={styles.formField__requiredAsterisk} aria-hidden="true">
           *
         </span>
       )}
-      {showBadge && <span className={formFieldRequiredBadge}>必須</span>}
+      {showBadge && <span className={styles.formField__requiredBadge}>必須</span>}
     </label>
   );
 };
@@ -231,7 +223,7 @@ const FormFieldControl = ({ className, children, ...props }: FormFieldControlPro
   });
 
   return (
-    <div {...props} className={clsx(formFieldControl, className)}>
+    <div {...props} className={clsx(styles.formField__control, className)}>
       {control}
     </div>
   );
@@ -252,7 +244,9 @@ const FormFieldHelperText = ({ className, ...props }: FormFieldHelperTextProps) 
 
   useEffect(() => registerHelperText(helperTextId), [registerHelperText, helperTextId]);
 
-  return <p {...props} id={helperTextId} className={clsx(formFieldHelperText, className)} />;
+  return (
+    <p {...props} id={helperTextId} className={clsx(styles.formField__helperText, className)} />
+  );
 };
 
 export type FormFieldErrorTextProps = Omit<ComponentPropsWithRef<'p'>, 'id'>;
@@ -273,7 +267,12 @@ const FormFieldErrorText = ({ className, role = 'alert', ...props }: FormFieldEr
   useEffect(() => registerErrorText(errorTextId), [registerErrorText, errorTextId]);
 
   return (
-    <p {...props} id={errorTextId} role={role} className={clsx(formFieldErrorText, className)} />
+    <p
+      {...props}
+      id={errorTextId}
+      role={role}
+      className={clsx(styles.formField__errorText, className)}
+    />
   );
 };
 

@@ -5,7 +5,7 @@ import { isRenderable } from '@/utils/renderableNode';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
-import { radio, radioBox, radioControl, radioDot, radioInput, radioLabel } from './Radio.css';
+import styles from './Radio.module.css';
 
 export type RadioProps = {
   /**
@@ -22,15 +22,15 @@ export const Radio = ({ children, disabled: disabledProp, className, ...props }:
   const { disabled } = useFormFieldState({ disabled: disabledProp });
 
   return (
-    <label className={clsx(radio, className)} data-disabled={disabled}>
-      <span className={radioControl}>
-        <input type="radio" className={radioInput} disabled={disabled} {...props} />
-        <span className={radioBox} aria-hidden="true">
-          <span className={radioDot} />
+    <label className={clsx(styles.radio, className)} data-disabled={disabled}>
+      <span className={styles.radio__control}>
+        <input type="radio" className={styles.radio__input} disabled={disabled} {...props} />
+        <span className={styles.radio__box} aria-hidden="true">
+          <span className={styles.radio__dot} />
         </span>
       </span>
 
-      {isRenderable(children) && <span className={radioLabel}>{children}</span>}
+      {isRenderable(children) && <span className={styles.radio__label}>{children}</span>}
     </label>
   );
 };

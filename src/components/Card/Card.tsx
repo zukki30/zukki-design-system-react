@@ -5,24 +5,16 @@ import type { ComponentPropsWithRef, Ref } from 'react';
 import type { HeadingLevel } from '@/types';
 import { headingTag } from '@/utils/headingTag';
 
-import {
-  card,
-  cardAction,
-  cardBody,
-  cardFooter,
-  cardHeader,
-  cardImage,
-  cardTitle,
-} from './Card.css';
+import styles from './Card.module.css';
 import { CardContext, type CardContextValue, type CardSize, useCardContext } from './CardContext';
 
 export type CardProps = {
   /**
-   * カードのサイズ。サブコンポーネントの余白は context 経由でこの値から決まる。
+   * カードのサイズ。パーツの余白はこの値から決まる。
    *
-   * ルート要素には `data-size` 属性としても出力される。スタイルはすべて
-   * `styleVariants()` 側で解決しているため CSS からは参照していないが、
-   * 利用側がカード全体を size 別にスタイリングするためのフックとして残している
+   * ルート要素に `data-size` 属性として出力され、CSS はそれを見て余白の
+   * カスタムプロパティを切り替える。値は継承するため、Card を入れ子にしても
+   * 内側のパーツは内側の size に従う
    *
    * @default 'md'
    */
@@ -59,7 +51,7 @@ export function Card({ size = 'md', className, children, ...props }: CardProps) 
 
   return (
     // data-size は size と常に一致させたいので、利用側の props より後に指定する
-    <div {...props} className={clsx(card, className)} data-size={size}>
+    <div {...props} className={clsx(styles.card, className)} data-size={size}>
       <CardContext value={contextValue}>{children}</CardContext>
     </div>
   );
@@ -71,7 +63,7 @@ export type CardImageProps = ComponentPropsWithRef<'div'>;
  * カード上部の画像領域。img 要素などを children に渡す
  */
 const CardImage = ({ className, ...props }: CardImageProps) => {
-  return <div {...props} className={clsx(cardImage, className)} />;
+  return <div {...props} className={clsx(styles.card__image, className)} />;
 };
 
 export type CardHeaderProps = ComponentPropsWithRef<'div'>;
@@ -80,11 +72,11 @@ export type CardHeaderProps = ComponentPropsWithRef<'div'>;
  * カードのヘッダー。Card.Title / Card.Action を任意の組み合わせで配置できる
  */
 const CardHeader = ({ className, ...props }: CardHeaderProps) => {
-  const {
-    state: { size },
-  } = useCardContext();
+  // 余白は data-size から CSS が引く。ここで context を読むのは、
+  // <Card> の外側で使われたことを早期に知らせるため
+  useCardContext();
 
-  return <div {...props} className={clsx(cardHeader[size], className)} />;
+  return <div {...props} className={clsx(styles.card__header, className)} />;
 };
 
 export type CardTitleProps = {
@@ -127,7 +119,7 @@ const CardTitle = ({ level, className, ref, ...props }: CardTitleProps) => {
   return createElement(level === undefined ? 'div' : headingTag(level), {
     ...props,
     ref,
-    className: clsx(cardTitle, className),
+    className: clsx(styles.card__title, className),
   });
 };
 
@@ -137,7 +129,7 @@ export type CardActionProps = ComponentPropsWithRef<'div'>;
  * ヘッダー右側に置く補足要素（リンクなど）。Card.Title の有無に依存しない
  */
 const CardAction = ({ className, ...props }: CardActionProps) => {
-  return <div {...props} className={clsx(cardAction, className)} />;
+  return <div {...props} className={clsx(styles.card__action, className)} />;
 };
 
 export type CardBodyProps = ComponentPropsWithRef<'div'>;
@@ -146,11 +138,11 @@ export type CardBodyProps = ComponentPropsWithRef<'div'>;
  * カード本文
  */
 const CardBody = ({ className, ...props }: CardBodyProps) => {
-  const {
-    state: { size },
-  } = useCardContext();
+  // 余白は data-size から CSS が引く。ここで context を読むのは、
+  // <Card> の外側で使われたことを早期に知らせるため
+  useCardContext();
 
-  return <div {...props} className={clsx(cardBody[size], className)} />;
+  return <div {...props} className={clsx(styles.card__body, className)} />;
 };
 
 export type CardFooterProps = ComponentPropsWithRef<'div'>;
@@ -159,11 +151,11 @@ export type CardFooterProps = ComponentPropsWithRef<'div'>;
  * カードのフッター
  */
 const CardFooter = ({ className, ...props }: CardFooterProps) => {
-  const {
-    state: { size },
-  } = useCardContext();
+  // 余白は data-size から CSS が引く。ここで context を読むのは、
+  // <Card> の外側で使われたことを早期に知らせるため
+  useCardContext();
 
-  return <div {...props} className={clsx(cardFooter[size], className)} />;
+  return <div {...props} className={clsx(styles.card__footer, className)} />;
 };
 
 // compound components として合成できるようにルートへぶら下げる

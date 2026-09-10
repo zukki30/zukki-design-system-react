@@ -1,0 +1,280 @@
+.button {
+  composes: interactiveTouch from '../../styles/mixins.module.css';
+  position: relative;
+  box-sizing: border-box;
+  padding-block: var(--spacing-none);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  cursor: pointer;
+  line-height: 0;
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-2xs);
+}
+
+.button[data-selected='true'],
+.button:disabled,
+.button[data-loading='true'] {
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- サイズ */
+
+.button[data-size='sm'] {
+  padding-inline: var(--spacing-2xl);
+  border-radius: var(--border-radius-sm);
+}
+
+.button[data-size='sm'][data-has-start-icon='true'] {
+  padding-inline-start: var(--spacing-xl);
+}
+
+.button[data-size='sm'][data-has-end-icon='true'] {
+  padding-inline-end: var(--spacing-xl);
+}
+
+.button[data-size='md'] {
+  padding-inline: var(--spacing-3xl);
+  border-radius: var(--border-radius-md);
+}
+
+.button[data-size='md'][data-has-start-icon='true'] {
+  padding-inline-start: var(--spacing-2xl);
+}
+
+.button[data-size='md'][data-has-end-icon='true'] {
+  padding-inline-end: var(--spacing-2xl);
+}
+
+/* ---------------------------------------------------------------- バリアント */
+
+.button[data-variant='default'] {
+  background-color: var(--color-default-default);
+  border-color: var(--color-default-subtle);
+  color: var(--color-text-on-light-default);
+}
+
+.button[data-variant='default']:hover {
+  background-color: var(--color-default-hover);
+}
+
+.button[data-variant='default'][data-selected='true'] {
+  background-color: var(--color-default-seleted);
+  border-color: var(--color-default-seleted);
+}
+
+.button[data-variant='default']:disabled {
+  background-color: var(--color-default-default);
+  border-color: var(--color-default-disabled);
+  color: var(--color-text-on-light-disabled);
+}
+
+.button[data-variant='primary'] {
+  background-color: var(--color-primary-default);
+  border-color: var(--color-primary-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.button[data-variant='primary']:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.button[data-variant='primary'][data-selected='true'] {
+  background-color: var(--color-primary-seleted);
+  border-color: var(--color-primary-seleted);
+}
+
+.button[data-variant='primary']:disabled {
+  background-color: var(--color-primary-disabled);
+  border-color: var(--color-primary-disabled);
+}
+
+.button[data-variant='secondary'] {
+  background-color: var(--color-secondary-default);
+  border-color: var(--color-secondary-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.button[data-variant='secondary']:hover {
+  background-color: var(--color-secondary-hover);
+  border-color: var(--color-secondary-hover);
+}
+
+.button[data-variant='secondary'][data-selected='true'] {
+  background-color: var(--color-secondary-seleted);
+  border-color: var(--color-secondary-seleted);
+}
+
+.button[data-variant='secondary']:disabled {
+  background-color: var(--color-secondary-disabled);
+  border-color: var(--color-secondary-disabled);
+}
+
+.button[data-variant='success'] {
+  background-color: var(--color-success-default);
+  border-color: var(--color-success-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.button[data-variant='success']:hover {
+  background-color: var(--color-success-hover);
+  border-color: var(--color-success-hover);
+}
+
+.button[data-variant='success'][data-selected='true'] {
+  background-color: var(--color-success-seleted);
+  border-color: var(--color-success-seleted);
+}
+
+.button[data-variant='success']:disabled {
+  background-color: var(--color-success-disabled);
+  border-color: var(--color-success-disabled);
+}
+
+.button[data-variant='failure'] {
+  background-color: var(--color-failure-default);
+  border-color: var(--color-failure-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.button[data-variant='failure']:hover {
+  background-color: var(--color-failure-hover);
+  border-color: var(--color-failure-hover);
+}
+
+.button[data-variant='failure'][data-selected='true'] {
+  background-color: var(--color-failure-seleted);
+  border-color: var(--color-failure-seleted);
+}
+
+.button[data-variant='failure']:disabled {
+  background-color: var(--color-failure-disabled);
+  border-color: var(--color-failure-disabled);
+}
+
+.button[data-variant='profile'] {
+  background-color: var(--color-profile-default);
+  border-color: var(--color-profile-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.button[data-variant='profile']:hover {
+  background-color: var(--color-profile-hover);
+  border-color: var(--color-profile-hover);
+}
+
+.button[data-variant='profile'][data-selected='true'] {
+  background-color: var(--color-profile-seleted);
+  border-color: var(--color-profile-seleted);
+}
+
+.button[data-variant='profile']:disabled {
+  background-color: var(--color-profile-disabled);
+  border-color: var(--color-profile-disabled);
+}
+
+.button[data-variant='works'] {
+  background-color: var(--color-works-default);
+  border-color: var(--color-works-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.button[data-variant='works']:hover {
+  background-color: var(--color-works-hover);
+  border-color: var(--color-works-hover);
+}
+
+.button[data-variant='works'][data-selected='true'] {
+  background-color: var(--color-works-seleted);
+  border-color: var(--color-works-seleted);
+}
+
+.button[data-variant='works']:disabled {
+  background-color: var(--color-works-disabled);
+  border-color: var(--color-works-disabled);
+}
+
+.button[data-variant='outputs'] {
+  background-color: var(--color-outputs-default);
+  border-color: var(--color-outputs-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.button[data-variant='outputs']:hover {
+  background-color: var(--color-outputs-hover);
+  border-color: var(--color-outputs-hover);
+}
+
+.button[data-variant='outputs'][data-selected='true'] {
+  background-color: var(--color-outputs-seleted);
+  border-color: var(--color-outputs-seleted);
+}
+
+.button[data-variant='outputs']:disabled {
+  background-color: var(--color-outputs-disabled);
+  border-color: var(--color-outputs-disabled);
+}
+
+/* ---------------------------------------------------------------- パーツ */
+
+.button__inner {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  gap: var(--spacing-sm);
+}
+
+/*
+ * visibility: hidden だとラベルがアクセシビリティツリーから外れ、loading 中の
+ * アクセシブルネームが Spinner の文言だけになってしまうため opacity で隠す
+ */
+.button__inner[data-loading='true'] {
+  opacity: 0;
+}
+
+.button__label {
+  margin-block: var(--leading-trim);
+  box-sizing: border-box;
+  display: flex;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-line);
+}
+
+.button[data-size='sm'] .button__label {
+  padding-block-start: var(--spacing-lg);
+  padding-block-end: var(--spacing-md);
+  font-size: var(--font-size-xs);
+}
+
+.button[data-size='md'] .button__label {
+  padding-block-start: var(--spacing-xl);
+  padding-block-end: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+}
+
+.button__loading {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

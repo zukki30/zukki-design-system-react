@@ -1,0 +1,99 @@
+.input {
+  /*
+   * UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin のコメント）。
+   * 利用側が type="date" / "time" などを渡せるぶん、対象になるネイティブウィジェットが多い
+   */
+  composes: inputColorSchemeLight from '../../styles/mixins.module.css';
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--color-input-background-default);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-input-border-default);
+  border-radius: var(--border-radius-lg);
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.input:hover:not([data-disabled='true']):not([data-error='true']) {
+  border-color: var(--color-input-border-hover);
+}
+
+.input:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-xs);
+}
+
+.input[data-error='true'] {
+  background-color: var(--color-input-background-error);
+  border-color: var(--color-input-border-error);
+}
+
+.input[data-error='true']:hover:not([data-disabled='true']) {
+  border-color: var(--color-input-border-error-hover);
+}
+
+.input[data-disabled='true'] {
+  background-color: var(--color-input-background-disabled);
+  border-color: var(--color-input-border-disabled);
+}
+
+.input__field {
+  flex: 1 0 0;
+  min-width: 0;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  padding-inline: var(--spacing-sm);
+  padding-block: var(--spacing-md);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-line);
+  color: var(--color-text-on-light-default);
+}
+
+.input__field::placeholder {
+  color: var(--color-text-on-light-placeholder);
+}
+
+.input__field:disabled {
+  color: var(--color-text-on-light-disabled);
+  -webkit-text-fill-color: var(--color-text-on-light-disabled);
+  cursor: not-allowed;
+}
+
+.input__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+  color: var(--color-text-on-light-subtle);
+}
+
+.input__icon[data-position='start'] {
+  padding-inline-start: var(--spacing-sm);
+}
+
+.input__icon[data-position='end'] {
+  padding-inline-end: var(--spacing-sm);
+}
+
+/*
+ * 祖先を限定しないと、data-disabled を持つ他コンポーネント（FormField など）の
+ * 内側に置いたときにアドーンメントだけが disabled 色になる
+ */
+.input[data-disabled='true'] .input__icon {
+  color: var(--color-text-on-light-disabled);
+}

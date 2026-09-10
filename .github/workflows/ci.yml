@@ -23,6 +23,9 @@ jobs:
           - format:check
           - typecheck
           - test
+          # *.module.css.d.ts は生成物。build に生成が組み込まれているため、
+          # 古いままコミットされても build は通ってしまう。鮮度はここで見る
+          - check:css-types
     steps:
       - uses: actions/checkout@v7
 

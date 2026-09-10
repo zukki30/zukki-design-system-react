@@ -3,23 +3,14 @@ import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 import { Icon } from '../Icon/Icon';
 
-import {
-  breadcrumb,
-  breadcrumbCurrent,
-  breadcrumbIcon,
-  breadcrumbItem,
-  breadcrumbLabel,
-  breadcrumbLink,
-  breadcrumbList,
-  breadcrumbSeparator,
-} from './Breadcrumb.css';
+import styles from './Breadcrumb.module.css';
 
 const SEPARATOR_ICON_SIZE = 20;
 
 // 静的な要素は巻き上げる。ここは items.map() の中なので項目数ぶん生成を減らせる
 const SEPARATOR_ICON = (
   <Icon
-    className={breadcrumbSeparator}
+    className={styles.breadcrumb__separator}
     name="chevronRight"
     width={SEPARATOR_ICON_SIZE}
     height={SEPARATOR_ICON_SIZE}
@@ -72,30 +63,35 @@ export const Breadcrumb = ({
   ...props
 }: BreadcrumbProps) => {
   return (
-    <nav className={clsx(breadcrumb, className)} aria-label={ariaLabel} {...props}>
-      <ol className={breadcrumbList}>
+    <nav
+      className={clsx(styles.breadcrumb, className)}
+      aria-label={ariaLabel}
+      {...props}
+      data-variant={variant}
+    >
+      <ol className={styles.breadcrumb__list}>
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           const key = `${index}-${item.href ?? ''}`;
           const content = (
             <>
-              {item.icon ? <span className={breadcrumbIcon}>{item.icon}</span> : null}
-              <span className={breadcrumbLabel}>{item.label}</span>
+              {item.icon ? <span className={styles.breadcrumb__icon}>{item.icon}</span> : null}
+              <span className={styles.breadcrumb__label}>{item.label}</span>
             </>
           );
 
           return (
-            <li key={key} className={breadcrumbItem}>
+            <li key={key} className={styles.breadcrumb__item}>
               {isLast ? (
-                <span className={breadcrumbCurrent[variant]} aria-current="page">
+                <span className={styles.breadcrumb__current} aria-current="page">
                   {content}
                 </span>
               ) : item.href != null ? (
-                <a className={breadcrumbLink} href={item.href}>
+                <a className={styles.breadcrumb__link} href={item.href}>
                   {content}
                 </a>
               ) : (
-                <span className={breadcrumbLink}>{content}</span>
+                <span className={styles.breadcrumb__link}>{content}</span>
               )}
 
               {!isLast && SEPARATOR_ICON}

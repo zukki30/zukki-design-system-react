@@ -1,0 +1,178 @@
+.stepsItem {
+  --zds-steps-item-icon-size: 32px;
+  /* ステップ同士をつなぐ棒の太さ */
+  --zds-steps-item-bar-size: 2px;
+
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.stepsItem::after {
+  background-color: var(--color-surface-subtle);
+  content: '';
+}
+
+.stepsItem:last-child {
+  flex: none;
+}
+
+/*
+ * 横並びの末尾のみ、伸ばさずに縮む余地だけ残す。
+ * 縦並びで縮ませると高さが潰れる意味になってしまうためスコープを絞る
+ */
+.stepsItem[data-orientation='horizontal']:last-child {
+  flex: 0 1 auto;
+}
+
+.stepsItem:last-child::after {
+  display: none;
+}
+
+.stepsItem[data-orientation='horizontal'] {
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.stepsItem[data-orientation='horizontal']::after {
+  flex: 1;
+  height: var(--zds-steps-item-bar-size);
+}
+
+.stepsItem[data-orientation='vertical'] {
+  gap: var(--spacing-sm);
+  flex-direction: column;
+}
+
+.stepsItem[data-orientation='vertical']::after {
+  width: var(--zds-steps-item-bar-size);
+  height: 20px;
+  margin-inline-start: calc(var(--spacing-xl) - var(--zds-steps-item-bar-size));
+}
+
+.stepsItem__control {
+  /* .stepsItem__status（position: absolute）の包含ブロックを固定する */
+  position: relative;
+  /* 長いラベルのときに親の幅まで縮められるようにする（縮んだぶんはラベル側で省略される） */
+  min-width: 0;
+  display: grid;
+  align-items: center;
+  justify-content: flex-start;
+  /* ラベル列は auto のままだと min-content 未満に縮まないため minmax(0, auto) にする */
+  grid-template-columns: var(--zds-steps-item-icon-size) minmax(0, auto);
+  gap: var(--spacing-sm);
+  line-height: 1;
+}
+
+/*
+ * 縦並びの主軸は縦なので、flex-shrink は「高さが縮む」意味になる。
+ * 横幅のあふれ対策は不要なため、縮まない従来の挙動を保つ。
+ * data-orientation は FormField など他コンポーネントも使うため、
+ * 祖先セレクタは Steps.Item のルートに限定する
+ */
+.stepsItem[data-orientation='vertical'] .stepsItem__control {
+  flex-shrink: 0;
+}
+
+.stepsItem__control:is(button) {
+  padding: var(--spacing-none);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* フォーカス時の視覚フィードバックを Button / IconButton / Tag と揃える */
+.stepsItem__control:is(button):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-2xs);
+}
+
+.stepsItem__icon {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: var(--zds-steps-item-icon-size);
+  height: var(--zds-steps-item-icon-size);
+  border-radius: var(--border-radius-full);
+  border-width: 1px;
+  border-style: solid;
+  font-family: var(--font-family-number);
+  font-size: var(--font-size-sm);
+  font-style: normal;
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+}
+
+.stepsItem__control[data-status='default'] .stepsItem__icon {
+  border-color: var(--color-surface-subtle);
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-on-surface-default);
+}
+
+.stepsItem__control[data-status='default']:is(button):hover .stepsItem__icon {
+  border-color: var(--color-primary-text);
+}
+
+.stepsItem__control[data-status='current'] .stepsItem__icon {
+  border-color: var(--color-primary-default);
+  background-color: var(--color-primary-default);
+  color: var(--color-text-on-accent-default);
+}
+
+.stepsItem__control[data-status='current']:is(button):hover .stepsItem__icon {
+  border-color: var(--color-primary-hover);
+  background-color: var(--color-primary-hover);
+}
+
+.stepsItem__control[data-status='finished'] .stepsItem__icon {
+  border-color: var(--color-primary-subtle);
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary-text);
+}
+
+/* 視覚的には隠しつつ、支援技術には読み上げさせる状態テキスト */
+.stepsItem__status {
+  position: absolute;
+  /*
+   * 絶対配置でブロック化される挙動を明示する。アクセシブルネーム計算時に
+   * ラベルとの間へ区切りが入り「カート 完了」のように読み上げられる
+   */
+  display: block;
+  width: 1px;
+  height: 1px;
+  padding: var(--spacing-none);
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 横並びはステップ同士が幅を奪い合うため 1 行で省略する */
+.stepsItem__label {
+  composes: truncate from '../../styles/mixins.module.css';
+  color: var(--color-text-on-surface-default);
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-line);
+  font-weight: var(--font-weight-normal);
+}
+
+/*
+ * 現在ステップを色以外でも示す（WCAG 1.4.1）。完了ステップはチェックアイコンという
+ * 形状差があるが、現在ステップは default と円の形が同じで差が色だけになるため。
+ * 「現在」を太字で表すのは Breadcrumb の現在ページと揃えている
+ */
+.stepsItem__control[data-status='current'] .stepsItem__label {
+  font-weight: var(--font-weight-bold);
+}
+
+/* 縦並びは 1 ステップが 1 行を占めて幅に余裕があるため、省略せず折り返して全文を見せる */
+.stepsItem[data-orientation='vertical'] .stepsItem__label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.stepsItem__control:is(button):hover .stepsItem__label {
+  color: var(--color-primary-text);
+}

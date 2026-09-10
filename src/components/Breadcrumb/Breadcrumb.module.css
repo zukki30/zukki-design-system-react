@@ -1,0 +1,83 @@
+.breadcrumb {
+  display: block;
+}
+
+.breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  /* 長いラベルのときに行幅まで縮められるようにする（flex-wrap で自身の行に落ちたあと省略される） */
+  min-width: 0;
+}
+
+.breadcrumb__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-line);
+  color: var(--color-text-on-surface-subtle);
+  text-decoration: underline;
+}
+
+a.breadcrumb__link:hover {
+  color: var(--color-text-on-surface-default);
+}
+
+.breadcrumb__current {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-line);
+}
+
+/* 現在地の色だけがバリアントで変わる。意味カラーは面の上の文字なので text の段を使う */
+.breadcrumb[data-variant='default'] .breadcrumb__current {
+  color: var(--color-text-on-surface-strong);
+}
+
+.breadcrumb[data-variant='profile'] .breadcrumb__current {
+  color: var(--color-profile-text);
+}
+
+.breadcrumb[data-variant='works'] .breadcrumb__current {
+  color: var(--color-works-text);
+}
+
+.breadcrumb[data-variant='outputs'] .breadcrumb__current {
+  color: var(--color-outputs-text);
+}
+
+/* アイコンは縮めず、あふれはラベル側で吸収する */
+.breadcrumb__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* text-overflow は flex コンテナ自身には効かないため、ラベルを専用の要素に包んで省略する */
+.breadcrumb__label {
+  composes: truncate from '../../styles/mixins.module.css';
+}
+
+.breadcrumb__separator {
+  display: block;
+  flex-shrink: 0;
+  color: var(--color-text-on-surface-subtle);
+}

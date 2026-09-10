@@ -1,0 +1,91 @@
+/*
+ * TODO(#104): elevation4 のドロップシャドウを当て直す。
+ * --elevation-styles-elevation4-blur は単位なしの 8 で、`var(--…)px` は `8px` にならず
+ * （置換はトークン単位で行われる）box-shadow の宣言ごと破棄される。
+ * 移行前も計算値は none だったため、見た目を揃えてここでは宣言を置かない。
+ * 当て直すときは calc(var(--elevation-styles-elevation4-blur) * 1px) とする
+ */
+.dialog {
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: stretch;
+  width: 520px;
+  max-width: calc(100% - var(--spacing-xl) - var(--spacing-xl));
+  /*
+   * 余白はルートではなく各パーツが持つ。
+   * ヘッダーが任意になったため、ルートに上余白を置くと未合成時に本文の余白と二重になる
+   */
+  padding: 0;
+  background-color: var(--color-surface-raised);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-surface-subtle);
+  border-radius: var(--border-radius-xl);
+  color: var(--color-text-on-surface-default);
+  /*
+   * モーダル表示中の dialog は UA スタイルで overflow:auto / max-height を持つため、
+   * 本文が長いとダイアログ自体がスクロールする。そのスクロールが背景へ連鎖しないようにする
+   */
+  overscroll-behavior: contain;
+}
+
+/* ネイティブ dialog は閉じている間 display:none。開いているときだけ flex にする */
+.dialog[open] {
+  display: flex;
+}
+
+.dialog::backdrop {
+  background-color: var(--color-black);
+  opacity: 0.25;
+}
+
+.dialog__header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  flex-shrink: 0;
+  padding-block-start: var(--spacing-2xl);
+  padding-inline: var(--spacing-2xl);
+}
+
+.dialog__title {
+  margin: 0;
+  flex-shrink: 0;
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-heading);
+  color: var(--color-text-on-surface-default);
+}
+
+.dialog__close {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+.dialog__body {
+  box-sizing: border-box;
+  width: 100%;
+  flex-shrink: 0;
+  padding: var(--spacing-2xl);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-default);
+  color: var(--color-text-on-surface-default);
+}
+
+.dialog__footer {
+  box-sizing: border-box;
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  flex-shrink: 0;
+  padding-top: var(--spacing-none);
+  padding-bottom: var(--spacing-2xl);
+  padding-inline: var(--spacing-2xl);
+}

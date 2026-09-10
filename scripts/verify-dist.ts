@@ -95,6 +95,30 @@ const hasFixedScheme = (css: string, scheme: Scheme) =>
 check('light 版の color-scheme が light に固定されている', hasFixedScheme(light, 'light'), '');
 check('dark 版の color-scheme が dark に固定されている', hasFixedScheme(dark, 'dark'), '');
 
+// 固定版は :root を丸ごと差し替えて作る。差し替え元の変数ファイルに無い変数を
+// 誰かが :root で足すと、固定版からだけ静かに消える。
+// light-dark() の検査は「落とし残し」しか見ないため、「落としすぎ」はここで見る
+const customPropertiesOf = (css: string) =>
+  new Set([...css.matchAll(/(--[a-zA-Z0-9-]+)\s*:/g)].map((m) => m[1]));
+
+const declaredInDefault = customPropertiesOf(styles);
+
+for (const [scheme, css] of [
+  ['light', light],
+  ['dark', dark],
+] as const) {
+  const declared = customPropertiesOf(css);
+  const missing = [...declaredInDefault].filter((name) => !declared.has(name));
+
+  check(
+    `${scheme} 版に既定 CSS と同じ変数がそろっている`,
+    missing.length === 0,
+    missing.length === 0
+      ? `${declaredInDefault.size} 件`
+      : `不足: ${missing.slice(0, 5).join(', ')}`
+  );
+}
+
 // 5. 固定版が実際に異なる値を持っている（同じなら派生生成が効いていない）
 const surfaceOf = (css: string) => /--color-surface-raised\s*:\s*([^;}]*)/.exec(css)?.[1]?.trim();
 

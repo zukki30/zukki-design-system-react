@@ -1,0 +1,125 @@
+.switch {
+  --zds-switch-track-width: 48px;
+  --zds-switch-track-height: 24px;
+  --zds-switch-thumb-size: 20px;
+  --zds-switch-thumb-inset: 2px;
+
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.switch[data-disabled='true'] {
+  cursor: not-allowed;
+}
+
+.switch__control {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  width: var(--zds-switch-track-width);
+  height: var(--zds-switch-track-height);
+}
+
+.switch__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.switch__track {
+  pointer-events: none;
+  box-sizing: border-box;
+  position: relative;
+  width: var(--zds-switch-track-width);
+  height: var(--zds-switch-track-height);
+  background-color: var(--color-switch-background-default);
+  border-radius: var(--border-radius-full);
+  transition: background-color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.switch__input:hover:not(:disabled):not(:checked) + .switch__track {
+  background-color: var(--color-switch-background-hover);
+}
+
+.switch__input:checked + .switch__track {
+  background-color: var(--color-switch-background-checked);
+}
+
+.switch__input:checked:hover:not(:disabled) + .switch__track {
+  background-color: var(--color-switch-background-checked-hover);
+}
+
+.switch__input:disabled:not(:checked) + .switch__track {
+  background-color: var(--color-switch-background-disabled);
+}
+
+.switch__input:disabled:checked + .switch__track {
+  background-color: var(--color-switch-background-checked-disabled);
+}
+
+.switch__input:focus-visible + .switch__track {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-xs);
+}
+
+.switch__thumb {
+  position: absolute;
+  top: var(--zds-switch-thumb-inset);
+  left: var(--zds-switch-thumb-inset);
+  width: var(--zds-switch-thumb-size);
+  height: var(--zds-switch-thumb-size);
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-switch-icon-default);
+  transition:
+    transform 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+
+  /*
+   * モーション低減時はつまみを移動アニメーションなしで切り替える。
+   * 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる
+   */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* つまみの移動量: トラック幅 - つまみ - 左右インセット */
+.switch__input:checked + .switch__track .switch__thumb {
+  transform: translateX(
+    calc(
+      var(--zds-switch-track-width) - var(--zds-switch-thumb-size) - var(--zds-switch-thumb-inset) *
+        2
+    )
+  );
+}
+
+.switch__input:disabled + .switch__track .switch__thumb {
+  background-color: var(--color-switch-icon-disabled);
+}
+
+.switch__label {
+  padding-block: var(--spacing-2xs);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-line);
+  color: var(--color-text-on-surface-default);
+  word-break: break-word;
+}
+
+.switch[data-disabled='true'] .switch__label {
+  color: var(--color-text-on-surface-disabled);
+}

@@ -2,6 +2,11 @@ import type { Preview } from '@storybook/react-vite';
 import { themes } from 'storybook/theming';
 import { prefersDark } from './theme';
 
+// コンポーネントが参照する CSS 変数の定義。
+// ライブラリ本体では src/main.tsx が読んでいるが、Storybook は main.tsx を通らないため
+// ここで明示的に読む。light-dark() を保持した版を読み、配色は decorator が
+// ルート要素の color-scheme で切り替える
+import '../src/styles/variables.css';
 import './preview.css';
 
 const preview: Preview = {

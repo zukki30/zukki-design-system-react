@@ -1,12 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
 
-import { vars } from '@/styles/theme.css';
-
 import { Card } from './Card';
 
 const moreLinkStyle = {
-  color: vars.color.textOnLink.default,
+  color: 'var(--color-text-on-link-default)',
   fontWeight: 700,
   fontSize: '0.875rem',
   textDecoration: 'underline',
@@ -319,4 +317,30 @@ export const AllVariants: Story = {
       </div>
     );
   },
+};
+
+/**
+ * Card は入れ子にできる。余白は最も近い Card の `size` に従い、外側の指定は内側へ及ばない。
+ *
+ * 余白は `data-size` が切り替えるカスタムプロパティの継承で決まる。jsdom は `var()` を
+ * 解決しないためユニットテストでは属性までしか確かめられず、実際の余白が正しいことは
+ * このストーリー（＝実ブラウザ）で担保している
+ */
+export const Nested: Story = {
+  args: { children: null },
+  render: () => (
+    <Card size="sm" style={{ width: '420px' }}>
+      <Card.Header>
+        <Card.Title level={3}>外側 size = sm</Card.Title>
+      </Card.Header>
+      <Card.Body>
+        <Card size="md">
+          <Card.Header>
+            <Card.Title level={4}>内側 size = md</Card.Title>
+          </Card.Header>
+          <Card.Body>内側の余白は外側の sm ではなく、自身の md に従う</Card.Body>
+        </Card>
+      </Card.Body>
+    </Card>
+  ),
 };

@@ -5,14 +5,7 @@ import { isRenderable } from '@/utils/renderableNode';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
-import {
-  switchControl,
-  switchInput,
-  switchLabel,
-  switchRoot,
-  switchThumb,
-  switchTrack,
-} from './Switch.css';
+import styles from './Switch.module.css';
 
 export type SwitchProps = {
   /**
@@ -29,21 +22,21 @@ export const Switch = ({ children, disabled: disabledProp, className, ...props }
   const { disabled } = useFormFieldState({ disabled: disabledProp });
 
   return (
-    <label className={clsx(switchRoot, className)} data-disabled={disabled}>
-      <span className={switchControl}>
+    <label className={clsx(styles.switch, className)} data-disabled={disabled}>
+      <span className={styles.switch__control}>
         <input
           type="checkbox"
           role="switch"
-          className={switchInput}
+          className={styles.switch__input}
           disabled={disabled}
           {...props}
         />
-        <span className={switchTrack} aria-hidden="true">
-          <span className={switchThumb} />
+        <span className={styles.switch__track} aria-hidden="true">
+          <span className={styles.switch__thumb} />
         </span>
       </span>
 
-      {isRenderable(children) && <span className={switchLabel}>{children}</span>}
+      {isRenderable(children) && <span className={styles.switch__label}>{children}</span>}
     </label>
   );
 };

@@ -5,14 +5,7 @@ import type { SizeType, ZukkiVariantType } from '@/types';
 
 import { Spinner } from '../Spinner/Spinner';
 
-import {
-  button,
-  buttonInner,
-  buttonLabel,
-  buttonLoading,
-  buttonSize,
-  buttonVariant,
-} from './Button.css';
+import styles from './Button.module.css';
 
 /**
  * ボタンのバリアント。
@@ -104,24 +97,28 @@ export const Button = ({
     <button
       type={type}
       onClick={handleClick}
-      className={clsx(buttonSize[size], buttonVariant[variant], button, className)}
+      className={clsx(styles.button, className)}
       disabled={disabled}
+      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
+      aria-busy={loading}
+      {...props}
+      // data-* は CSS が見た目を引くためのもの。props と常に一致させたいので、
+      // 利用側の props より後に指定して上書きさせない
+      data-variant={variant}
+      data-size={size}
       data-selected={selected}
       data-has-start-icon={!!startIcon}
       data-has-end-icon={!!endIcon}
       data-loading={loading}
-      // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
-      aria-busy={loading}
-      {...props}
     >
-      <span className={buttonInner} data-loading={loading}>
+      <span className={styles.button__inner} data-loading={loading}>
         {startIcon}
-        <span className={buttonLabel[size]}>{children}</span>
+        <span className={styles.button__label}>{children}</span>
         {endIcon}
       </span>
 
       {loading && (
-        <span className={buttonLoading}>
+        <span className={styles.button__loading}>
           {/* 状態は aria-busy が伝えるため、Spinner は装飾として扱う
               （aria-label を渡すとアクセシブルネームに混ざってしまう） */}
           <Spinner variant={spinnerVariant} width={spinnerSize} height={spinnerSize} />

@@ -1,0 +1,43 @@
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  vertical-align: top;
+  fill: none;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  /* SVG の transform-origin は既定が要素の原点になるため中心を明示する */
+  transform-origin: center;
+  animation: rotate 1s linear infinite;
+
+  /*
+   * ローディング中であることは伝え続ける必要があるため、停止ではなく回転を十分に遅くする。
+   * 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる
+   */
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 3s;
+  }
+}
+
+.spinner[data-variant='light'] {
+  stroke: var(--color-grey-1000);
+}
+
+.spinner[data-variant='dark'] {
+  stroke: var(--color-grey-0);
+}
+
+.spinner[data-variant='primary'] {
+  stroke: var(--color-primary-text);
+}
+
+.spinner[data-variant='accent'] {
+  stroke: var(--color-text-on-accent-default);
+}

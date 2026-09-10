@@ -38,9 +38,6 @@ updates:
           - prettier
           - 'eslint-config-prettier'
           - globals
-      vanilla-extract:
-        patterns:
-          - '@vanilla-extract/*'
       build-test:
         patterns:
           - vite

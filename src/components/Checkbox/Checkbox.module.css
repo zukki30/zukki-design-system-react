@@ -1,0 +1,133 @@
+.checkbox {
+  --zds-checkbox-box-size: 24px;
+
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.checkbox[data-disabled='true'] {
+  cursor: not-allowed;
+}
+
+.checkbox__control {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  width: var(--zds-checkbox-box-size);
+  height: var(--zds-checkbox-box-size);
+}
+
+.checkbox__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.checkbox__box {
+  pointer-events: none;
+  box-sizing: border-box;
+  position: relative;
+  width: var(--zds-checkbox-box-size);
+  height: var(--zds-checkbox-box-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-checkbox-radio-background-default);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-checkbox-radio-border-default);
+  border-radius: var(--border-radius-md);
+  color: var(--color-checkbox-radio-icon-default);
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.checkbox__input:hover:not(:disabled):not(:checked):not(:indeterminate) + .checkbox__box {
+  border-color: var(--color-checkbox-radio-border-hover);
+}
+
+.checkbox__input:checked + .checkbox__box,
+.checkbox__input:indeterminate + .checkbox__box {
+  background-color: var(--color-checkbox-radio-background-checked);
+  border-color: var(--color-checkbox-radio-border-checked);
+}
+
+.checkbox__input:checked:hover:not(:disabled) + .checkbox__box,
+.checkbox__input:indeterminate:hover:not(:disabled) + .checkbox__box {
+  background-color: var(--color-checkbox-radio-background-checked-hover);
+  border-color: var(--color-checkbox-radio-border-checked-hover);
+}
+
+.checkbox__input:disabled:not(:checked):not(:indeterminate) + .checkbox__box {
+  background-color: var(--color-checkbox-radio-background-disabled);
+  border-color: var(--color-checkbox-radio-border-disabled);
+}
+
+.checkbox__input:disabled:checked + .checkbox__box,
+.checkbox__input:disabled:indeterminate + .checkbox__box {
+  background-color: var(--color-checkbox-radio-background-checked-disabled);
+  border-color: var(--color-checkbox-radio-border-checked-disabled);
+  color: var(--color-checkbox-radio-icon-checked-disabled);
+}
+
+.checkbox__input:focus-visible + .checkbox__box {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-xs);
+}
+
+.checkbox__icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.checkbox__checkIcon {
+  composes: checkbox__icon;
+  opacity: 0;
+}
+
+.checkbox__input:checked + .checkbox__box .checkbox__checkIcon {
+  opacity: 1;
+}
+
+/* checked かつ indeterminate のときは indeterminate を優先しチェックを隠す */
+.checkbox__input:indeterminate + .checkbox__box .checkbox__checkIcon {
+  opacity: 0;
+}
+
+.checkbox__minusIcon {
+  composes: checkbox__icon;
+  opacity: 0;
+}
+
+.checkbox__input:indeterminate + .checkbox__box .checkbox__minusIcon {
+  opacity: 1;
+}
+
+.checkbox__label {
+  padding-block: var(--spacing-2xs);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-line);
+  color: var(--color-text-on-surface-default);
+  word-break: break-word;
+}
+
+.checkbox[data-disabled='true'] .checkbox__label {
+  color: var(--color-text-on-surface-disabled);
+}

@@ -1,0 +1,61 @@
+.textArea {
+  /* UA が描画するパーツをライト固定のフィールドに合わせる（詳細は mixin のコメント） */
+  composes: inputColorSchemeLight from '../../styles/mixins.module.css';
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  /* Figma の TextArea は最小コンテンツ高さ 120px（symbol 全体 136px） */
+  min-height: 136px;
+  padding: var(--spacing-sm);
+  background-color: var(--color-input-background-default);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-input-border-default);
+  border-radius: var(--border-radius-lg);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-default);
+  color: var(--color-text-on-light-default);
+  resize: vertical;
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+
+  /* 同一ルール内に置くことで、出力順によらずベース宣言を上書きできる */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    animation: none;
+  }
+}
+
+.textArea::placeholder {
+  color: var(--color-text-on-light-placeholder);
+}
+
+.textArea:hover:not(:disabled):not([data-error='true']) {
+  border-color: var(--color-input-border-hover);
+}
+
+.textArea:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: var(--spacing-xs);
+}
+
+.textArea[data-error='true'] {
+  background-color: var(--color-input-background-error);
+  border-color: var(--color-input-border-error);
+}
+
+.textArea[data-error='true']:hover:not(:disabled) {
+  border-color: var(--color-input-border-error-hover);
+}
+
+.textArea:disabled {
+  background-color: var(--color-input-background-disabled);
+  border-color: var(--color-input-border-disabled);
+  color: var(--color-text-on-light-disabled);
+  -webkit-text-fill-color: var(--color-text-on-light-disabled);
+  cursor: not-allowed;
+  resize: none;
+}

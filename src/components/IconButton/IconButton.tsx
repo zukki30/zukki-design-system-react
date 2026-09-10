@@ -5,13 +5,7 @@ import type { SizeType } from '@/types';
 
 import { Spinner } from '../Spinner/Spinner';
 
-import {
-  iconButton,
-  iconButtonInner,
-  iconButtonLoading,
-  iconButtonSize,
-  iconButtonVariant,
-} from './IconButton.css';
+import styles from './IconButton.module.css';
 
 /**
  * アイコンボタンのバリアント。
@@ -98,20 +92,24 @@ export const IconButton = ({
     <button
       type={type}
       onClick={handleClick}
-      className={clsx(iconButtonSize[size], iconButtonVariant[variant], iconButton, className)}
+      className={clsx(styles.iconButton, className)}
       disabled={disabled}
-      data-selected={selected}
-      data-loading={loading}
       // 処理中であることを支援技術に伝える（Spinner は視覚的な手がかりにすぎない）
       aria-busy={loading}
       {...props}
+      // data-* は CSS が見た目を引くためのもの。props と常に一致させたいので、
+      // 利用側の props より後に指定して上書きさせない
+      data-variant={variant}
+      data-size={size}
+      data-selected={selected}
+      data-loading={loading}
     >
-      <span className={iconButtonInner} data-loading={loading}>
+      <span className={styles.iconButton__inner} data-loading={loading}>
         {children}
       </span>
 
       {loading && (
-        <span className={iconButtonLoading}>
+        <span className={styles.iconButton__loading}>
           {/* 状態は aria-busy が伝えるため、Spinner は装飾として扱う */}
           <Spinner variant={spinnerVariant} width={SPINNER_SIZE} height={SPINNER_SIZE} />
         </span>

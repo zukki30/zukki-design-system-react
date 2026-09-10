@@ -3,7 +3,7 @@ import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button, type ButtonSize } from './Button';
-import { buttonLoading } from './Button.css';
+import styles from './Button.module.css';
 
 describe('Button', () => {
   it('children をアクセシブルネームとして描画する', () => {
@@ -127,38 +127,66 @@ describe('Button', () => {
 
       // startIcon などを渡すケースを足したときにアイコン側の svg を掴まないよう、
       // Spinner のラッパー配下に絞る
-      const spinner = container.querySelector(`.${buttonLoading} svg`);
+      const spinner = container.querySelector(`.${styles.button__loading} svg`);
 
       expect(spinner).toHaveAttribute('width', spinnerSize);
       expect(spinner).toHaveAttribute('height', spinnerSize);
     }
   );
 
-  it.each([
-    ['md', 'sm'],
-    ['sm', 'md'],
-  ] as const)('size=%s と size=%s でスタイルが変わる', (size, otherSize) => {
-    const { rerender } = render(<Button size={size}>送信</Button>);
-    const className = screen.getByRole('button', { name: '送信' }).className;
+  // 見た目は data-size / data-variant を CSS が引く形で出し分けている
+  it.each(['sm', 'md'] as const)('size=%s を data-size に反映する', (size) => {
+    render(<Button size={size}>送信</Button>);
 
-    rerender(<Button size={otherSize}>送信</Button>);
-
-    expect(screen.getByRole('button', { name: '送信' }).className).not.toBe(className);
+    expect(screen.getByRole('button', { name: '送信' })).toHaveAttribute('data-size', size);
   });
 
   it.each([
-    ['default', 'primary'],
-    ['primary', 'secondary'],
-    ['secondary', 'success'],
-    ['success', 'failure'],
-    ['failure', 'default'],
-  ] as const)('variant=%s と variant=%s でスタイルが変わる', (variant, otherVariant) => {
-    const { rerender } = render(<Button variant={variant}>送信</Button>);
-    const className = screen.getByRole('button', { name: '送信' }).className;
+    'default',
+    'primary',
+    'secondary',
+    'success',
+    'failure',
+    'profile',
+    'works',
+    'outputs',
+  ] as const)('variant=%s を data-variant に反映する', (variant) => {
+    render(<Button variant={variant}>送信</Button>);
 
-    rerender(<Button variant={otherVariant}>送信</Button>);
+    expect(screen.getByRole('button', { name: '送信' })).toHaveAttribute('data-variant', variant);
+  });
 
-    expect(screen.getByRole('button', { name: '送信' }).className).not.toBe(className);
+  it('見た目を決める data-* は利用側から上書きできない', () => {
+    // data-* はスタイルの分岐に使うため、props と食い違わせない。
+    // 食い違わせられると、variant は default なのに primary の見た目になる
+    render(
+      <Button
+        variant="default"
+        size="md"
+        data-variant="primary"
+        data-size="sm"
+        data-selected="true"
+        data-loading="true"
+      >
+        送信
+      </Button>
+    );
+
+    const button = screen.getByRole('button', { name: '送信' });
+
+    expect(button).toHaveAttribute('data-variant', 'default');
+    expect(button).toHaveAttribute('data-size', 'md');
+    expect(button).not.toHaveAttribute('data-selected');
+    expect(button).not.toHaveAttribute('data-loading');
+  });
+
+  it('size / variant を省略すると md / default になる', () => {
+    render(<Button>送信</Button>);
+
+    const button = screen.getByRole('button', { name: '送信' });
+
+    expect(button).toHaveAttribute('data-size', 'md');
+    expect(button).toHaveAttribute('data-variant', 'default');
   });
 
   it('ref を button に転送する', () => {

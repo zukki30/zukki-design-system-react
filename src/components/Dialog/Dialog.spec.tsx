@@ -4,11 +4,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { headingLevels } from '@/types';
 
-import { iconButtonSize, iconButtonVariant } from '../IconButton/IconButton.css';
-
 import { Dialog } from './index';
-
-const classesOf = (className: string) => className.split(' ');
 
 // jsdom は showModal/close を未実装のためモックする
 beforeAll(() => {
@@ -605,8 +601,8 @@ describe('Dialog', () => {
 
       const closeButton = screen.getByTestId('close');
 
-      expect(closeButton).toHaveClass(...classesOf(iconButtonVariant['secondary-exposed']));
-      expect(closeButton).toHaveClass(...classesOf(iconButtonSize.sm));
+      expect(closeButton).toHaveAttribute('data-variant', 'secondary-exposed');
+      expect(closeButton).toHaveAttribute('data-size', 'sm');
     });
 
     // {...props} を先に展開しても、意図的に受け取っている見た目の prop は上書きできる
@@ -621,8 +617,8 @@ describe('Dialog', () => {
 
       const closeButton = screen.getByTestId('close');
 
-      expect(closeButton).toHaveClass(...classesOf(iconButtonVariant.primary));
-      expect(closeButton).toHaveClass(...classesOf(iconButtonSize.md));
+      expect(closeButton).toHaveAttribute('data-variant', 'primary');
+      expect(closeButton).toHaveAttribute('data-size', 'md');
     });
   });
 

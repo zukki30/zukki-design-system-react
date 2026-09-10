@@ -5,10 +5,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { headingLevels } from '@/types';
 
 import { Card } from './Card';
-import { cardBody, cardFooter, cardHeader } from './Card.css';
 
-// styleVariants の合成結果はスペース区切りの複数クラスになるため、個別のクラスへ分解する
-const classesOf = (className: string) => className.split(' ');
+/**
+ * パーツの余白は、ルートの `data-size` が切り替えるカスタムプロパティから決まる。
+ * jsdom は var() を解決しないため、ここでは属性が出ていることまでを検査する。
+ * 実際の余白は pnpm test:a11y と Storybook のストーリーで確認する
+ */
+const rootOf = (part: HTMLElement) => part.closest('[data-size]');
 
 describe('Card', () => {
   it('children を描画する', () => {
@@ -93,14 +96,14 @@ describe('Card', () => {
       expect(header).toHaveClass('custom');
     });
 
-    it('size に応じたクラスを適用する', () => {
+    it('余白の元になる size がルートの data-size に出る', () => {
       const { rerender } = render(
         <Card>
           <Card.Header data-testid="header">ヘッダー</Card.Header>
         </Card>
       );
 
-      expect(screen.getByTestId('header')).toHaveClass(...classesOf(cardHeader.md));
+      expect(rootOf(screen.getByTestId('header'))).toHaveAttribute('data-size', 'md');
 
       rerender(
         <Card size="sm">
@@ -108,7 +111,7 @@ describe('Card', () => {
         </Card>
       );
 
-      expect(screen.getByTestId('header')).toHaveClass(...classesOf(cardHeader.sm));
+      expect(rootOf(screen.getByTestId('header'))).toHaveAttribute('data-size', 'sm');
     });
   });
 
@@ -213,14 +216,14 @@ describe('Card', () => {
       expect(body).toHaveClass('custom');
     });
 
-    it('size に応じたクラスを適用する', () => {
+    it('余白の元になる size がルートの data-size に出る', () => {
       const { rerender } = render(
         <Card>
           <Card.Body data-testid="body">本文</Card.Body>
         </Card>
       );
 
-      expect(screen.getByTestId('body')).toHaveClass(...classesOf(cardBody.md));
+      expect(rootOf(screen.getByTestId('body'))).toHaveAttribute('data-size', 'md');
 
       rerender(
         <Card size="sm">
@@ -228,7 +231,7 @@ describe('Card', () => {
         </Card>
       );
 
-      expect(screen.getByTestId('body')).toHaveClass(...classesOf(cardBody.sm));
+      expect(rootOf(screen.getByTestId('body'))).toHaveAttribute('data-size', 'sm');
     });
   });
 
@@ -250,14 +253,14 @@ describe('Card', () => {
       expect(footer).toHaveClass('custom');
     });
 
-    it('size に応じたクラスを適用する', () => {
+    it('余白の元になる size がルートの data-size に出る', () => {
       const { rerender } = render(
         <Card>
           <Card.Footer data-testid="footer">フッター</Card.Footer>
         </Card>
       );
 
-      expect(screen.getByTestId('footer')).toHaveClass(...classesOf(cardFooter.md));
+      expect(rootOf(screen.getByTestId('footer'))).toHaveAttribute('data-size', 'md');
 
       rerender(
         <Card size="sm">
@@ -265,7 +268,7 @@ describe('Card', () => {
         </Card>
       );
 
-      expect(screen.getByTestId('footer')).toHaveClass(...classesOf(cardFooter.sm));
+      expect(rootOf(screen.getByTestId('footer'))).toHaveAttribute('data-size', 'sm');
     });
   });
   describe('ネストした Card', () => {
@@ -280,8 +283,9 @@ describe('Card', () => {
         </Card>
       );
 
-      expect(screen.getByTestId('outer-body')).toHaveClass(...classesOf(cardBody.sm));
-      expect(screen.getByTestId('inner-body')).toHaveClass(...classesOf(cardBody.md));
+      // 余白のカスタムプロパティは継承するため、内側のパーツは最も近い Card の値を引く
+      expect(rootOf(screen.getByTestId('outer-body'))).toHaveAttribute('data-size', 'sm');
+      expect(rootOf(screen.getByTestId('inner-body'))).toHaveAttribute('data-size', 'md');
     });
   });
 
@@ -290,8 +294,8 @@ describe('Card', () => {
       vi.restoreAllMocks();
     });
 
-    // size を必要とするパーツだけが context を読むため、誤用を検知できるのもこの 3 つ。
-    // Dialog.Header などと同じく、context を使わないパーツは単体でも描画できる
+    // 誤用を検知できるのは context を読む 3 つ。
+    // Dialog.Header などと同じく、context を読まないパーツは単体でも描画できる
     const contextDependentParts = [
       ['Card.Header', <Card.Header key="header" />],
       ['Card.Body', <Card.Body key="body" />],
@@ -313,7 +317,7 @@ describe('Card', () => {
       ['Card.Action', <Card.Action key="action" />],
     ] as const;
 
-    it.each(standaloneParts)('%s は size を参照しないため単体でも描画できる', (_name, element) => {
+    it.each(standaloneParts)('%s は context を読まないため単体でも描画できる', (_name, element) => {
       expect(() => render(element)).not.toThrow();
     });
   });

@@ -6,7 +6,7 @@ import { isRenderable } from '@/utils/renderableNode';
 import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
-import { select, selectField, selectIcon } from './Select.css';
+import styles from './Select.module.css';
 
 export type SelectProps = {
   /**
@@ -26,8 +26,6 @@ export type SelectProps = {
    */
   children?: ReactNode;
 } & Omit<ComponentPropsWithRef<'select'>, 'prefix' | 'suffix'>;
-
-const ICON_SIZE = 20;
 
 export const Select = ({
   placeholder,
@@ -49,9 +47,9 @@ export const Select = ({
     value === undefined && defaultValue === undefined && hasPlaceholder ? '' : defaultValue;
 
   return (
-    <div className={clsx(select, className)} data-error={error} data-disabled={disabled}>
+    <div className={clsx(styles.select, className)} data-error={error} data-disabled={disabled}>
       <select
-        className={selectField}
+        className={styles.select__field}
         disabled={disabled}
         aria-invalid={error}
         value={value}
@@ -66,8 +64,9 @@ export const Select = ({
         {children}
       </select>
 
-      <span className={selectIcon} aria-hidden="true">
-        <Icon name="chevronDown" width={ICON_SIZE} height={ICON_SIZE} />
+      <span className={styles.select__icon} aria-hidden="true">
+        {/* サイズは CSS が持つ（Select.module.css の --zds-select-icon-size） */}
+        <Icon name="chevronDown" />
       </span>
     </div>
   );

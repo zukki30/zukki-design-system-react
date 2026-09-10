@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { vars } from '@/styles/theme.css';
-
 import { Spinner } from './Spinner';
 
 const meta = {
@@ -54,7 +52,7 @@ export const Accent: Story = {
     'aria-label': 'Loading Spinner...',
   },
   render: (args) => (
-    <div style={{ backgroundColor: vars.color.primary.default, padding: '12px' }}>
+    <div style={{ backgroundColor: 'var(--color-primary-default)', padding: '12px' }}>
       <Spinner {...args} />
     </div>
   ),
