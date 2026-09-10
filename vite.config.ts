@@ -1,4 +1,3 @@
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
@@ -9,7 +8,6 @@ import dts from 'vite-plugin-dts';
 export default defineConfig({
   plugins: [
     react(),
-    vanillaExtractPlugin(),
     // 型宣言を出力する。src は @/ エイリアスを多用しており、素の tsc では
     // .d.ts の中にエイリアスがそのまま残って利用側から解決できないため、
     // 相対パスへ書き換えてくれるこのプラグインを使う

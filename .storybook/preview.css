@@ -1,0 +1,29 @@
+/*
+ * Storybook のキャンバスに当てるスタイル。ライブラリの配布物には含まれないため、
+ * ここでだけ body やテーマクラスのようなグローバルセレクタを触ってよい。
+ *
+ * CSS Modules ではないので `.module` を付けない。クラス名はスコープされず、
+ * preview.tsx の decorator が付け替えるクラスにそのまま対応する。
+ */
+
+/*
+ * 配色は preview.tsx の decorator が theme グローバルに応じて付け替える。
+ * color-scheme は継承プロパティなので、ルート要素に当てれば light-dark() が全体で解決される
+ */
+.light-theme {
+  color-scheme: light;
+}
+
+.dark-theme {
+  color-scheme: dark;
+}
+
+/*
+ * キャンバスにページ面のトークンを当てる。
+ * これが無いと Storybook 既定の白い背景の上でダーク配色が描画され、
+ * `pnpm test:a11y` のダーク側がホストアプリと違う背景でコントラストを測ってしまう
+ */
+body {
+  background-color: var(--color-surface-page);
+  color: var(--color-text-on-surface-default);
+}
