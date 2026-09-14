@@ -98,7 +98,9 @@ describe('Switch', () => {
   });
 
   describe('size', () => {
-    const root = () => screen.getByRole('switch').closest('[data-size]');
+    // [data-size] で辿ると FormField のルートまで登ってしまい、
+    // Switch 自身が属性を出さなくなっても通ってしまう
+    const root = () => screen.getByRole('switch').closest('label');
 
     it('既定は md', () => {
       render(<Switch>通知を受け取る</Switch>);

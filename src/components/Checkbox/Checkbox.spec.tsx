@@ -152,7 +152,9 @@ describe('Checkbox', () => {
   });
 
   describe('size', () => {
-    const root = () => screen.getByRole('checkbox').closest('[data-size]');
+    // [data-size] で辿ると FormField のルートまで登ってしまい、
+    // Checkbox 自身が属性を出さなくなっても通ってしまう
+    const root = () => screen.getByRole('checkbox').closest('label');
 
     it('既定は md', () => {
       render(<Checkbox>同意する</Checkbox>);

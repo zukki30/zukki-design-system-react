@@ -115,7 +115,9 @@ describe('Radio', () => {
   });
 
   describe('size', () => {
-    const root = () => screen.getByRole('radio').closest('[data-size]');
+    // [data-size] で辿ると FormField のルートまで登ってしまい、
+    // Radio 自身が属性を出さなくなっても通ってしまう
+    const root = () => screen.getByRole('radio').closest('label');
 
     it('既定は md', () => {
       render(<Radio>りんご</Radio>);
