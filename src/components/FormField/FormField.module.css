@@ -17,17 +17,18 @@
 }
 
 /*
- * 補助テキストとエラーメッセージのフォントサイズは sm でも下げない。
- * 1 段下は --font-size-2xs（10px）しかなく、エラーメッセージとしては小さすぎる。
- * sm の密度はラベル・gap・ラベル列の幅で作る。
+ * 文字のサイズは sm でも下げない。密度は gap・ラベル列の幅・余白で作る。
  *
- * この結果 sm ではラベルと補助テキストがどちらも 12px になり、サイズの差がなくなる。
- * 階層は配置と色で表す（ラベルは text-on-surface-default、補助テキストは subtle）
+ * - ラベルは 14px のまま。12px に下げると Checkbox / Radio / Switch のラベル
+ *   （sm で 14px）より小さくなり、フィールド全体を名指すラベルが、その中の
+ *   1 項目を指すラベルより小さいという逆転が起きる。補助テキスト（12px）との
+ *   差も無くなる
+ * - 補助テキストとエラーメッセージは 12px のまま。1 段下は --font-size-2xs
+ *   （10px）しかなく、エラーメッセージとしては小さすぎる
  */
 .formField[data-size='sm'] {
   --zds-form-field-label-column-width: 80px;
   --zds-form-field-gap: var(--spacing-xs);
-  --zds-form-field-label-font-size: var(--font-size-xs);
   --zds-form-field-label-padding-top: var(--spacing-sm);
   --zds-form-field-required-badge-padding-inline: var(--spacing-2xs);
 }

@@ -300,7 +300,6 @@ export const Input = ({
 .formField[data-size='sm'] {
   --zds-form-field-label-column-width: 80px;
   --zds-form-field-gap: var(--spacing-xs);
-  --zds-form-field-label-font-size: var(--font-size-xs);
   --zds-form-field-label-padding-top: var(--spacing-sm);
   --zds-form-field-required-badge-padding-inline: var(--spacing-2xs);
 }
@@ -309,14 +308,20 @@ export const Input = ({
 | 箇所 | `md` | `sm` | 意図 |
 | --- | --- | --- | --- |
 | ルートと `Control` の `gap` | 8px | 4px | 縦の密度 |
-| ラベル列の幅 | 100px | 80px | 12px のラベルに合わせて詰める |
-| ラベルと必須アスタリスクの `font-size` | 14px | 12px | どちらも同じ変数を引く（現状も同値） |
+| ラベル列の幅 | 100px | 80px | 横幅の密度 |
+| ラベルと必須アスタリスクの `font-size` | 14px | **据え置き** | 下記のとおり要件から変更 |
 | 横並び時のラベルの `padding-top` | 12px | 8px | 入力欄の `padding-block` に合わせて 1 行目に揃える |
 | 必須バッジの `padding-inline` | 4px | 2px | フォントサイズは下げずに幅だけ詰める |
 | 必須バッジの `font-size` | 10px | **据え置き** | `--font-size-2xs` が最小段。これ以上下げるトークンが無い |
 | 補助テキスト・エラーメッセージ | 12px | **据え置き** | 下記のとおり要件から変更 |
 
-> **要件から変えた点（確認したい）。** 要件 R5 では補助テキスト・エラーメッセージも 1 段小さくすると書いたが、1 段下は `--font-size-2xs`（10px）しかない。**エラーメッセージを 10px で出すのは可読性を大きく損なう**ため、12px を維持したい。`sm` の密度はラベル・`gap`・列幅で十分に出る。
+> **要件から変えた点（その 1）。** 要件 R5 では補助テキスト・エラーメッセージも 1 段小さくすると書いたが、1 段下は `--font-size-2xs`（10px）しかない。**エラーメッセージを 10px で出すのは可読性を大きく損なう**ため、12px を維持する。
+
+> **要件から変えた点（その 2）。** 要件ではラベルを 14px → 12px に下げると書いたが、**`sm` でも 14px を維持する。** 12px に下げると `Checkbox` / `Radio` / `Switch` のラベル（`sm` で 14px）より小さくなり、**フィールド全体を名指すラベルが、その中の 1 項目を指すラベルより小さい**という逆転が起きる。補助テキスト（12px）との差も無くなり、階層が色と配置だけになる。
+>
+> 入力テキスト（16px 据え置き）と補助テキスト（12px 据え置き）に当てた「読める下限は割らない」という基準を、ラベルにも同じく当てる形になる。`sm` の密度は `gap`（8 → 4px）・ラベル列の幅（100 → 80px）・ラベルの `padding-top`（12 → 8px）・入力欄の `padding-block`（12 → 8px）・必須バッジの `padding-inline`（4 → 2px）で十分に出る。
+>
+> ラベル列の 80px は当初 12px のラベルに合わせた値だが、14px でもそのままとする。折り返しは 12px でも起きており、列幅を戻すと `sm` の横幅の詰まりが薄れるため。
 
 ## 5. TSX に残っている寸法を CSS へ移す
 
