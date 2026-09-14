@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef } from 'react';
 
 import { useMergedRef } from '@/hooks/useMergedRef';
-import type { SizeType } from '@/types';
+import type { ControlSize } from '@/types';
 import { isRenderable } from '@/utils/renderableNode';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
@@ -13,10 +13,9 @@ import styles from './Checkbox.module.css';
 /**
  * チェックボックスのサイズ。`sm` / `md` の 2 段階。
  *
- * 小さくなるのは箱の見た目とラベルだけで、**クリック領域は 24 × 24 px のまま**。
- * `lg` は意図的に持たない（Button / IconButton に `lg` が無いため）
+ * 小さくなるのは箱の見た目とラベルだけで、**クリック領域は 24 × 24 px のまま**
  */
-export type CheckboxSize = Exclude<SizeType, 'lg'>;
+export type CheckboxSize = ControlSize;
 
 export type CheckboxProps = {
   /**

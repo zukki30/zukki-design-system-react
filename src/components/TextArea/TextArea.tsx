@@ -1,19 +1,16 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef } from 'react';
 
-import type { SizeType } from '@/types';
+import type { ControlSize } from '@/types';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import styles from './TextArea.module.css';
 
 /**
- * テキストエリアのサイズ。`sm` / `md` の 2 段階。
- *
- * `lg` は意図的に持たない。Button / IconButton に `lg` が無いため、
- * 隣にボタンを並べたときに対応する段が無くなる
+ * テキストエリアのサイズ。`sm` / `md` の 2 段階
  */
-export type TextAreaSize = Exclude<SizeType, 'lg'>;
+export type TextAreaSize = ControlSize;
 
 export type TextAreaProps = {
   /**

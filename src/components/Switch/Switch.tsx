@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
-import type { SizeType } from '@/types';
+import type { ControlSize } from '@/types';
 import { isRenderable } from '@/utils/renderableNode';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
@@ -11,10 +11,9 @@ import styles from './Switch.module.css';
 /**
  * スイッチのサイズ。`sm` / `md` の 2 段階。
  *
- * 小さくなるのはトラックの見た目とラベルだけで、**クリック領域の高さは 24 px のまま**。
- * `lg` は意図的に持たない（Button / IconButton に `lg` が無いため）
+ * 小さくなるのはトラックの見た目とラベルだけで、**クリック領域の高さは 24 px のまま**
  */
-export type SwitchSize = Exclude<SizeType, 'lg'>;
+export type SwitchSize = ControlSize;
 
 export type SwitchProps = {
   /**

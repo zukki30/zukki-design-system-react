@@ -5,6 +5,18 @@ export const sizeTypes = ['sm', 'md', 'lg'] as const;
 export type SizeType = (typeof sizeTypes)[number];
 
 /**
+ * フォーム部品とボタンのサイズ。`sm` / `md` の 2 段階。
+ *
+ * `lg` は意図的に持たない。Button / IconButton に `lg` が無いため、
+ * フォームの隣にボタンを並べたときに対応する段が無くなる。
+ *
+ * **この型は公開しない。** 利用側には `InputSize` / `ButtonSize` のように
+ * コンポーネント固有の名前を付けて公開する（汎用名は利用側の型と衝突するため）。
+ * 段を増減するときはここだけを直す
+ */
+export type ControlSize = Exclude<SizeType, 'lg'>;
+
+/**
  * zukki サイトのバリアント
  */
 export const zukkiVariantTypes = ['profile', 'works', 'outputs'] as const;

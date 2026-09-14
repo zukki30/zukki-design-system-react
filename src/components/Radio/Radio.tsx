@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
-import type { SizeType } from '@/types';
+import type { ControlSize } from '@/types';
 import { isRenderable } from '@/utils/renderableNode';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
@@ -11,10 +11,9 @@ import styles from './Radio.module.css';
 /**
  * ラジオボタンのサイズ。`sm` / `md` の 2 段階。
  *
- * 小さくなるのは箱の見た目とラベルだけで、**クリック領域は 24 × 24 px のまま**。
- * `lg` は意図的に持たない（Button / IconButton に `lg` が無いため）
+ * 小さくなるのは箱の見た目とラベルだけで、**クリック領域は 24 × 24 px のまま**
  */
-export type RadioSize = Exclude<SizeType, 'lg'>;
+export type RadioSize = ControlSize;
 
 export type RadioProps = {
   /**

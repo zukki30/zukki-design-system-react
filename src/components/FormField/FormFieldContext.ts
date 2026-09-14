@@ -1,6 +1,6 @@
 import { createContext, use } from 'react';
 
-import type { SizeType } from '@/types';
+import type { ControlSize } from '@/types';
 import { toTruthyOrUndefined } from '@/utils/dataAttribute';
 
 /**
@@ -14,12 +14,17 @@ export type FormFieldOrientation = 'horizontal' | 'vertical';
 export type FormFieldRequiredMark = 'badge' | 'asterisk' | 'both';
 
 /**
- * フィールドのサイズ。`sm` / `md` の 2 段階。
- *
- * `lg` は意図的に持たない。Button / IconButton に `lg` が無いため、
- * フォームの隣にボタンを並べたときに対応する段が無くなる
+ * フィールドのサイズ。`sm` / `md` の 2 段階
  */
-export type FormFieldSize = Exclude<SizeType, 'lg'>;
+export type FormFieldSize = ControlSize;
+
+/**
+ * フォーム部品の `size` の既定値。
+ *
+ * 参照するのは `useFormFieldState`（未指定の解決）と `FormField`（自身の
+ * `data-size` を出すため）の 2 箇所だけ。各入力コンポーネントには散らさない
+ */
+export const DEFAULT_FORM_FIELD_SIZE: FormFieldSize = 'md';
 
 /**
  * FormField がサブコンポーネントへ共有する値。
@@ -168,7 +173,7 @@ export const useFormFieldState = ({
   return {
     error: error ?? toTruthyOrUndefined(context?.state.error),
     disabled: disabled ?? toTruthyOrUndefined(context?.state.disabled),
-    // 既定の 'md' はここだけが持つ。各入力コンポーネントに散らさない
-    size: size ?? context?.state.size ?? 'md',
+    // 既定値は DEFAULT_FORM_FIELD_SIZE が持つ。各入力コンポーネントに散らさない
+    size: size ?? context?.state.size ?? DEFAULT_FORM_FIELD_SIZE,
   };
 };

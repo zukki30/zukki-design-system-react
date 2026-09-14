@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentProps, ComponentPropsWithRef, MouseEvent, ReactNode } from 'react';
 
-import type { SizeType } from '@/types';
+import type { ControlSize } from '@/types';
 
 import { Spinner } from '../Spinner/Spinner';
 
@@ -21,7 +21,7 @@ export type IconButtonVariant = 'primary' | 'secondary' | 'primary-exposed' | 's
  * `lg` は意図的に持たない。タッチ領域は `md` で確保しているため、
  * それ以上に大きくする必要がない
  */
-export type IconButtonSize = Exclude<SizeType, 'lg'>;
+export type IconButtonSize = ControlSize;
 
 export type IconButtonProps = {
   /**

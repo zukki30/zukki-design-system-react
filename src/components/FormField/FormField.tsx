@@ -6,6 +6,7 @@ import { toTruthyOrUndefined } from '@/utils/dataAttribute';
 
 import styles from './FormField.module.css';
 import {
+  DEFAULT_FORM_FIELD_SIZE,
   FormFieldContext,
   type FormFieldContextValue,
   type FormFieldOrientation,
@@ -92,7 +93,7 @@ export function FormField({
   requiredMark = 'badge',
   disabled = false,
   error,
-  size = 'md',
+  size = DEFAULT_FORM_FIELD_SIZE,
   className,
   children,
   // グループとしての名前付けは利用側から上書きできるようにする
