@@ -12,4 +12,6 @@ export type {
   FormFieldControlState,
   FormFieldOrientation,
   FormFieldRequiredMark,
+  FormFieldResolvedState,
+  FormFieldSize,
 } from './FormFieldContext';

@@ -53,6 +53,8 @@ export type {
   FormFieldOrientation,
   FormFieldProps,
   FormFieldRequiredMark,
+  FormFieldResolvedState,
+  FormFieldSize,
 } from './components/FormField';
 export { Card, useCardContext } from './components/Card';
 export type {

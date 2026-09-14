@@ -58,6 +58,16 @@ describe('FormField', () => {
     );
   });
 
+  it('size を data 属性に反映する（デフォルト md）', () => {
+    const { rerender } = render(<FormField data-testid="field" />);
+
+    expect(screen.getByTestId('field')).toHaveAttribute('data-size', 'md');
+
+    rerender(<FormField size="sm" data-testid="field" />);
+
+    expect(screen.getByTestId('field')).toHaveAttribute('data-size', 'sm');
+  });
+
   it('ネイティブ属性を div に渡す', () => {
     render(<FormField data-testid="field" />);
 

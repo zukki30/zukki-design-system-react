@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Checkbox } from '../Checkbox';
 import { Input } from '../Input';
+import { Select } from '../Select';
 
 import { FormField } from './FormField';
 
@@ -31,6 +32,7 @@ const docsDescription = [
   '| --- | --- |',
   '| `required` | `aria-required`（ラベルには必須マーク） |',
   '| `disabled` | `disabled`（ラベルは disabled 表示） |',
+  '| `size` | `size`（ラベル・補助テキストも一緒に縮みます） |',
   '| `FormField.ErrorText` の描画 | `error` / `aria-invalid` |',
   '',
   'エラー状態は `FormField.ErrorText` を描画しているかどうかで決まります。',
@@ -123,6 +125,29 @@ export const Vertical: Story = {
 export const Disabled: Story = {
   args: {
     disabled: true,
+  },
+};
+
+// size は context 経由で配下の入力要素へ伝わる。
+// 種類の違う入力を並べて、まとめて sm になることを実ブラウザの a11y 検査にも載せる
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+    required: true,
+    children: (
+      <>
+        <FormField.Label>ラベル</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="placeholder" />
+          <Select placeholder="選択してください">
+            <option value="1">選択肢 1</option>
+            <option value="2">選択肢 2</option>
+          </Select>
+          <Checkbox>チェックボックス</Checkbox>
+        </FormField.Control>
+        <FormField.HelperText>補助テキスト</FormField.HelperText>
+      </>
+    ),
   },
 };
 
