@@ -19,7 +19,10 @@
 /*
  * 補助テキストとエラーメッセージのフォントサイズは sm でも下げない。
  * 1 段下は --font-size-2xs（10px）しかなく、エラーメッセージとしては小さすぎる。
- * sm の密度はラベル・gap・ラベル列の幅で作る
+ * sm の密度はラベル・gap・ラベル列の幅で作る。
+ *
+ * この結果 sm ではラベルと補助テキストがどちらも 12px になり、サイズの差がなくなる。
+ * 階層は配置と色で表す（ラベルは text-on-surface-default、補助テキストは subtle）
  */
 .formField[data-size='sm'] {
   --zds-form-field-label-column-width: 80px;
