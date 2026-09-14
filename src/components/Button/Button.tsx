@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import type { ComponentProps, ComponentPropsWithRef, MouseEvent, ReactNode } from 'react';
 
-import type { SizeType, ZukkiVariantType } from '@/types';
+import type { ControlSize, ZukkiVariantType } from '@/types';
 
 import { Spinner } from '../Spinner/Spinner';
 
@@ -23,7 +23,7 @@ export type ButtonVariant =
  * `lg` は意図的に持たない。大きく見せたいボタンはサイズではなく、置く側で
  * 幅を与えて表現する
  */
-export type ButtonSize = Exclude<SizeType, 'lg'>;
+export type ButtonSize = ControlSize;
 
 export type ButtonProps = {
   /**

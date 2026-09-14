@@ -2,11 +2,17 @@ import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, type MouseEvent, useRef } from 'react';
 
 import { useMergedRef } from '@/hooks/useMergedRef';
+import type { ControlSize } from '@/types';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
 import styles from './InputNumber.module.css';
+
+/**
+ * 数値入力のサイズ。`sm` / `md` の 2 段階
+ */
+export type InputNumberSize = ControlSize;
 
 export type InputNumberProps = {
   /**
@@ -17,9 +23,13 @@ export type InputNumberProps = {
    * 数値入力の disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithRef<'input'>, 'type' | 'prefix' | 'suffix'>;
-
-const ARROW_SIZE = 16;
+  /**
+   * 数値入力のサイズ。未指定のときは FormField の size を引き継ぐ
+   *
+   * @default 'md'
+   */
+  size?: InputNumberSize;
+} & Omit<ComponentPropsWithRef<'input'>, 'type' | 'prefix' | 'suffix' | 'size'>;
 
 const isFractional = (value: string | number | undefined): boolean => {
   if (value === undefined) {
@@ -66,11 +76,17 @@ const resolveInputMode = (
 export const InputNumber = ({
   error: errorProp,
   disabled: disabledProp,
+  // 既定値を書かないこと。undefined が消えて FormField の size を常に上書きしてしまう
+  size: sizeProp,
   className,
   ref,
   ...props
 }: InputNumberProps) => {
-  const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
+  const { error, disabled, size } = useFormFieldState({
+    error: errorProp,
+    disabled: disabledProp,
+    size: sizeProp,
+  });
 
   // スピンボタンの操作には DOM 要素が必要なため、内部で保持しつつ利用側の ref にも転送する
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +118,7 @@ export const InputNumber = ({
       className={clsx(styles.inputNumber, className)}
       data-error={error}
       data-disabled={disabled}
+      data-size={size}
     >
       <input
         ref={mergedRef}
@@ -124,7 +141,8 @@ export const InputNumber = ({
           onMouseDown={handleMouseDown}
           onClick={() => handleStep('up')}
         >
-          <Icon name="menuUp" width={ARROW_SIZE} height={ARROW_SIZE} />
+          {/* 大きさは CSS が持つ（InputNumber.module.css の --zds-input-number-arrow-size） */}
+          <Icon name="menuUp" />
         </button>
 
         <span className={styles.inputNumber__spinDivider} />
@@ -138,7 +156,7 @@ export const InputNumber = ({
           onMouseDown={handleMouseDown}
           onClick={() => handleStep('down')}
         >
-          <Icon name="menuDown" width={ARROW_SIZE} height={ARROW_SIZE} />
+          <Icon name="menuDown" />
         </button>
       </div>
     </div>

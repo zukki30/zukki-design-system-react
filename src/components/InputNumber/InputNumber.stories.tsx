@@ -76,3 +76,11 @@ export const Error: Story = {
   },
   render: (args) => <InputNumber {...args} />,
 };
+
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+    defaultValue: 186,
+  },
+  render: (args) => <InputNumber {...args} />,
+};

@@ -62,6 +62,40 @@ describe('TextArea', () => {
     expect(ref.current).toBe(screen.getByPlaceholderText('ref'));
   });
 
+  describe('size', () => {
+    it('既定は md', () => {
+      render(<TextArea placeholder="textarea" />);
+
+      expect(screen.getByPlaceholderText('textarea')).toHaveAttribute('data-size', 'md');
+    });
+
+    it('指定した size を data 属性に反映する', () => {
+      render(<TextArea placeholder="textarea" size="sm" />);
+
+      expect(screen.getByPlaceholderText('textarea')).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('FormField の size を引き継ぐ', () => {
+      render(
+        <FormField size="sm">
+          <TextArea placeholder="textarea" />
+        </FormField>
+      );
+
+      expect(screen.getByPlaceholderText('textarea')).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('自身に指定した size を FormField より優先する', () => {
+      render(
+        <FormField size="sm">
+          <TextArea placeholder="textarea" size="md" />
+        </FormField>
+      );
+
+      expect(screen.getByPlaceholderText('textarea')).toHaveAttribute('data-size', 'md');
+    });
+  });
+
   describe('FormField との連携', () => {
     it('FormField のエラー状態と disabled を引き継ぐ', () => {
       render(

@@ -85,3 +85,10 @@ export const Error: Story = {
   },
   render: (args) => <Select {...args} />,
 };
+
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+  },
+  render: (args) => <Select {...args} />,
+};

@@ -58,6 +58,28 @@ describe('FormField', () => {
     );
   });
 
+  it('size を data 属性に反映する（デフォルト md）', () => {
+    const { rerender } = render(<FormField data-testid="field" />);
+
+    expect(screen.getByTestId('field')).toHaveAttribute('data-size', 'md');
+
+    rerender(<FormField size="sm" data-testid="field" />);
+
+    expect(screen.getByTestId('field')).toHaveAttribute('data-size', 'sm');
+  });
+
+  it('size を配下の入力要素へ伝播する', () => {
+    render(
+      <FormField size="sm">
+        <FormField.Control>
+          <Input aria-label="入力" />
+        </FormField.Control>
+      </FormField>
+    );
+
+    expect(screen.getByLabelText('入力').parentElement).toHaveAttribute('data-size', 'sm');
+  });
+
   it('ネイティブ属性を div に渡す', () => {
     render(<FormField data-testid="field" />);
 

@@ -4,6 +4,16 @@
    * 利用側が type="date" / "time" などを渡せるぶん、対象になるネイティブウィジェットが多い
    */
   composes: inputColorSchemeLight from '../../styles/mixins.module.css';
+
+  /*
+   * サイズで変わる値はここと [data-size='sm'] の 2 ブロックに集める。
+   * 入力テキストの font-size は sm でも 16px から下げない
+   * （16px 未満だと iOS Safari がフォーカス時にページを自動ズームする）
+   */
+  --zds-input-padding-block: var(--spacing-md);
+  /* アドーンメントの描画サイズ。md は Icon の既定と同値なので見た目は変わらない */
+  --zds-input-icon-size: 24px;
+
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -22,6 +32,13 @@
     transition: none;
     animation: none;
   }
+}
+
+.input[data-size='sm'] {
+  --zds-input-padding-block: var(--spacing-sm);
+  --zds-input-icon-size: 20px;
+
+  border-radius: var(--border-radius-md);
 }
 
 .input:hover:not([data-disabled='true']):not([data-error='true']) {
@@ -55,7 +72,7 @@
   outline: none;
   background-color: transparent;
   padding-inline: var(--spacing-sm);
-  padding-block: var(--spacing-md);
+  padding-block: var(--zds-input-padding-block);
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-base);
@@ -80,6 +97,16 @@
   flex-shrink: 0;
   line-height: 0;
   color: var(--color-text-on-light-subtle);
+}
+
+/*
+ * アドーンメントの大きさは入力欄側が決める（Select のシェブロンと同じ形）。
+ * Icon は width/height 属性で 24 を出すが、CSS の指定が優先される。
+ * 直下の svg だけが対象なので、要素で包めば利用側が自分で大きさを決められる
+ */
+.input__icon > svg {
+  width: var(--zds-input-icon-size);
+  height: var(--zds-input-icon-size);
 }
 
 .input__icon[data-position='start'] {

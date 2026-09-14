@@ -14,7 +14,14 @@ const noop = () => () => {};
 const createContextValue = (
   state?: Partial<FormFieldContextValue['state']>
 ): FormFieldContextValue => ({
-  state: { required: false, requiredMark: 'badge', disabled: false, error: false, ...state },
+  state: {
+    required: false,
+    requiredMark: 'badge',
+    disabled: false,
+    error: false,
+    size: 'md',
+    ...state,
+  },
   actions: {
     registerLabel: noop,
     registerControl: noop,
@@ -60,13 +67,13 @@ describe('useFormFieldState', () => {
   it('FormField の外側では渡された値をそのまま返す', () => {
     const { result } = renderHook(() => useFormFieldState({ error: true, disabled: true }));
 
-    expect(result.current).toEqual({ error: true, disabled: true });
+    expect(result.current).toEqual({ error: true, disabled: true, size: 'md' });
   });
 
   it('FormField の外側で未指定なら undefined を返す', () => {
     const { result } = renderHook(() => useFormFieldState({}));
 
-    expect(result.current).toEqual({ error: undefined, disabled: undefined });
+    expect(result.current).toEqual({ error: undefined, disabled: undefined, size: 'md' });
   });
 
   it('未指定のときは FormField の状態を引き継ぐ', () => {
@@ -74,7 +81,7 @@ describe('useFormFieldState', () => {
       wrapper: createWrapper({ error: true, disabled: true }),
     });
 
-    expect(result.current).toEqual({ error: true, disabled: true });
+    expect(result.current).toEqual({ error: true, disabled: true, size: 'md' });
   });
 
   it('FormField の状態が false のときは属性を出力しないよう undefined にする', () => {
@@ -82,7 +89,7 @@ describe('useFormFieldState', () => {
       wrapper: createWrapper({ error: false, disabled: false }),
     });
 
-    expect(result.current).toEqual({ error: undefined, disabled: undefined });
+    expect(result.current).toEqual({ error: undefined, disabled: undefined, size: 'md' });
   });
 
   it('明示された値は FormField の状態より優先する', () => {
@@ -90,6 +97,36 @@ describe('useFormFieldState', () => {
       wrapper: createWrapper({ error: true, disabled: true }),
     });
 
-    expect(result.current).toEqual({ error: false, disabled: false });
+    expect(result.current).toEqual({ error: false, disabled: false, size: 'md' });
+  });
+
+  describe('size', () => {
+    it('FormField の外側で未指定なら md を返す', () => {
+      const { result } = renderHook(() => useFormFieldState({}));
+
+      expect(result.current.size).toBe('md');
+    });
+
+    it('FormField の外側でも明示された size を返す', () => {
+      const { result } = renderHook(() => useFormFieldState({ size: 'sm' }));
+
+      expect(result.current.size).toBe('sm');
+    });
+
+    it('未指定のときは FormField の size を引き継ぐ', () => {
+      const { result } = renderHook(() => useFormFieldState({}), {
+        wrapper: createWrapper({ size: 'sm' }),
+      });
+
+      expect(result.current.size).toBe('sm');
+    });
+
+    it('明示された size は FormField の size より優先する', () => {
+      const { result } = renderHook(() => useFormFieldState({ size: 'md' }), {
+        wrapper: createWrapper({ size: 'sm' }),
+      });
+
+      expect(result.current.size).toBe('md');
+    });
   });
 });

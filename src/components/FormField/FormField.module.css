@@ -1,10 +1,36 @@
+/*
+ * サイズで変わる値はルートのカスタムプロパティに集約する。
+ * 既定（md）と [data-size='sm'] の 2 ブロックだけを読めば差分が分かる状態を保つこと
+ */
 .formField {
   /* 横並びのときのラベル列の幅 */
   --zds-form-field-label-column-width: 100px;
+  --zds-form-field-gap: var(--spacing-sm);
+  --zds-form-field-label-font-size: var(--font-size-sm);
+  /* 横並びのとき、入力欄の上下パディングに合わせてラベルを下げる量 */
+  --zds-form-field-label-padding-top: var(--spacing-md);
+  --zds-form-field-required-badge-padding-inline: var(--spacing-xs);
 
   display: grid;
-  gap: var(--spacing-sm);
+  gap: var(--zds-form-field-gap);
   align-items: start;
+}
+
+/*
+ * 文字のサイズは sm でも下げない。密度は gap・ラベル列の幅・余白で作る。
+ *
+ * - ラベルは 14px のまま。12px に下げると Checkbox / Radio / Switch のラベル
+ *   （sm で 14px）より小さくなり、フィールド全体を名指すラベルが、その中の
+ *   1 項目を指すラベルより小さいという逆転が起きる。補助テキスト（12px）との
+ *   差も無くなる
+ * - 補助テキストとエラーメッセージは 12px のまま。1 段下は --font-size-2xs
+ *   （10px）しかなく、エラーメッセージとしては小さすぎる
+ */
+.formField[data-size='sm'] {
+  --zds-form-field-label-column-width: 80px;
+  --zds-form-field-gap: var(--spacing-xs);
+  --zds-form-field-label-padding-top: var(--spacing-sm);
+  --zds-form-field-required-badge-padding-inline: var(--spacing-2xs);
 }
 
 /*
@@ -42,14 +68,14 @@
   gap: var(--spacing-sm);
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-sm);
+  font-size: var(--zds-form-field-label-font-size);
   line-height: var(--line-height-heading);
   color: var(--color-text-on-surface-default);
 }
 
 /* 横並びのときは入力欄の上下パディングに合わせてラベルを下げる */
 .formField[data-orientation='horizontal'] .formField__label {
-  padding-top: var(--spacing-md);
+  padding-top: var(--zds-form-field-label-padding-top);
 }
 
 /* data-disabled も複数コンポーネントが使う共有属性のため、同様にルートへ限定する */
@@ -61,7 +87,7 @@
   flex-shrink: 0;
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-sm);
+  font-size: var(--zds-form-field-label-font-size);
   line-height: var(--line-height-heading);
   color: var(--color-failure-text);
 }
@@ -71,7 +97,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding-inline: var(--spacing-xs);
+  padding-inline: var(--zds-form-field-required-badge-padding-inline);
   padding-block: var(--spacing-2xs);
   border-radius: var(--border-radius-xs);
   background-color: var(--color-failure-default);
@@ -88,7 +114,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--spacing-sm);
+  gap: var(--zds-form-field-gap);
 }
 
 .formField__helperText {

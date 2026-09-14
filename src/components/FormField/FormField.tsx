@@ -6,10 +6,12 @@ import { toTruthyOrUndefined } from '@/utils/dataAttribute';
 
 import styles from './FormField.module.css';
 import {
+  DEFAULT_FORM_FIELD_SIZE,
   FormFieldContext,
   type FormFieldContextValue,
   type FormFieldOrientation,
   type FormFieldRequiredMark,
+  type FormFieldSize,
   useFormFieldContext,
 } from './FormFieldContext';
 import { useFormFieldControl } from './hooks';
@@ -42,6 +44,15 @@ export type FormFieldProps = {
    * 初回描画から確実にエラー状態にしたい場合に指定する
    */
   error?: boolean;
+  /**
+   * ラベル・補助テキストと、配下の入力要素のサイズ。
+   *
+   * context 経由で入力要素へ伝わる。入力要素側で `size` を指定した場合は
+   * そちらが優先される
+   *
+   * @default 'md'
+   */
+  size?: FormFieldSize;
 } & ComponentPropsWithRef<'div'>;
 
 /**
@@ -50,8 +61,8 @@ export type FormFieldProps = {
  * 中身は `FormField.Label` / `FormField.Control` / `FormField.HelperText` /
  * `FormField.ErrorText` を合成して組み立てる。各パーツの有無は、描画するかどうかで表現する。
  *
- * `required` / `disabled` / エラー状態は context 経由で入力要素へ自動的に伝播するため、
- * `<Input error disabled>` のように入力要素側で指定し直す必要はない。
+ * `required` / `disabled` / エラー状態 / `size` は context 経由で入力要素へ自動的に伝播するため、
+ * `<Input error disabled size="sm">` のように入力要素側で指定し直す必要はない。
  *
  * **パーツはルートの直下に置くこと。**
  * 横並びのレイアウトはルートの grid で組んでいるため、
@@ -82,6 +93,7 @@ export function FormField({
   requiredMark = 'badge',
   disabled = false,
   error,
+  size = DEFAULT_FORM_FIELD_SIZE,
   className,
   children,
   // グループとしての名前付けは利用側から上書きできるようにする
@@ -111,7 +123,7 @@ export function FormField({
   // register 系はいずれも参照が安定しているので、実質は状態と id の変化でのみ作り直される
   const contextValue = useMemo<FormFieldContextValue>(
     () => ({
-      state: { required, requiredMark, disabled, error: hasError },
+      state: { required, requiredMark, disabled, error: hasError, size },
       actions: { registerLabel, registerControl, registerHelperText, registerErrorText },
       meta: { labelId, labelledControlId, describedBy },
     }),
@@ -120,6 +132,7 @@ export function FormField({
       requiredMark,
       disabled,
       hasError,
+      size,
       registerLabel,
       registerControl,
       registerHelperText,
@@ -139,6 +152,7 @@ export function FormField({
         role={role ?? (isLabelledGroup ? 'group' : undefined)}
         aria-labelledby={ariaLabelledBy ?? (isLabelledGroup ? labelId : undefined)}
         data-orientation={orientation}
+        data-size={size}
         // false は属性ごと出力しない。CSS は [data-error="true"] で拾うため、
         // false の出力は DOM のノイズにしかならない。
         // useFormFieldState が入力コンポーネントへ引き継ぐ値と同じ扱いに揃えている

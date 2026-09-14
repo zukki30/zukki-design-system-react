@@ -113,6 +113,42 @@ describe('Select', () => {
     expect(ref.current).toBe(screen.getByRole('combobox'));
   });
 
+  describe('size', () => {
+    const root = () => screen.getByRole('combobox').parentElement;
+
+    it('既定は md', () => {
+      render(<Select />);
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+
+    it('指定した size を data 属性に反映する', () => {
+      render(<Select size="sm" />);
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('FormField の size を引き継ぐ', () => {
+      render(
+        <FormField size="sm">
+          <Select />
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('自身に指定した size を FormField より優先する', () => {
+      render(
+        <FormField size="sm">
+          <Select size="md" />
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+  });
+
   describe('FormField との連携', () => {
     it('FormField のエラー状態と disabled を引き継ぐ', () => {
       render(

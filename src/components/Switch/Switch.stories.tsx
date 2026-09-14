@@ -66,3 +66,10 @@ export const WithoutLabel: Story = {
   },
   render: (args) => <Switch {...args} />,
 };
+
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+  },
+  render: (args) => <Switch {...args} />,
+};

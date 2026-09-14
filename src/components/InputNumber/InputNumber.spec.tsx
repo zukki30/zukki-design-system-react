@@ -145,6 +145,42 @@ describe('InputNumber', () => {
     expect(screen.getByRole('spinbutton')).toHaveValue(6);
   });
 
+  describe('size', () => {
+    const root = () => screen.getByRole('spinbutton').parentElement;
+
+    it('既定は md', () => {
+      render(<InputNumber />);
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+
+    it('指定した size を data 属性に反映する', () => {
+      render(<InputNumber size="sm" />);
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('FormField の size を引き継ぐ', () => {
+      render(
+        <FormField size="sm">
+          <InputNumber />
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('自身に指定した size を FormField より優先する', () => {
+      render(
+        <FormField size="sm">
+          <InputNumber size="md" />
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+  });
+
   describe('FormField との連携', () => {
     it('FormField のエラー状態と disabled を引き継ぐ', () => {
       render(

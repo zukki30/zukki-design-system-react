@@ -29,6 +29,23 @@
   }
 }
 
+/*
+ * ルート要素がフィールドそのものなので、サイズの差分はここに直接書く
+ * （カスタムプロパティを噛ませる先が無い）。
+ *
+ * min-height は md と同じ導き方（本文の行数 × 行の高さ ＋ 上下余白）で出す。
+ * 1 行は --line-height-default 150% × 16px = 24px。
+ * md は Figma 由来の 5 行ぶん 120px ＋ 上下余白 16px = 136px、
+ * sm は 4 行ぶん 96px ＋ 上下余白 8px = 104px。
+ * font-size は sm でも 16px から下げない
+ * （16px 未満だと iOS Safari がフォーカス時にページを自動ズームする）
+ */
+.textArea[data-size='sm'] {
+  min-height: 104px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+}
+
 .textArea::placeholder {
   color: var(--color-text-on-light-placeholder);
 }

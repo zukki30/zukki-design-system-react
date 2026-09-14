@@ -151,6 +151,44 @@ describe('Checkbox', () => {
     expect(ref.current?.indeterminate).toBe(true);
   });
 
+  describe('size', () => {
+    // [data-size] で辿ると FormField のルートまで登ってしまい、
+    // Checkbox 自身が属性を出さなくなっても通ってしまう
+    const root = () => screen.getByRole('checkbox').closest('label');
+
+    it('既定は md', () => {
+      render(<Checkbox>同意する</Checkbox>);
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+
+    it('指定した size を data 属性に反映する', () => {
+      render(<Checkbox size="sm">同意する</Checkbox>);
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('FormField の size を引き継ぐ', () => {
+      render(
+        <FormField size="sm">
+          <Checkbox>同意する</Checkbox>
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('自身に指定した size を FormField より優先する', () => {
+      render(
+        <FormField size="sm">
+          <Checkbox size="md">同意する</Checkbox>
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+  });
+
   describe('FormField との連携', () => {
     it('FormField の disabled を引き継ぐ', () => {
       render(

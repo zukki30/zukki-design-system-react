@@ -6,14 +6,29 @@
   composes: inputColorSchemeLight from '../../styles/mixins.module.css';
 
   /*
+   * サイズで変わる値はここと [data-size='sm'] の 2 ブロックに集める。
+   * 入力テキストの font-size は sm でも 16px から下げない
+   * （16px 未満だと iOS Safari がフォーカス時にページを自動ズームする）
+   */
+
+  /*
    * シェブロンアイコンの描画サイズ。フィールドの右パディングと、
    * アイコン自身の大きさの両方をここから決める（持ち主を 1 つにするため）
    */
   --zds-select-icon-size: 20px;
+  --zds-select-padding-block: var(--spacing-md);
+  /* 枠線を描くのはルートではなく .select__field なので、変数で配る */
+  --zds-select-border-radius: var(--border-radius-lg);
 
   position: relative;
   display: inline-flex;
   width: 100%;
+}
+
+.select[data-size='sm'] {
+  --zds-select-icon-size: 16px;
+  --zds-select-padding-block: var(--spacing-sm);
+  --zds-select-border-radius: var(--border-radius-md);
 }
 
 .select__field {
@@ -23,7 +38,7 @@
   box-sizing: border-box;
   width: 100%;
   margin: 0;
-  padding-block: var(--spacing-md);
+  padding-block: var(--zds-select-padding-block);
   padding-inline-start: var(--spacing-sm);
   /* 右側はシェブロンアイコンのスペースを確保する（左右パディング + アイコン幅） */
   padding-inline-end: calc(var(--spacing-sm) * 2 + var(--zds-select-icon-size));
@@ -31,7 +46,7 @@
   border-width: 1px;
   border-style: solid;
   border-color: var(--color-input-border-default);
-  border-radius: var(--border-radius-lg);
+  border-radius: var(--zds-select-border-radius);
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-base);

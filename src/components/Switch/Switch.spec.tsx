@@ -97,6 +97,44 @@ describe('Switch', () => {
     expect(ref.current).toBe(screen.getByRole('switch'));
   });
 
+  describe('size', () => {
+    // [data-size] で辿ると FormField のルートまで登ってしまい、
+    // Switch 自身が属性を出さなくなっても通ってしまう
+    const root = () => screen.getByRole('switch').closest('label');
+
+    it('既定は md', () => {
+      render(<Switch>通知を受け取る</Switch>);
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+
+    it('指定した size を data 属性に反映する', () => {
+      render(<Switch size="sm">通知を受け取る</Switch>);
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('FormField の size を引き継ぐ', () => {
+      render(
+        <FormField size="sm">
+          <Switch>通知を受け取る</Switch>
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('自身に指定した size を FormField より優先する', () => {
+      render(
+        <FormField size="sm">
+          <Switch size="md">通知を受け取る</Switch>
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+  });
+
   describe('FormField との連携', () => {
     it('FormField の disabled を引き継ぐ', () => {
       render(
