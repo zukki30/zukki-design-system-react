@@ -97,7 +97,8 @@ React 19（`^19.0.0`）が必要です（peer dependency）。
 ### 覚えておくこと
 
 - **`Dialog` の開閉は `open` prop だけで制御します。** `ref` から `showModal()` / `close()` を呼ばないでください。`onClose` は「閉じる要求」で、実際に閉じるかどうかは `open` が決めます
-- **`FormField` の状態は子へ自動的に伝わります。** `disabled` とエラー状態は context で入力要素に渡るため、`<Input error disabled>` と書き直す必要はありません
+- **`FormField` の状態は子へ自動的に伝わります。** `disabled` とエラー状態、そして `size` は context で入力要素に渡るため、`<Input error disabled size="sm">` と書き直す必要はありません
+- **フォーム部品の `size` は `sm` / `md` の 2 段階です。** `<FormField size="sm">` を使うと、配下の入力要素とラベル・補助テキストがまとめて小さくなります。入力要素側で `size` を指定した場合はそちらが優先されます。`sm` でも入力欄の文字は 16px のままです（それより小さいと iOS Safari がフォーカス時にページを自動ズームするため）
 - **ただし `FormField` の `required` が注入するのは `aria-required` だけです。** 支援技術には必須と伝わりますが、**ブラウザのネイティブ検証（送信時のブロック）は効きません。** 必要な場合は `<Input required>` を自分で指定してください
 - **`FormField.Control` が注入するのは子が単一の要素のときだけです。** 複数の入力を並べる場合（ラジオグループなど）は `id` と `aria-required` を自分で指定してください
 - **`Steps` のステップ番号は並び順から自動で採番されます。** `Steps.Item` に番号を渡す prop はありません。現在位置はルートの `current` で指定します
@@ -150,7 +151,12 @@ export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
 
 ```tsx
 ❌ <Button size="lg">送信</Button>
-✅ <Button size="md">送信</Button>   {/* Button の size は sm / md のみ */}
+✅ <Button size="md">送信</Button>   {/* size は sm / md のみ。フォーム部品も同じ */}
+```
+
+```tsx
+❌ <Input size={20} />                {/* HTML の size 属性は受け付けません */}
+✅ <Input size="sm" />                {/* 幅を変えたいときは CSS で指定してください */}
 ```
 
 ```tsx
