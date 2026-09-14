@@ -18,17 +18,21 @@
   align-items: flex-start;
   gap: var(--spacing-sm);
   cursor: pointer;
-}
 
-.switch[data-size='sm'] {
-  --zds-switch-track-width: 40px;
-  --zds-switch-track-height: 20px;
-  --zds-switch-thumb-size: 16px;
-  --zds-switch-label-font-size: var(--font-size-sm);
-}
+  &[data-size='sm'] {
+    --zds-switch-track-width: 40px;
+    --zds-switch-track-height: 20px;
+    --zds-switch-thumb-size: 16px;
+    --zds-switch-label-font-size: var(--font-size-sm);
+  }
 
-.switch[data-disabled='true'] {
-  cursor: not-allowed;
+  &[data-disabled='true'] {
+    cursor: not-allowed;
+
+    & .switch__label {
+      color: var(--color-text-on-surface-disabled);
+    }
+  }
 }
 
 .switch__control {
@@ -42,6 +46,7 @@
   height: var(--zds-switch-control-height);
 }
 
+/* 入力の状態で変わるトラックとつまみの見た目は、ここにまとめて置く */
 .switch__input {
   position: absolute;
   inset: 0;
@@ -50,6 +55,45 @@
   margin: 0;
   opacity: 0;
   cursor: inherit;
+
+  &:hover:not(:disabled):not(:checked) + .switch__track {
+    background-color: var(--color-switch-background-hover);
+  }
+
+  &:checked + .switch__track {
+    background-color: var(--color-switch-background-checked);
+  }
+
+  &:checked:hover:not(:disabled) + .switch__track {
+    background-color: var(--color-switch-background-checked-hover);
+  }
+
+  &:disabled:not(:checked) + .switch__track {
+    background-color: var(--color-switch-background-disabled);
+  }
+
+  &:disabled:checked + .switch__track {
+    background-color: var(--color-switch-background-checked-disabled);
+  }
+
+  &:focus-visible + .switch__track {
+    outline: 2px solid var(--color-focus);
+    outline-offset: var(--spacing-xs);
+  }
+
+  /* つまみの移動量: トラック幅 - つまみ - 左右インセット */
+  &:checked + .switch__track .switch__thumb {
+    transform: translateX(
+      calc(
+        var(--zds-switch-track-width) - var(--zds-switch-thumb-size) -
+          var(--zds-switch-thumb-inset) * 2
+      )
+    );
+  }
+
+  &:disabled + .switch__track .switch__thumb {
+    background-color: var(--color-switch-icon-disabled);
+  }
 }
 
 .switch__track {
@@ -67,31 +111,6 @@
     transition: none;
     animation: none;
   }
-}
-
-.switch__input:hover:not(:disabled):not(:checked) + .switch__track {
-  background-color: var(--color-switch-background-hover);
-}
-
-.switch__input:checked + .switch__track {
-  background-color: var(--color-switch-background-checked);
-}
-
-.switch__input:checked:hover:not(:disabled) + .switch__track {
-  background-color: var(--color-switch-background-checked-hover);
-}
-
-.switch__input:disabled:not(:checked) + .switch__track {
-  background-color: var(--color-switch-background-disabled);
-}
-
-.switch__input:disabled:checked + .switch__track {
-  background-color: var(--color-switch-background-checked-disabled);
-}
-
-.switch__input:focus-visible + .switch__track {
-  outline: 2px solid var(--color-focus);
-  outline-offset: var(--spacing-xs);
 }
 
 .switch__thumb {
@@ -116,20 +135,6 @@
   }
 }
 
-/* つまみの移動量: トラック幅 - つまみ - 左右インセット */
-.switch__input:checked + .switch__track .switch__thumb {
-  transform: translateX(
-    calc(
-      var(--zds-switch-track-width) - var(--zds-switch-thumb-size) - var(--zds-switch-thumb-inset) *
-        2
-    )
-  );
-}
-
-.switch__input:disabled + .switch__track .switch__thumb {
-  background-color: var(--color-switch-icon-disabled);
-}
-
 .switch__label {
   padding-block: var(--spacing-2xs);
   font-family: var(--font-family-default);
@@ -138,8 +143,4 @@
   line-height: var(--line-height-line);
   color: var(--color-text-on-surface-default);
   word-break: break-word;
-}
-
-.switch[data-disabled='true'] .switch__label {
-  color: var(--color-text-on-surface-disabled);
 }
