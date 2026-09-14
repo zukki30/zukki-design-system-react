@@ -11,7 +11,10 @@
    * （16px 未満だと iOS Safari がフォーカス時にページを自動ズームする）
    */
 
-  /* 独自スピンボタンの列幅と、フィールドが縮みきらないための下限 */
+  /*
+   * 独自スピンボタンの列幅と、フィールドが縮みきらないための下限。
+   * 列幅は sm でも縮めない（理由は .inputNumber__spinButton のコメント）
+   */
   --zds-input-number-spin-width: 22px;
   --zds-input-number-field-min-width: 80px;
   --zds-input-number-arrow-size: 16px;
@@ -38,7 +41,6 @@
 }
 
 .inputNumber[data-size='sm'] {
-  --zds-input-number-spin-width: 20px;
   --zds-input-number-field-min-width: 64px;
   --zds-input-number-arrow-size: 14px;
   --zds-input-number-padding-block: var(--spacing-sm);
@@ -128,6 +130,20 @@
   border-inline-start-color: var(--color-input-border-disabled);
 }
 
+/*
+ * スピンボタンは高さを自分で持たず、フィールドの高さを 2 分割する。
+ * そのため WCAG 2.2 の 2.5.8（24 × 24 px）を満たせない（md で 22 × 20.6px、
+ * sm で 22 × 16.6px）。24px × 2 + 区切り線 = 49px が必要で、md のフィールド高
+ * 42.1px にも入らないため、min-height で押し広げると sm が md より高くなる。
+ *
+ * 増減はフォーカス中の入力欄の ↑↓ キーと直接入力で同じことができ、入力欄自体は
+ * 24px を大きく超えるため、2.5.8 の Equivalent 例外に依っている
+ * （スピンボタンは tabIndex={-1} でポインタ専用の補助として置いている）。
+ * sm でも列幅を 22px から縮めないのは、せめて横方向を維持するため。
+ *
+ * 横並びレイアウトへの変更は Figma のデザイン判断を伴うため #116 で追跡する。
+ * axe-core は target size を検査しないので test:a11y では検出できない
+ */
 .inputNumber__spinButton {
   flex: 1 1 0;
   box-sizing: border-box;
