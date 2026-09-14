@@ -438,6 +438,7 @@ src/utils/
 - テストは 2 系統に分かれる。`vitest.config.ts` の `projects` で環境ごとに分離している
   - `pnpm test` … jsdom 上のユニットテスト（`unit` プロジェクト）
   - `pnpm test:a11y` … 全ストーリーを Chromium で描画し `axe-core` にかける（`a11y-light` / `a11y-dark` プロジェクト）
+- **jsdom は CSS の入れ子を解析できない。** `&` を含むスタイルシートを丸ごと捨てるため、`getComputedStyle` で当たり方を確かめているテストが「スタイルが当たらない」側だけ黙って通ってしまう。`unit` プロジェクトには `*.module.css` の入れ子を展開してから渡すプラグインを入れてある（`vitest.config.ts`）。ブラウザで動く a11y のプロジェクトと配布物は入れ子のまま扱う
 
 **a11y の検査:**
 
