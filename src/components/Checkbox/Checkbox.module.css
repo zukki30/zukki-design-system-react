@@ -1,10 +1,25 @@
+/*
+ * サイズで変わる値はここと [data-size='sm'] の 2 ブロックに集める。
+ *
+ * 当たり判定（--zds-checkbox-control-size）と見た目（--zds-checkbox-box-size）を
+ * 別の変数で持つ。sm は箱を 20px に縮めるが、ポインタターゲットは
+ * WCAG 2.2 の 2.5.8（24 × 24 px 以上）を割らないよう 24px のまま据え置く。
+ * ラベルを持たない使い方（テーブルの行選択など）でも 24px が確保される
+ */
 .checkbox {
+  --zds-checkbox-control-size: 24px;
   --zds-checkbox-box-size: 24px;
+  --zds-checkbox-label-font-size: var(--font-size-base);
 
   display: inline-flex;
   align-items: flex-start;
   gap: var(--spacing-sm);
   cursor: pointer;
+}
+
+.checkbox[data-size='sm'] {
+  --zds-checkbox-box-size: 20px;
+  --zds-checkbox-label-font-size: var(--font-size-sm);
 }
 
 .checkbox[data-disabled='true'] {
@@ -15,8 +30,11 @@
   position: relative;
   flex-shrink: 0;
   display: inline-flex;
-  width: var(--zds-checkbox-box-size);
-  height: var(--zds-checkbox-box-size);
+  /* 箱が当たり判定より小さいとき、箱を中央に置く */
+  align-items: center;
+  justify-content: center;
+  width: var(--zds-checkbox-control-size);
+  height: var(--zds-checkbox-control-size);
 }
 
 .checkbox__input {
@@ -122,7 +140,7 @@
   padding-block: var(--spacing-2xs);
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
+  font-size: var(--zds-checkbox-label-font-size);
   line-height: var(--line-height-line);
   color: var(--color-text-on-surface-default);
   word-break: break-word;

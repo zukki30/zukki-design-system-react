@@ -83,3 +83,10 @@ export const WithoutLabel: Story = {
   },
   render: (args) => <Radio {...args} />,
 };
+
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+  },
+  render: (args) => <Radio {...args} />,
+};

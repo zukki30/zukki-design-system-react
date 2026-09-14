@@ -1,13 +1,29 @@
+/*
+ * サイズで変わる値はここと [data-size='sm'] の 2 ブロックに集める。
+ *
+ * 当たり判定の高さ（--zds-switch-control-height）とトラックの見た目を別の変数で持つ。
+ * sm はトラックを 40 × 20px に縮めるが、ポインタターゲットは
+ * WCAG 2.2 の 2.5.8（24 × 24 px 以上）を割らないよう高さ 24px のまま据え置く
+ */
 .switch {
+  --zds-switch-control-height: 24px;
   --zds-switch-track-width: 48px;
   --zds-switch-track-height: 24px;
   --zds-switch-thumb-size: 20px;
   --zds-switch-thumb-inset: 2px;
+  --zds-switch-label-font-size: var(--font-size-base);
 
   display: inline-flex;
   align-items: flex-start;
   gap: var(--spacing-sm);
   cursor: pointer;
+}
+
+.switch[data-size='sm'] {
+  --zds-switch-track-width: 40px;
+  --zds-switch-track-height: 20px;
+  --zds-switch-thumb-size: 16px;
+  --zds-switch-label-font-size: var(--font-size-sm);
 }
 
 .switch[data-disabled='true'] {
@@ -18,8 +34,11 @@
   position: relative;
   flex-shrink: 0;
   display: inline-flex;
+  /* トラックが当たり判定より低いとき、トラックを中央に置く */
+  align-items: center;
+  justify-content: center;
   width: var(--zds-switch-track-width);
-  height: var(--zds-switch-track-height);
+  height: var(--zds-switch-control-height);
 }
 
 .switch__input {
@@ -114,7 +133,7 @@
   padding-block: var(--spacing-2xs);
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
+  font-size: var(--zds-switch-label-font-size);
   line-height: var(--line-height-line);
   color: var(--color-text-on-surface-default);
   word-break: break-word;

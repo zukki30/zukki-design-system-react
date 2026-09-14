@@ -74,3 +74,10 @@ export const WithoutLabel: Story = {
   },
   render: (args) => <Checkbox {...args} />,
 };
+
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+  },
+  render: (args) => <Checkbox {...args} />,
+};

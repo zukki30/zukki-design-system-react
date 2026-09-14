@@ -35,11 +35,11 @@ export type { InputNumberProps, InputNumberSize } from './components/InputNumber
 export { TextArea } from './components/TextArea';
 export type { TextAreaProps, TextAreaSize } from './components/TextArea';
 export { Checkbox } from './components/Checkbox';
-export type { CheckboxProps } from './components/Checkbox';
+export type { CheckboxProps, CheckboxSize } from './components/Checkbox';
 export { Radio } from './components/Radio';
-export type { RadioProps } from './components/Radio';
+export type { RadioProps, RadioSize } from './components/Radio';
 export { Switch } from './components/Switch';
-export type { SwitchProps } from './components/Switch';
+export type { SwitchProps, SwitchSize } from './components/Switch';
 export { Select } from './components/Select';
 export type { SelectProps, SelectSize } from './components/Select';
 export { FormField, useFormFieldContext, useFormFieldState } from './components/FormField';

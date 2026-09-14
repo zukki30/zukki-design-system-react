@@ -114,6 +114,42 @@ describe('Radio', () => {
     expect(ref.current).toBe(screen.getByRole('radio'));
   });
 
+  describe('size', () => {
+    const root = () => screen.getByRole('radio').closest('[data-size]');
+
+    it('既定は md', () => {
+      render(<Radio>りんご</Radio>);
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+
+    it('指定した size を data 属性に反映する', () => {
+      render(<Radio size="sm">りんご</Radio>);
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('FormField の size を引き継ぐ', () => {
+      render(
+        <FormField size="sm">
+          <Radio>りんご</Radio>
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'sm');
+    });
+
+    it('自身に指定した size を FormField より優先する', () => {
+      render(
+        <FormField size="sm">
+          <Radio size="md">りんご</Radio>
+        </FormField>
+      );
+
+      expect(root()).toHaveAttribute('data-size', 'md');
+    });
+  });
+
   describe('FormField との連携', () => {
     it('FormField の disabled を引き継ぐ', () => {
       render(
