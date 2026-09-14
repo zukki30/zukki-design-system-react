@@ -1,12 +1,21 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
+import type { SizeType } from '@/types';
 import { isRenderable } from '@/utils/renderableNode';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 import { Icon } from '../Icon/Icon';
 
 import styles from './Select.module.css';
+
+/**
+ * セレクトのサイズ。`sm` / `md` の 2 段階。
+ *
+ * `lg` は意図的に持たない。Button / IconButton に `lg` が無いため、
+ * 隣にボタンを並べたときに対応する段が無くなる
+ */
+export type SelectSize = Exclude<SizeType, 'lg'>;
 
 export type SelectProps = {
   /**
@@ -22,22 +31,34 @@ export type SelectProps = {
    */
   disabled?: boolean;
   /**
+   * セレクトのサイズ。未指定のときは FormField の size を引き継ぐ
+   *
+   * @default 'md'
+   */
+  size?: SelectSize;
+  /**
    * option 要素
    */
   children?: ReactNode;
-} & Omit<ComponentPropsWithRef<'select'>, 'prefix' | 'suffix'>;
+} & Omit<ComponentPropsWithRef<'select'>, 'prefix' | 'suffix' | 'size'>;
 
 export const Select = ({
   placeholder,
   error: errorProp,
   disabled: disabledProp,
+  // 既定値を書かないこと。undefined が消えて FormField の size を常に上書きしてしまう
+  size: sizeProp,
   className,
   children,
   value,
   defaultValue,
   ...props
 }: SelectProps) => {
-  const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
+  const { error, disabled, size } = useFormFieldState({
+    error: errorProp,
+    disabled: disabledProp,
+    size: sizeProp,
+  });
 
   // 初期選択の行き先が消えないよう、option の描画と初期値の算出は同じ判定を使う
   const hasPlaceholder = isRenderable(placeholder);
@@ -47,7 +68,12 @@ export const Select = ({
     value === undefined && defaultValue === undefined && hasPlaceholder ? '' : defaultValue;
 
   return (
-    <div className={clsx(styles.select, className)} data-error={error} data-disabled={disabled}>
+    <div
+      className={clsx(styles.select, className)}
+      data-error={error}
+      data-disabled={disabled}
+      data-size={size}
+    >
       <select
         className={styles.select__field}
         disabled={disabled}
