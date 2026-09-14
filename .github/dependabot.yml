@@ -15,6 +15,13 @@ updates:
       # コミット規約に合わせて chore(deps): ... の形にする
       prefix: chore
       include: scope
+    ignore:
+      # @types/node のメジャーは実行する Node のメジャーと揃える。型だけ先行すると、
+      # 実行中の Node に無い API を書いても typecheck が通ってしまう。
+      # .mise.toml / ci.yml の Node を上げるときに、この ignore も一緒に外すこと
+      - dependency-name: '@types/node'
+        update-types:
+          - version-update:semver-major
     # 関連パッケージはまとめて 1 PR にする（上から順にマッチしたグループへ入る）
     groups:
       storybook:

@@ -1,3 +1,5 @@
 [tools]
+# ここを上げるときは .github/workflows/ci.yml の node-version と、
+# .github/dependabot.yml で ignore している @types/node のメジャーも揃えること
 node = "24.14.1"
 pnpm = "10.33.0"
