@@ -29,11 +29,11 @@ export type {
   StepsProps,
 } from './components/Steps';
 export { Input } from './components/Input';
-export type { InputProps } from './components/Input';
+export type { InputProps, InputSize } from './components/Input';
 export { InputNumber } from './components/InputNumber';
-export type { InputNumberProps } from './components/InputNumber';
+export type { InputNumberProps, InputNumberSize } from './components/InputNumber';
 export { TextArea } from './components/TextArea';
-export type { TextAreaProps } from './components/TextArea';
+export type { TextAreaProps, TextAreaSize } from './components/TextArea';
 export { Checkbox } from './components/Checkbox';
 export type { CheckboxProps } from './components/Checkbox';
 export { Radio } from './components/Radio';

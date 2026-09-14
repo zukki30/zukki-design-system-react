@@ -29,6 +29,20 @@
   }
 }
 
+/*
+ * ルート要素がフィールドそのものなので、サイズの差分はここに直接書く
+ * （カスタムプロパティを噛ませる先が無い）。
+ *
+ * min-height は md と同じ導き方: 本文 4 行ぶん（24px × 4 = 96px）＋ 上下余白 8px。
+ * font-size は sm でも 16px から下げない
+ * （16px 未満だと iOS Safari がフォーカス時にページを自動ズームする）
+ */
+.textArea[data-size='sm'] {
+  min-height: 104px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+}
+
 .textArea::placeholder {
   color: var(--color-text-on-light-placeholder);
 }

@@ -1,9 +1,19 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
+import type { SizeType } from '@/types';
+
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import styles from './Input.module.css';
+
+/**
+ * 入力のサイズ。`sm` / `md` の 2 段階。
+ *
+ * `lg` は意図的に持たない。Button / IconButton に `lg` が無いため、
+ * 隣にボタンを並べたときに対応する段が無くなる
+ */
+export type InputSize = Exclude<SizeType, 'lg'>;
 
 export type InputProps = {
   /**
@@ -26,20 +36,37 @@ export type InputProps = {
    * 入力の disabled 属性。未指定のときは FormField の disabled を引き継ぐ
    */
   disabled?: boolean;
-} & Omit<ComponentPropsWithRef<'input'>, 'prefix' | 'suffix'>;
+  /**
+   * 入力のサイズ。未指定のときは FormField の size を引き継ぐ
+   *
+   * @default 'md'
+   */
+  size?: InputSize;
+} & Omit<ComponentPropsWithRef<'input'>, 'prefix' | 'suffix' | 'size'>;
 
 export const Input = ({
   startIcon,
   endIcon,
   error: errorProp,
   disabled: disabledProp,
+  // 既定値を書かないこと。undefined が消えて FormField の size を常に上書きしてしまう
+  size: sizeProp,
   className,
   ...props
 }: InputProps) => {
-  const { error, disabled } = useFormFieldState({ error: errorProp, disabled: disabledProp });
+  const { error, disabled, size } = useFormFieldState({
+    error: errorProp,
+    disabled: disabledProp,
+    size: sizeProp,
+  });
 
   return (
-    <div className={clsx(styles.input, className)} data-error={error} data-disabled={disabled}>
+    <div
+      className={clsx(styles.input, className)}
+      data-error={error}
+      data-disabled={disabled}
+      data-size={size}
+    >
       {startIcon ? (
         <span className={styles.input__icon} data-position="start" aria-hidden="true">
           {startIcon}

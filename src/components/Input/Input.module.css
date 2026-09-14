@@ -4,6 +4,14 @@
    * 利用側が type="date" / "time" などを渡せるぶん、対象になるネイティブウィジェットが多い
    */
   composes: inputColorSchemeLight from '../../styles/mixins.module.css';
+
+  /*
+   * サイズで変わる値はここと [data-size='sm'] の 2 ブロックに集める。
+   * 入力テキストの font-size は sm でも 16px から下げない
+   * （16px 未満だと iOS Safari がフォーカス時にページを自動ズームする）
+   */
+  --zds-input-padding-block: var(--spacing-md);
+
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -22,6 +30,12 @@
     transition: none;
     animation: none;
   }
+}
+
+.input[data-size='sm'] {
+  --zds-input-padding-block: var(--spacing-sm);
+
+  border-radius: var(--border-radius-md);
 }
 
 .input:hover:not([data-disabled='true']):not([data-error='true']) {
@@ -55,7 +69,7 @@
   outline: none;
   background-color: transparent;
   padding-inline: var(--spacing-sm);
-  padding-block: var(--spacing-md);
+  padding-block: var(--zds-input-padding-block);
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-base);

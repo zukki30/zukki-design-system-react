@@ -73,3 +73,11 @@ export const Error: Story = {
   },
   render: (args) => <TextArea {...args} />,
 };
+
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+    defaultValue: 'サンプルテキスト',
+  },
+  render: (args) => <TextArea {...args} />,
+};

@@ -96,3 +96,10 @@ export const EndIcon: Story = {
   },
   render: (args) => <Input {...args} />,
 };
+
+export const SizeSm: Story = {
+  args: {
+    size: 'sm',
+  },
+  render: (args) => <Input {...args} />,
+};
