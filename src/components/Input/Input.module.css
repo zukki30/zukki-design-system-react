@@ -32,36 +32,44 @@
     transition: none;
     animation: none;
   }
-}
 
-.input[data-size='sm'] {
-  --zds-input-padding-block: var(--spacing-sm);
-  --zds-input-icon-size: 20px;
+  &[data-size='sm'] {
+    --zds-input-padding-block: var(--spacing-sm);
+    --zds-input-icon-size: 20px;
 
-  border-radius: var(--border-radius-md);
-}
+    border-radius: var(--border-radius-md);
+  }
 
-.input:hover:not([data-disabled='true']):not([data-error='true']) {
-  border-color: var(--color-input-border-hover);
-}
+  &:hover:not([data-disabled='true']):not([data-error='true']) {
+    border-color: var(--color-input-border-hover);
+  }
 
-.input:focus-within {
-  outline: 2px solid var(--color-focus);
-  outline-offset: var(--spacing-xs);
-}
+  &:focus-within {
+    outline: 2px solid var(--color-focus);
+    outline-offset: var(--spacing-xs);
+  }
 
-.input[data-error='true'] {
-  background-color: var(--color-input-background-error);
-  border-color: var(--color-input-border-error);
-}
+  &[data-error='true'] {
+    background-color: var(--color-input-background-error);
+    border-color: var(--color-input-border-error);
 
-.input[data-error='true']:hover:not([data-disabled='true']) {
-  border-color: var(--color-input-border-error-hover);
-}
+    &:hover:not([data-disabled='true']) {
+      border-color: var(--color-input-border-error-hover);
+    }
+  }
 
-.input[data-disabled='true'] {
-  background-color: var(--color-input-background-disabled);
-  border-color: var(--color-input-border-disabled);
+  &[data-disabled='true'] {
+    background-color: var(--color-input-background-disabled);
+    border-color: var(--color-input-border-disabled);
+
+    /*
+     * 祖先を限定しないと、data-disabled を持つ他コンポーネント（FormField など）の
+     * 内側に置いたときにアドーンメントだけが disabled 色になる
+     */
+    & .input__icon {
+      color: var(--color-text-on-light-disabled);
+    }
+  }
 }
 
 .input__field {
@@ -78,16 +86,16 @@
   font-size: var(--font-size-base);
   line-height: var(--line-height-line);
   color: var(--color-text-on-light-default);
-}
 
-.input__field::placeholder {
-  color: var(--color-text-on-light-placeholder);
-}
+  &::placeholder {
+    color: var(--color-text-on-light-placeholder);
+  }
 
-.input__field:disabled {
-  color: var(--color-text-on-light-disabled);
-  -webkit-text-fill-color: var(--color-text-on-light-disabled);
-  cursor: not-allowed;
+  &:disabled {
+    color: var(--color-text-on-light-disabled);
+    -webkit-text-fill-color: var(--color-text-on-light-disabled);
+    cursor: not-allowed;
+  }
 }
 
 .input__icon {
@@ -97,30 +105,22 @@
   flex-shrink: 0;
   line-height: 0;
   color: var(--color-text-on-light-subtle);
-}
 
-/*
- * アドーンメントの大きさは入力欄側が決める（Select のシェブロンと同じ形）。
- * Icon は width/height 属性で 24 を出すが、CSS の指定が優先される。
- * 直下の svg だけが対象なので、要素で包めば利用側が自分で大きさを決められる
- */
-.input__icon > svg {
-  width: var(--zds-input-icon-size);
-  height: var(--zds-input-icon-size);
-}
+  /*
+   * アドーンメントの大きさは入力欄側が決める（Select のシェブロンと同じ形）。
+   * Icon は width/height 属性で 24 を出すが、CSS の指定が優先される。
+   * 直下の svg だけが対象なので、要素で包めば利用側が自分で大きさを決められる
+   */
+  & > svg {
+    width: var(--zds-input-icon-size);
+    height: var(--zds-input-icon-size);
+  }
 
-.input__icon[data-position='start'] {
-  padding-inline-start: var(--spacing-sm);
-}
+  &[data-position='start'] {
+    padding-inline-start: var(--spacing-sm);
+  }
 
-.input__icon[data-position='end'] {
-  padding-inline-end: var(--spacing-sm);
-}
-
-/*
- * 祖先を限定しないと、data-disabled を持つ他コンポーネント（FormField など）の
- * 内側に置いたときにアドーンメントだけが disabled 色になる
- */
-.input[data-disabled='true'] .input__icon {
-  color: var(--color-text-on-light-disabled);
+  &[data-position='end'] {
+    padding-inline-end: var(--spacing-sm);
+  }
 }
