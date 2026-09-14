@@ -1,9 +1,9 @@
 /*
  * サイズで変わる値はここと [data-size='sm'] の 2 ブロックに集める。
  *
- * 当たり判定（--zds-checkbox-control-size）と見た目（--zds-checkbox-box-size）を
- * 別の変数で持つ。sm は箱を 20px に縮めるが、ポインタターゲットは
- * WCAG 2.2 の 2.5.8（24 × 24 px 以上）を割らないよう 24px のまま据え置く。
+ * ただし当たり判定（--zds-checkbox-control-size）はサイズで変えない。
+ * 見た目（--zds-checkbox-box-size）と変数を分けてあり、sm は箱を 20px に縮めるが、
+ * ポインタターゲットは WCAG 2.2 の 2.5.8（24 × 24 px 以上）を割らないよう 24px のまま据え置く。
  * ラベルを持たない使い方（テーブルの行選択など）でも 24px が確保される
  */
 .checkbox {
@@ -137,7 +137,9 @@
 }
 
 .checkbox__label {
-  padding-block: var(--spacing-2xs);
+  padding-block-start: calc(
+    (var(--zds-checkbox-control-size) - var(--zds-checkbox-label-font-size)) / 2
+  );
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--zds-checkbox-label-font-size);
