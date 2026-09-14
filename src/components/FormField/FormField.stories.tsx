@@ -129,7 +129,10 @@ export const Disabled: Story = {
 };
 
 // size は context 経由で配下の入力要素へ伝わる。
-// 種類の違う入力を並べて、まとめて sm になることを実ブラウザの a11y 検査にも載せる
+// 種類の違う入力を並べて、まとめて sm になることを実ブラウザの a11y 検査にも載せる。
+//
+// 入力を複数置くと FormField.Control は id を注入しないため（ラベルの紐付け先を
+// 1 つに決められない）、名前はそれぞれに付ける。ラベルはグループ名として働く
 export const SizeSm: Story = {
   args: {
     size: 'sm',
@@ -138,8 +141,8 @@ export const SizeSm: Story = {
       <>
         <FormField.Label>ラベル</FormField.Label>
         <FormField.Control>
-          <Input placeholder="placeholder" />
-          <Select placeholder="選択してください">
+          <Input placeholder="placeholder" aria-label="テキスト入力" />
+          <Select placeholder="選択してください" aria-label="セレクト">
             <option value="1">選択肢 1</option>
             <option value="2">選択肢 2</option>
           </Select>
