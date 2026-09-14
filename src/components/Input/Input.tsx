@@ -1,31 +1,30 @@
 import { clsx } from 'clsx';
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
-import type { SizeType } from '@/types';
+import type { ControlSize } from '@/types';
 
 import { useFormFieldState } from '../FormField/FormFieldContext';
 
 import styles from './Input.module.css';
 
 /**
- * 入力のサイズ。`sm` / `md` の 2 段階。
- *
- * `lg` は意図的に持たない。Button / IconButton に `lg` が無いため、
- * 隣にボタンを並べたときに対応する段が無くなる
+ * 入力のサイズ。`sm` / `md` の 2 段階
  */
-export type InputSize = Exclude<SizeType, 'lg'>;
+export type InputSize = ControlSize;
 
 export type InputProps = {
   /**
    * 入力の前に表示する装飾アイコン。
    * 支援技術からは隠されるため、操作要素や意味のあるテキストは渡さないこと。
-   * `0` や `''` などの falsy な値はアイコン未指定として扱い、何も描画しない
+   * `0` や `''` などの falsy な値はアイコン未指定として扱い、何も描画しない。
+   * 直下の `svg` は大きさを入力欄に合わせて描画される（`size` に応じて 24px / 20px）
    */
   startIcon?: ReactNode;
   /**
    * 入力の後に表示する装飾アイコン。
    * 支援技術からは隠されるため、操作要素や意味のあるテキストは渡さないこと。
-   * `0` や `''` などの falsy な値はアイコン未指定として扱い、何も描画しない
+   * `0` や `''` などの falsy な値はアイコン未指定として扱い、何も描画しない。
+   * 直下の `svg` は大きさを入力欄に合わせて描画される（`size` に応じて 24px / 20px）
    */
   endIcon?: ReactNode;
   /**

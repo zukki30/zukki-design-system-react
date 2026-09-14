@@ -103,3 +103,12 @@ export const SizeSm: Story = {
   },
   render: (args) => <Input {...args} />,
 };
+
+// アドーンメントも sm に合わせて縮む（大きさは Input.module.css が持つ）
+export const SizeSmWithIcon: Story = {
+  args: {
+    size: 'sm',
+    startIcon: <Icon name="calendarMonth" />,
+  },
+  render: (args) => <Input {...args} />,
+};
