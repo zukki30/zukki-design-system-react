@@ -23,14 +23,55 @@
   position: relative;
   display: inline-flex;
   width: 100%;
+
+  &[data-size='sm'] {
+    --zds-select-icon-size: 16px;
+    --zds-select-padding-block: var(--spacing-sm);
+    --zds-select-border-radius: var(--border-radius-md);
+  }
+
+  &:not([data-error='true']) {
+    /* 値未選択（placeholder option が選択中）はプレースホルダー色 */
+    & .select__field:has(option[value='']:checked):not(:disabled) {
+      color: var(--color-text-on-light-placeholder);
+    }
+
+    & .select__field:hover:not(:disabled) {
+      border-color: var(--color-input-border-hover);
+    }
+  }
+
+  &[data-error='true'] {
+    & .select__field {
+      background-color: var(--color-input-background-error);
+      border-color: var(--color-input-border-error);
+      color: var(--color-text-on-failure-default);
+
+      &:hover:not(:disabled) {
+        border-color: var(--color-input-border-error-hover);
+      }
+
+      /*
+       * エラー時はフィールドと選択肢リストの背景を揃える。
+       * Chrome / Windows は折りたたみ時の描画にも選択中 option の背景を使うことがあり、
+       * 白のままだとエラーの薄赤が消えて見える
+       */
+      & option {
+        background-color: var(--color-input-background-error);
+      }
+    }
+
+    & .select__icon {
+      color: var(--color-text-on-failure-default);
+    }
+  }
+
+  &[data-disabled='true'] .select__icon {
+    color: var(--color-text-on-light-disabled);
+  }
 }
 
-.select[data-size='sm'] {
-  --zds-select-icon-size: 16px;
-  --zds-select-padding-block: var(--spacing-sm);
-  --zds-select-border-radius: var(--border-radius-md);
-}
-
+/* エラー時の色は .select[data-error='true'] 側で当てている */
 .select__field {
   appearance: none;
   -webkit-appearance: none;
@@ -62,63 +103,34 @@
     transition: none;
     animation: none;
   }
-}
 
-/* 値未選択（placeholder option が選択中）はプレースホルダー色 */
-.select:not([data-error='true'])
-  .select__field:has(option[value='']:checked):not(:disabled) {
-  color: var(--color-text-on-light-placeholder);
-}
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: var(--spacing-xs);
+  }
 
-.select:not([data-error='true']) .select__field:hover:not(:disabled) {
-  border-color: var(--color-input-border-hover);
-}
+  &:disabled {
+    background-color: var(--color-input-background-disabled);
+    border-color: var(--color-input-border-disabled);
+    color: var(--color-text-on-light-disabled);
+    cursor: not-allowed;
+  }
 
-.select__field:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: var(--spacing-xs);
-}
+  /*
+   * ネイティブの選択肢リスト（ブラウザ描画。指定可能な範囲で色を合わせる）。
+   * option は素の要素セレクタなので CSS Modules のスコープ対象にならず、
+   * クラスのスコープの内側にありながらグローバルな要素として書ける。
+   *
+   * background-color を省くと Windows のダークテーマで暗い背景に濃色テキストが載って読めなくなる
+   */
+  & option {
+    background-color: var(--color-input-background-default);
+    color: var(--color-text-on-light-default);
 
-.select[data-error='true'] .select__field {
-  background-color: var(--color-input-background-error);
-  border-color: var(--color-input-border-error);
-  color: var(--color-text-on-failure-default);
-}
-
-.select[data-error='true'] .select__field:hover:not(:disabled) {
-  border-color: var(--color-input-border-error-hover);
-}
-
-.select__field:disabled {
-  background-color: var(--color-input-background-disabled);
-  border-color: var(--color-input-border-disabled);
-  color: var(--color-text-on-light-disabled);
-  cursor: not-allowed;
-}
-
-/*
- * ネイティブの選択肢リスト（ブラウザ描画。指定可能な範囲で色を合わせる）。
- * option は素の要素セレクタなので CSS Modules のスコープ対象にならず、
- * クラスのスコープの内側にありながらグローバルな要素として書ける。
- *
- * background-color を省くと Windows のダークテーマで暗い背景に濃色テキストが載って読めなくなる
- */
-.select__field option {
-  background-color: var(--color-input-background-default);
-  color: var(--color-text-on-light-default);
-}
-
-/*
- * エラー時はフィールドと選択肢リストの背景を揃える。
- * Chrome / Windows は折りたたみ時の描画にも選択中 option の背景を使うことがあり、
- * 白のままだとエラーの薄赤が消えて見える
- */
-.select[data-error='true'] .select__field option {
-  background-color: var(--color-input-background-error);
-}
-
-.select__field option:disabled {
-  color: var(--color-text-on-light-disabled);
+    &:disabled {
+      color: var(--color-text-on-light-disabled);
+    }
+  }
 }
 
 .select__icon {
@@ -130,18 +142,10 @@
   justify-content: center;
   pointer-events: none;
   color: var(--color-text-on-light-subtle);
-}
 
-/* Icon は width/height 属性で 24 を出すが、CSS の指定が優先される */
-.select__icon > svg {
-  width: var(--zds-select-icon-size);
-  height: var(--zds-select-icon-size);
-}
-
-.select[data-error='true'] .select__icon {
-  color: var(--color-text-on-failure-default);
-}
-
-.select[data-disabled='true'] .select__icon {
-  color: var(--color-text-on-light-disabled);
+  /* Icon は width/height 属性で 24 を出すが、CSS の指定が優先される */
+  & > svg {
+    width: var(--zds-select-icon-size);
+    height: var(--zds-select-icon-size);
+  }
 }

@@ -20,10 +20,10 @@
   border-style: solid;
   border-color: var(--color-surface-subtle);
   border-radius: var(--border-radius-lg);
-}
 
-.card[data-size='sm'] {
-  --zds-card-padding: var(--spacing-xl);
+  &[data-size='sm'] {
+    --zds-card-padding: var(--spacing-xl);
+  }
 }
 
 .card__image {

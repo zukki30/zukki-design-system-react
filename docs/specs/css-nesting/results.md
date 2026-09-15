@@ -1,0 +1,100 @@
+# 結果: CSS を入れ子（CSS Nesting）で書く
+
+対象 Issue: [#117](https://github.com/zukki30/zukki-design-system-react/issues/117) / 要件: [requirements.md](./requirements.md) / 設計: [design.md](./design.md) / 実装計画: [implementation-plan.md](./implementation-plan.md)
+
+ブランチ: `chore/css-nesting`（`origin/main` の `098bb70` から派生）
+
+## 何をしたか
+
+`src/components/**/*.module.css` の 19 ファイルを CSS Nesting で書き直した。描画結果は変えていない。
+
+| | 変更前 | 変更後 |
+| --- | --- | --- |
+| トップレベルのルール | 314 | **85**（＋ `@keyframes` 2 つ） |
+| 最も分散していたファイル | `Button` が `.button` 1 つに 43 ルール | `.button` / `__inner` / `__label` / `__loading` の 4 つ |
+
+`src/styles/mixins.module.css` は 3 クラスとも宣言のみで、ネストする対象が無いため変更していない（要件 R5 のとおり）。
+
+## 入れ子の規則
+
+設計 §1 の 6 つをそのまま適用した。`AGENTS.md` の「スタイリング（CSS Modules）」に規約として書いてある。
+
+1. トップレベルのルールはクラス 1 つにつき 1 つ
+2. 行き先は「セレクタの先頭に現れるクラス」で決める
+3. ネストしたセレクタは `&` から書き始める（例外は `a&:hover` の 1 件）
+4. 深さは 3 段まで
+5. 宣言はネストしたルールより前にまとめる
+6. ネストしたルール同士の順序は元のまま
+
+段を作るのは中間セレクタを 2 つ以上のルールで共有するときだけにした。`Breadcrumb` のバリアントのように 1 ルールしか無いものは `&[data-variant='profile'] .breadcrumb__current { … }` と 1 行で書いている。
+
+## 検証
+
+### 1. 出力 CSS の突き合わせ（`compare-flat-css.ts`）
+
+入れ子に未対応の `cssTarget` でビルドすると esbuild が `:is()` を挟まずフラットなセレクタへ展開する性質を使い、変更前後を突き合わせた。
+
+```
+宣言の差分なし（335 ルール / 323 セレクタ）
+順序の入れ替わり 462 組 / 勝敗が変わる組は 0 件
+```
+
+- **宣言の差分は 0。** セレクタ・詳細度・宣言の並びがすべて一致した
+- 順序の入れ替わりは 462 組あるが、「詳細度が等しく・同じ要素に当たり・同じプロパティを触る」組は 1 つも無い（設計 §3 の事前見積もり 325 組より増えたのは、実測がセレクタリストを 1 本ずつに分解して数えているため）
+
+比較の土台は `origin/main` を `git worktree` で展開して同じツールチェーンで取り直した。途中で `pnpm install` が走って Vite が 8.2.2 から 8.3.0 へ上がったが、取り直した結果は更新前と 1 バイトも違わなかった。
+
+ツールは 2 方向で動作を確かめてある。
+
+- 宣言を 1 つ変える（`Skeleton` の `border-radius`）→ 差分として検出し異常終了する
+- 同詳細度・同要素・同プロパティのルールを入れ替える（`Checkbox` の `checked` / `indeterminate` の `opacity`）→ 「勝敗が変わる組」として検出し異常終了する
+
+### 2. 計算後スタイルの突き合わせ（実ブラウザ）
+
+全 114 ストーリー × ライト / ダークの計算後スタイルを、変更前後のビルドで比較した。**差分なし。**
+
+ここで既存の `snapshot-computed-styles.ts` の測定タイミングに問題が見つかったため、`.tmp` に置いた写しへ待ちを足して測っている（詳細は次節）。
+
+### 3. 既存の検査
+
+| コマンド | 結果 |
+| --- | --- |
+| `pnpm check:css-types` | 20 件の型宣言は最新（クラスの増減なし） |
+| `pnpm lint:check` / `pnpm format:check` / `pnpm typecheck` | 通過 |
+| `pnpm test` | 485 件すべて通過 |
+| `pnpm test:a11y` | 通過 |
+| `pnpm verify:dist` | 通過 |
+
+## 途中で見つかったこと
+
+### jsdom は入れ子 CSS を解析できない
+
+**入れ子にした直後、`Steps` のユニットテストが 2 件落ちた。** jsdom の CSS パーサは `&` を含むスタイルシートを解析できず、"Could not parse CSS stylesheet" を出して**そのファイルの規則を丸ごと捨てる**。
+
+問題は落ちたテストより、落ちなかったテストのほうにあった。`getComputedStyle` で当たり方を確かめているテストのうち、**「スタイルが当たらないこと」を期待する側は、スタイルシートが捨てられた状態でも通ってしまう**。`Steps` の「外側の要素の `data-orientation` にスタイルが反応しない」がこれにあたる。
+
+対処として、`unit` プロジェクトにだけ `*.module.css` の入れ子を展開してから渡す Vite プラグインを入れた（`vitest.config.ts`）。
+
+- 展開は esbuild の `chrome111` ターゲットで行う。入れ子（Chrome 112）の 1 つ手前で、`:has()`（Chrome 105）は残る。`:is()` も挟まれないため詳細度は変わらない
+- 対象を `*.module.css` に絞ったのは、`variables*.css` の `light-dark()`（Chrome 123）まで変換させないため
+- ブラウザで動く a11y のプロジェクトと配布物は入れ子のまま扱う
+- これに伴い `esbuild` を devDependency として明示した（従来から Vite の依存として入っていたもの。`vite` の `transformWithEsbuild` は Vite 8 で deprecated になっており、`transformWithOxc` は CSS を扱えない）
+
+### 計算後スタイルのスナップショットは描画途中を測っていた
+
+`snapshot-computed-styles.ts` で最初に比較したとき、`FormField` のエラー系ストーリーで 9 件の差分が出た。調べた結果、**入れ子とは無関係の測定タイミングの問題**だった。
+
+- `FormField` のエラー状態は `FormField.ErrorText` の描画を子から登録して決まるため、`data-error` は初回ペイントの**後**に付く
+- `data-error` が付くと入力欄の `transition`（0.2s）が走り出す
+- スナップショットは `document.fonts.ready` の直後に測っていたため、**遷移の途中の色**が記録されていた
+
+同じビルドを 2 回測ると一致するので気づきにくいが、CSS の量が変わるとロードのタイミングがずれ、記録される中間色も変わる。実ブラウザで両ビルドを開いて確かめたところ、落ち着いた後の色は**変更前後で同一**だった。
+
+このため測定側に「効果が反映されるまで（`requestAnimationFrame` 2 回）＋ 遷移が終わるまで（400ms）」の待ちを足した写しを使った。待ちを足した状態では全ストーリーで差分ゼロになる。
+
+> `docs/specs/migrate-to-css-modules/` のスクリプトは過去の spec の成果物なのでそのままにしてある。次に使うときは同じ待ちが要る。
+
+## 利用側への影響
+
+- **描画結果は変わらない。** 公開 API・クラス名・型宣言（`*.module.css.d.ts`）もすべて同一
+- 配布する CSS には入れ子が残る（`build.cssTarget` の下限がいずれも入れ子対応済みのため展開されない）。ネイティブ対応は Chrome 112+ / Safari 17.2+ / Firefox 117+ で、README の対応ブラウザ（各最新版）を満たす。**対応ブラウザの要件は変わらない**

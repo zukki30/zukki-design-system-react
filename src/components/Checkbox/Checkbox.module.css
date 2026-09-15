@@ -15,15 +15,19 @@
   align-items: flex-start;
   gap: var(--spacing-sm);
   cursor: pointer;
-}
 
-.checkbox[data-size='sm'] {
-  --zds-checkbox-box-size: 20px;
-  --zds-checkbox-label-font-size: var(--font-size-sm);
-}
+  &[data-size='sm'] {
+    --zds-checkbox-box-size: 20px;
+    --zds-checkbox-label-font-size: var(--font-size-sm);
+  }
 
-.checkbox[data-disabled='true'] {
-  cursor: not-allowed;
+  &[data-disabled='true'] {
+    cursor: not-allowed;
+
+    & .checkbox__label {
+      color: var(--color-text-on-surface-disabled);
+    }
+  }
 }
 
 .checkbox__control {
@@ -37,6 +41,7 @@
   height: var(--zds-checkbox-control-size);
 }
 
+/* 入力の状態で変わる箱とアイコンの見た目は、ここにまとめて置く */
 .checkbox__input {
   position: absolute;
   inset: 0;
@@ -45,6 +50,52 @@
   margin: 0;
   opacity: 0;
   cursor: inherit;
+
+  &:hover:not(:disabled):not(:checked):not(:indeterminate) + .checkbox__box {
+    border-color: var(--color-checkbox-radio-border-hover);
+  }
+
+  &:checked + .checkbox__box,
+  &:indeterminate + .checkbox__box {
+    background-color: var(--color-checkbox-radio-background-checked);
+    border-color: var(--color-checkbox-radio-border-checked);
+  }
+
+  &:checked:hover:not(:disabled) + .checkbox__box,
+  &:indeterminate:hover:not(:disabled) + .checkbox__box {
+    background-color: var(--color-checkbox-radio-background-checked-hover);
+    border-color: var(--color-checkbox-radio-border-checked-hover);
+  }
+
+  &:disabled:not(:checked):not(:indeterminate) + .checkbox__box {
+    background-color: var(--color-checkbox-radio-background-disabled);
+    border-color: var(--color-checkbox-radio-border-disabled);
+  }
+
+  &:disabled:checked + .checkbox__box,
+  &:disabled:indeterminate + .checkbox__box {
+    background-color: var(--color-checkbox-radio-background-checked-disabled);
+    border-color: var(--color-checkbox-radio-border-checked-disabled);
+    color: var(--color-checkbox-radio-icon-checked-disabled);
+  }
+
+  &:focus-visible + .checkbox__box {
+    outline: 2px solid var(--color-focus);
+    outline-offset: var(--spacing-xs);
+  }
+
+  &:checked + .checkbox__box .checkbox__checkIcon {
+    opacity: 1;
+  }
+
+  /* checked かつ indeterminate のときは indeterminate を優先しチェックを隠す */
+  &:indeterminate + .checkbox__box .checkbox__checkIcon {
+    opacity: 0;
+  }
+
+  &:indeterminate + .checkbox__box .checkbox__minusIcon {
+    opacity: 1;
+  }
 }
 
 .checkbox__box {
@@ -73,39 +124,6 @@
   }
 }
 
-.checkbox__input:hover:not(:disabled):not(:checked):not(:indeterminate) + .checkbox__box {
-  border-color: var(--color-checkbox-radio-border-hover);
-}
-
-.checkbox__input:checked + .checkbox__box,
-.checkbox__input:indeterminate + .checkbox__box {
-  background-color: var(--color-checkbox-radio-background-checked);
-  border-color: var(--color-checkbox-radio-border-checked);
-}
-
-.checkbox__input:checked:hover:not(:disabled) + .checkbox__box,
-.checkbox__input:indeterminate:hover:not(:disabled) + .checkbox__box {
-  background-color: var(--color-checkbox-radio-background-checked-hover);
-  border-color: var(--color-checkbox-radio-border-checked-hover);
-}
-
-.checkbox__input:disabled:not(:checked):not(:indeterminate) + .checkbox__box {
-  background-color: var(--color-checkbox-radio-background-disabled);
-  border-color: var(--color-checkbox-radio-border-disabled);
-}
-
-.checkbox__input:disabled:checked + .checkbox__box,
-.checkbox__input:disabled:indeterminate + .checkbox__box {
-  background-color: var(--color-checkbox-radio-background-checked-disabled);
-  border-color: var(--color-checkbox-radio-border-checked-disabled);
-  color: var(--color-checkbox-radio-icon-checked-disabled);
-}
-
-.checkbox__input:focus-visible + .checkbox__box {
-  outline: 2px solid var(--color-focus);
-  outline-offset: var(--spacing-xs);
-}
-
 .checkbox__icon {
   position: absolute;
   inset: 0;
@@ -118,22 +136,9 @@
   opacity: 0;
 }
 
-.checkbox__input:checked + .checkbox__box .checkbox__checkIcon {
-  opacity: 1;
-}
-
-/* checked かつ indeterminate のときは indeterminate を優先しチェックを隠す */
-.checkbox__input:indeterminate + .checkbox__box .checkbox__checkIcon {
-  opacity: 0;
-}
-
 .checkbox__minusIcon {
   composes: checkbox__icon;
   opacity: 0;
-}
-
-.checkbox__input:indeterminate + .checkbox__box .checkbox__minusIcon {
-  opacity: 1;
 }
 
 .checkbox__label {
@@ -146,8 +151,4 @@
   line-height: var(--line-height-line);
   color: var(--color-text-on-surface-default);
   word-break: break-word;
-}
-
-.checkbox[data-disabled='true'] .checkbox__label {
-  color: var(--color-text-on-surface-disabled);
 }

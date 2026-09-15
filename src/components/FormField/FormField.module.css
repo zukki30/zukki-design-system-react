@@ -14,35 +14,52 @@
   display: grid;
   gap: var(--zds-form-field-gap);
   align-items: start;
-}
 
-/*
- * 文字のサイズは sm でも下げない。密度は gap・ラベル列の幅・余白で作る。
- *
- * - ラベルは 14px のまま。12px に下げると Checkbox / Radio / Switch のラベル
- *   （sm で 14px）より小さくなり、フィールド全体を名指すラベルが、その中の
- *   1 項目を指すラベルより小さいという逆転が起きる。補助テキスト（12px）との
- *   差も無くなる
- * - 補助テキストとエラーメッセージは 12px のまま。1 段下は --font-size-2xs
- *   （10px）しかなく、エラーメッセージとしては小さすぎる
- */
-.formField[data-size='sm'] {
-  --zds-form-field-label-column-width: 80px;
-  --zds-form-field-gap: var(--spacing-xs);
-  --zds-form-field-label-padding-top: var(--spacing-sm);
-  --zds-form-field-required-badge-padding-inline: var(--spacing-2xs);
-}
+  /*
+   * 文字のサイズは sm でも下げない。密度は gap・ラベル列の幅・余白で作る。
+   *
+   * - ラベルは 14px のまま。12px に下げると Checkbox / Radio / Switch のラベル
+   *   （sm で 14px）より小さくなり、フィールド全体を名指すラベルが、その中の
+   *   1 項目を指すラベルより小さいという逆転が起きる。補助テキスト（12px）との
+   *   差も無くなる
+   * - 補助テキストとエラーメッセージは 12px のまま。1 段下は --font-size-2xs
+   *   （10px）しかなく、エラーメッセージとしては小さすぎる
+   */
+  &[data-size='sm'] {
+    --zds-form-field-label-column-width: 80px;
+    --zds-form-field-gap: var(--spacing-xs);
+    --zds-form-field-label-padding-top: var(--spacing-sm);
+    --zds-form-field-required-badge-padding-inline: var(--spacing-2xs);
+  }
 
-/*
- * パーツはルート直下に並ぶため、列の割り当てだけでラベルと入力欄を配置する。
- * 入力欄の列は minmax(0, 1fr) にして、長いコンテンツで列が広がらないようにする
- */
-.formField[data-orientation='horizontal'] {
-  grid-template-columns: var(--zds-form-field-label-column-width) minmax(0, 1fr);
-}
+  /*
+   * パーツはルート直下に並ぶため、列の割り当てだけでラベルと入力欄を配置する。
+   * 入力欄の列は minmax(0, 1fr) にして、長いコンテンツで列が広がらないようにする。
+   *
+   * data-orientation は Steps など他コンポーネントも使うため、
+   * 祖先セレクタは FormField のルートに限定する
+   */
+  &[data-orientation='horizontal'] {
+    grid-template-columns: var(--zds-form-field-label-column-width) minmax(0, 1fr);
 
-.formField[data-orientation='vertical'] {
-  grid-template-columns: minmax(0, 1fr);
+    & .formField__controlColumn {
+      grid-column: 2;
+    }
+
+    /* 横並びのときは入力欄の上下パディングに合わせてラベルを下げる */
+    & .formField__label {
+      padding-top: var(--zds-form-field-label-padding-top);
+    }
+  }
+
+  &[data-orientation='vertical'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* data-disabled も複数コンポーネントが使う共有属性のため、同様にルートへ限定する */
+  &[data-disabled='true'] .formField__label {
+    color: var(--color-text-on-surface-disabled);
+  }
 }
 
 /*
@@ -53,14 +70,7 @@
   min-width: 0;
 }
 
-/*
- * data-orientation は Steps など他コンポーネントも使うため、
- * 祖先セレクタは FormField のルートに限定する
- */
-.formField[data-orientation='horizontal'] .formField__controlColumn {
-  grid-column: 2;
-}
-
+/* 横並びの padding と、無効時の色は .formField[data-…] 側で当てている */
 .formField__label {
   grid-column: 1;
   display: flex;
@@ -71,16 +81,6 @@
   font-size: var(--zds-form-field-label-font-size);
   line-height: var(--line-height-heading);
   color: var(--color-text-on-surface-default);
-}
-
-/* 横並びのときは入力欄の上下パディングに合わせてラベルを下げる */
-.formField[data-orientation='horizontal'] .formField__label {
-  padding-top: var(--zds-form-field-label-padding-top);
-}
-
-/* data-disabled も複数コンポーネントが使う共有属性のため、同様にルートへ限定する */
-.formField[data-disabled='true'] .formField__label {
-  color: var(--color-text-on-surface-disabled);
 }
 
 .formField__requiredAsterisk {

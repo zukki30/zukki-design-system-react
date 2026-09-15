@@ -24,16 +24,16 @@
    * 本文が長いとダイアログ自体がスクロールする。そのスクロールが背景へ連鎖しないようにする
    */
   overscroll-behavior: contain;
-}
 
-/* ネイティブ dialog は閉じている間 display:none。開いているときだけ flex にする */
-.dialog[open] {
-  display: flex;
-}
+  /* ネイティブ dialog は閉じている間 display:none。開いているときだけ flex にする */
+  &[open] {
+    display: flex;
+  }
 
-.dialog::backdrop {
-  background-color: var(--color-black);
-  opacity: 0.25;
+  &::backdrop {
+    background-color: var(--color-black);
+    opacity: 0.25;
+  }
 }
 
 .dialog__header {

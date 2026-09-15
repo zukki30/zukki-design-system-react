@@ -3,9 +3,43 @@ import { fileURLToPath } from 'node:url';
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
+import { transform } from 'esbuild';
+import type { Plugin } from 'vite';
 import { configDefaults, defineConfig } from 'vitest/config';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * `*.module.css` の入れ子を展開してから jsdom へ渡す。
+ *
+ * jsdom の CSS パーサは入れ子に未対応で、`&` を含むスタイルシートを **丸ごと捨てる**
+ * （"Could not parse CSS stylesheet" を出して以降そのファイルの規則が一切効かなくなる）。
+ * getComputedStyle で当たり方を確かめているテストが、
+ * 「スタイルが当たらない」ことを期待する側だけ黙って通ってしまうため、ここで展開する。
+ *
+ * 展開に使うターゲットは chrome111。入れ子（Chrome 112）の 1 つ手前で、
+ * `:has()`（Chrome 105）は残る組み合わせになる。展開しても `:is()` は挟まれず、
+ * 詳細度は入れ子のときと同じままになる。
+ * 対象を `*.module.css` に絞るのは、`variables*.css` の `light-dark()`（Chrome 123）まで
+ * 変換させないため。ブラウザで動く a11y のプロジェクトと配布物は入れ子のまま扱う
+ */
+const flattenCssNestingForJsdom = (): Plugin => ({
+  name: 'flatten-css-nesting-for-jsdom',
+  enforce: 'pre',
+  async transform(code, id) {
+    if (!id.includes('.module.css')) {
+      return null;
+    }
+
+    const { code: flattened } = await transform(code, {
+      loader: 'css',
+      target: ['chrome111'],
+      sourcefile: id,
+    });
+
+    return flattened;
+  },
+});
 
 /**
  * ストーリーを実ブラウザで実行し、axe-core で a11y を検査するプロジェクト。
@@ -45,6 +79,7 @@ export default defineConfig({
     projects: [
       {
         extends: './vite.config.ts',
+        plugins: [flattenCssNestingForJsdom()],
         test: {
           name: 'unit',
           globals: true,

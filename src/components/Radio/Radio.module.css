@@ -15,16 +15,20 @@
   align-items: flex-start;
   gap: var(--spacing-sm);
   cursor: pointer;
-}
 
-.radio[data-size='sm'] {
-  --zds-radio-box-size: 20px;
-  --zds-radio-dot-size: 8px;
-  --zds-radio-label-font-size: var(--font-size-sm);
-}
+  &[data-size='sm'] {
+    --zds-radio-box-size: 20px;
+    --zds-radio-dot-size: 8px;
+    --zds-radio-label-font-size: var(--font-size-sm);
+  }
 
-.radio[data-disabled='true'] {
-  cursor: not-allowed;
+  &[data-disabled='true'] {
+    cursor: not-allowed;
+
+    & .radio__label {
+      color: var(--color-text-on-surface-disabled);
+    }
+  }
 }
 
 .radio__control {
@@ -38,6 +42,7 @@
   height: var(--zds-radio-control-size);
 }
 
+/* 入力の状態で変わる箱とドットの見た目は、ここにまとめて置く */
 .radio__input {
   position: absolute;
   inset: 0;
@@ -46,6 +51,40 @@
   margin: 0;
   opacity: 0;
   cursor: inherit;
+
+  &:hover:not(:disabled):not(:checked) + .radio__box {
+    border-color: var(--color-checkbox-radio-border-hover);
+  }
+
+  &:checked + .radio__box {
+    background-color: var(--color-checkbox-radio-background-checked);
+    border-color: var(--color-checkbox-radio-border-checked);
+  }
+
+  &:checked:hover:not(:disabled) + .radio__box {
+    background-color: var(--color-checkbox-radio-background-checked-hover);
+    border-color: var(--color-checkbox-radio-border-checked-hover);
+  }
+
+  &:disabled:not(:checked) + .radio__box {
+    background-color: var(--color-checkbox-radio-background-disabled);
+    border-color: var(--color-checkbox-radio-border-disabled);
+  }
+
+  &:disabled:checked + .radio__box {
+    background-color: var(--color-checkbox-radio-background-checked-disabled);
+    border-color: var(--color-checkbox-radio-border-checked-disabled);
+    color: var(--color-checkbox-radio-icon-checked-disabled);
+  }
+
+  &:focus-visible + .radio__box {
+    outline: 2px solid var(--color-focus);
+    outline-offset: var(--spacing-xs);
+  }
+
+  &:checked + .radio__box .radio__dot {
+    opacity: 1;
+  }
 }
 
 .radio__box {
@@ -74,46 +113,12 @@
   }
 }
 
-.radio__input:hover:not(:disabled):not(:checked) + .radio__box {
-  border-color: var(--color-checkbox-radio-border-hover);
-}
-
-.radio__input:checked + .radio__box {
-  background-color: var(--color-checkbox-radio-background-checked);
-  border-color: var(--color-checkbox-radio-border-checked);
-}
-
-.radio__input:checked:hover:not(:disabled) + .radio__box {
-  background-color: var(--color-checkbox-radio-background-checked-hover);
-  border-color: var(--color-checkbox-radio-border-checked-hover);
-}
-
-.radio__input:disabled:not(:checked) + .radio__box {
-  background-color: var(--color-checkbox-radio-background-disabled);
-  border-color: var(--color-checkbox-radio-border-disabled);
-}
-
-.radio__input:disabled:checked + .radio__box {
-  background-color: var(--color-checkbox-radio-background-checked-disabled);
-  border-color: var(--color-checkbox-radio-border-checked-disabled);
-  color: var(--color-checkbox-radio-icon-checked-disabled);
-}
-
-.radio__input:focus-visible + .radio__box {
-  outline: 2px solid var(--color-focus);
-  outline-offset: var(--spacing-xs);
-}
-
 .radio__dot {
   width: var(--zds-radio-dot-size);
   height: var(--zds-radio-dot-size);
   border-radius: var(--border-radius-full);
   background-color: currentcolor;
   opacity: 0;
-}
-
-.radio__input:checked + .radio__box .radio__dot {
-  opacity: 1;
 }
 
 .radio__label {
@@ -124,8 +129,4 @@
   line-height: var(--line-height-line);
   color: var(--color-text-on-surface-default);
   word-break: break-word;
-}
-
-.radio[data-disabled='true'] .radio__label {
-  color: var(--color-text-on-surface-disabled);
 }

@@ -38,37 +38,57 @@
     transition: none;
     animation: none;
   }
-}
 
-.inputNumber[data-size='sm'] {
-  --zds-input-number-field-min-width: 64px;
-  --zds-input-number-arrow-size: 14px;
-  --zds-input-number-padding-block: var(--spacing-sm);
+  &[data-size='sm'] {
+    --zds-input-number-field-min-width: 64px;
+    --zds-input-number-arrow-size: 14px;
+    --zds-input-number-padding-block: var(--spacing-sm);
 
-  border-radius: var(--border-radius-md);
-}
+    border-radius: var(--border-radius-md);
+  }
 
-.inputNumber:hover:not([data-disabled='true']):not([data-error='true']) {
-  border-color: var(--color-input-border-hover);
-}
+  &:hover:not([data-disabled='true']):not([data-error='true']) {
+    border-color: var(--color-input-border-hover);
+  }
 
-.inputNumber:focus-within {
-  outline: 2px solid var(--color-focus);
-  outline-offset: var(--spacing-xs);
-}
+  &:focus-within {
+    outline: 2px solid var(--color-focus);
+    outline-offset: var(--spacing-xs);
+  }
 
-.inputNumber[data-error='true'] {
-  background-color: var(--color-input-background-error);
-  border-color: var(--color-input-border-error);
-}
+  &[data-error='true'] {
+    background-color: var(--color-input-background-error);
+    border-color: var(--color-input-border-error);
 
-.inputNumber[data-error='true']:hover:not([data-disabled='true']) {
-  border-color: var(--color-input-border-error-hover);
-}
+    &:hover:not([data-disabled='true']) {
+      border-color: var(--color-input-border-error-hover);
+    }
 
-.inputNumber[data-disabled='true'] {
-  background-color: var(--color-input-background-disabled);
-  border-color: var(--color-input-border-disabled);
+    & .inputNumber__field {
+      color: var(--color-text-on-failure-default);
+    }
+
+    & .inputNumber__spin {
+      border-inline-start-color: var(--color-input-border-error);
+    }
+
+    & .inputNumber__spinDivider {
+      background-color: var(--color-input-border-error);
+    }
+  }
+
+  &[data-disabled='true'] {
+    background-color: var(--color-input-background-disabled);
+    border-color: var(--color-input-border-disabled);
+
+    & .inputNumber__spin {
+      border-inline-start-color: var(--color-input-border-disabled);
+    }
+
+    & .inputNumber__spinDivider {
+      background-color: var(--color-input-border-disabled);
+    }
+  }
 }
 
 .inputNumber__field {
@@ -89,29 +109,26 @@
   color: var(--color-text-on-light-default);
   -moz-appearance: textfield;
   appearance: textfield;
+
+  &::placeholder {
+    color: var(--color-text-on-light-placeholder);
+  }
+
+  /* ネイティブのスピンボタンを隠す（独自ボタンで代替） */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:disabled {
+    color: var(--color-text-on-light-disabled);
+    -webkit-text-fill-color: var(--color-text-on-light-disabled);
+    cursor: not-allowed;
+  }
 }
 
-.inputNumber__field::placeholder {
-  color: var(--color-text-on-light-placeholder);
-}
-
-/* ネイティブのスピンボタンを隠す（独自ボタンで代替） */
-.inputNumber__field::-webkit-outer-spin-button,
-.inputNumber__field::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.inputNumber__field:disabled {
-  color: var(--color-text-on-light-disabled);
-  -webkit-text-fill-color: var(--color-text-on-light-disabled);
-  cursor: not-allowed;
-}
-
-.inputNumber[data-error='true'] .inputNumber__field {
-  color: var(--color-text-on-failure-default);
-}
-
+/* エラー・無効時の色は .inputNumber[data-…] 側で当てている */
 .inputNumber__spin {
   display: flex;
   flex-direction: column;
@@ -120,14 +137,6 @@
   border-inline-start-width: 1px;
   border-inline-start-style: solid;
   border-inline-start-color: var(--color-input-border-default);
-}
-
-.inputNumber[data-error='true'] .inputNumber__spin {
-  border-inline-start-color: var(--color-input-border-error);
-}
-
-.inputNumber[data-disabled='true'] .inputNumber__spin {
-  border-inline-start-color: var(--color-input-border-disabled);
 }
 
 /*
@@ -163,33 +172,26 @@
     transition: none;
     animation: none;
   }
+
+  /* Icon は width/height 属性で 24 を出すが、CSS の指定が優先される */
+  & > svg {
+    width: var(--zds-input-number-arrow-size);
+    height: var(--zds-input-number-arrow-size);
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-input-spin-button-background-hover);
+  }
+
+  &:disabled {
+    color: var(--color-text-on-light-disabled);
+    cursor: not-allowed;
+  }
 }
 
-/* Icon は width/height 属性で 24 を出すが、CSS の指定が優先される */
-.inputNumber__spinButton > svg {
-  width: var(--zds-input-number-arrow-size);
-  height: var(--zds-input-number-arrow-size);
-}
-
-.inputNumber__spinButton:hover:not(:disabled) {
-  background-color: var(--color-input-spin-button-background-hover);
-}
-
-.inputNumber__spinButton:disabled {
-  color: var(--color-text-on-light-disabled);
-  cursor: not-allowed;
-}
-
+/* エラー・無効時の色は .inputNumber[data-…] 側で当てている */
 .inputNumber__spinDivider {
   height: 1px;
   flex-shrink: 0;
   background-color: var(--color-input-border-default);
-}
-
-.inputNumber[data-error='true'] .inputNumber__spinDivider {
-  background-color: var(--color-input-border-error);
-}
-
-.inputNumber[data-disabled='true'] .inputNumber__spinDivider {
-  background-color: var(--color-input-border-disabled);
 }
