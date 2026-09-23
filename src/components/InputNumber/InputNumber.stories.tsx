@@ -1,6 +1,27 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 
 import { InputNumber } from './InputNumber';
+
+/** WCAG 2.2 SC 2.5.8 Target Size (Minimum) の下限 */
+const MIN_TARGET_SIZE = 24;
+
+/**
+ * スピンボタンの実寸が 2.5.8 を満たすことを確かめる。
+ *
+ * axe-core は target size を検査しないため、ここで測る。
+ * jsdom はレイアウトしないので、ブラウザで動く test:a11y 側でしか確認できない
+ */
+const expectSpinButtonTargetSize = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement);
+
+  for (const label of ['減らす', '増やす']) {
+    const { width, height } = canvas.getByLabelText(label).getBoundingClientRect();
+
+    await expect(width).toBeGreaterThanOrEqual(MIN_TARGET_SIZE);
+    await expect(height).toBeGreaterThanOrEqual(MIN_TARGET_SIZE);
+  }
+};
 
 const meta = {
   title: 'Components/InputNumber',
@@ -52,6 +73,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => <InputNumber {...args} />,
+  play: ({ canvasElement }) => expectSpinButtonTargetSize(canvasElement),
 };
 
 export const DefaultValue: Story = {
@@ -83,4 +105,5 @@ export const SizeSm: Story = {
     defaultValue: 186,
   },
   render: (args) => <InputNumber {...args} />,
+  play: ({ canvasElement }) => expectSpinButtonTargetSize(canvasElement),
 };
