@@ -98,6 +98,8 @@ iOS Safari は 16px 未満の入力欄にフォーカスするとページを自
 
 ### ただし `InputNumber` のスピンボタンだけは満たせない（[#116](https://github.com/zukki30/zukki-design-system-react/issues/116) で追跡）
 
+> **解消済み（2026-09-24）.** #116 でスピンボタンを横並び（`−` / `+`）にし、`sm` / `md` とも 24 × 24px 以上を満たした。経緯は [`docs/specs/input-number-spin-target-size/`](../input-number-spin-target-size/) を参照。以下はこの spec を進めた時点の記録である。
+
 スピンボタンは高さを自分で持たず、`flex: 1 1 0` でフィールドの高さを 2 分割する。そのため `sm` では 22 × 16.6px になる（`md` でも 22 × 20.6px で、元から 24px を割っていた）。
 
 縦積みのままでは解消できない。24px × 2 + 区切り線 = 49px が必要で、`md` のフィールド高 42.1px にも入らないため、`min-height` で押し広げると `sm` が今の `md` より高くなる。
@@ -139,5 +141,5 @@ iOS Safari は 16px 未満の入力欄にフォーカスするとページを自
 - **`meta.render` にサイズ比較のセクションを足していない。** 計算後スタイルの突き合わせで既存ストーリーの DOM を保つことを優先した。autodocs でサイズを見比べたい場合は後から足せる
 - **`lg` は用意していない。** `Button` / `IconButton` に `lg` が無いため、隣に並べたときに対応する段が無くなる。3 段階にするならボタン側と合わせて決める必要がある
 - **`Checkbox` / `Radio` / `Switch` の `gap` は `sm` でも 8px。** 20px の箱に対して 4px はラベルが近すぎると判断した。実際に使ってみて詰めたくなったら変える
-- **`InputNumber` のスピンボタンが 24 × 24px に届かない。** 縦並びのレイアウトを変えないと解消しないため [#116](https://github.com/zukki30/zukki-design-system-react/issues/116) で追跡する
+- ~~**`InputNumber` のスピンボタンが 24 × 24px に届かない。** 縦並びのレイアウトを変えないと解消しないため [#116](https://github.com/zukki30/zukki-design-system-react/issues/116) で追跡する~~ → **解消済み（2026-09-24）**。[`docs/specs/input-number-spin-target-size/`](../input-number-spin-target-size/)
 - **`FormField` のラベルと `Checkbox` のラベルが `sm` で同じ 14px。** 逆転は解消したが、グループ名が項目名より大きくはならない。14px と 12px の間にトークンが無いため、必要なら段を足すところから決める
