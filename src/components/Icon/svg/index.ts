@@ -14,4 +14,5 @@ export { default as home } from './IconHome';
 export { default as menuDown } from './IconMenuDown';
 export { default as menuUp } from './IconMenuUp';
 export { default as outlineCheck } from './IconOutlineCheck';
+export { default as plus } from './IconPlus';
 export { default as windowRestore } from './IconWindowRestore';
