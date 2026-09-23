@@ -15,6 +15,7 @@ export const iconNames = [
   'menuDown',
   'menuUp',
   'outlineCheck',
+  'plus',
   'windowRestore',
 ] as const;
 

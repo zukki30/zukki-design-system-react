@@ -131,22 +131,8 @@ export const InputNumber = ({
         {...props}
       />
 
+      {/* 横並びなので、DOM の順序も見た目に合わせて − → + にする */}
       <div className={styles.inputNumber__spin}>
-        <button
-          type="button"
-          tabIndex={-1}
-          aria-label="増やす"
-          className={styles.inputNumber__spinButton}
-          disabled={disabled}
-          onMouseDown={handleMouseDown}
-          onClick={() => handleStep('up')}
-        >
-          {/* 大きさは CSS が持つ（InputNumber.module.css の --zds-input-number-arrow-size） */}
-          <Icon name="menuUp" />
-        </button>
-
-        <span className={styles.inputNumber__spinDivider} />
-
         <button
           type="button"
           tabIndex={-1}
@@ -156,7 +142,22 @@ export const InputNumber = ({
           onMouseDown={handleMouseDown}
           onClick={() => handleStep('down')}
         >
-          <Icon name="menuDown" />
+          {/* 大きさは CSS が持つ（InputNumber.module.css の --zds-input-number-icon-size） */}
+          <Icon name="baselineMinus" />
+        </button>
+
+        <span className={styles.inputNumber__spinDivider} />
+
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="増やす"
+          className={styles.inputNumber__spinButton}
+          disabled={disabled}
+          onMouseDown={handleMouseDown}
+          onClick={() => handleStep('up')}
+        >
+          <Icon name="plus" />
         </button>
       </div>
     </div>
