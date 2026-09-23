@@ -98,8 +98,10 @@ FAIL |a11y-dark (chromium)|  InputNumber.stories.tsx > Size Sm
 | --- | --- |
 | 見た目 | スピンボタンが縦並び（`▲` / `▼`）から横並び（`−` / `+`）に |
 | 幅 | `InputNumber` の全体幅が 27px 広がる（`md` で最小 105px → 132px、`sm` で 89px → 116px） |
-| アイコン | `iconNames` に `plus` が増えた（18 件） |
-| 公開 API | 変更なし（`InputNumberProps` / `InputNumberSize` はそのまま） |
+| アイコン | `iconNames` に `plus` が増えた（17 → 18 件） |
+| 公開 API | `InputNumber` は変更なし（`InputNumberProps` / `InputNumberSize` はそのまま）。ただし **`IconName` に `'plus'` が、`iconNames` に `'plus'` が加わる** |
+
+`IconName` / `iconNames` は `src/main.tsx` から export しているため、アイコンの追加は**公開 API の変更にあたる**（後方互換の追加で、既存の利用側が壊れることはない）。`IconName` を網羅した `switch` や `Record<IconName, …>` を書いている利用側では、型エラーとして `plus` の追加が現れる。
 
 破壊的な API 変更とトークンの再生成はどちらも無い。
 

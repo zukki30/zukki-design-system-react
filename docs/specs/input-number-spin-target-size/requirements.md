@@ -116,7 +116,7 @@ div.inputNumber                 … data-size / data-error / data-disabled を�
 
 - `sm` でも列幅は 24px から縮めない（R1 のため）。`md` と同じ値を使う
 - アイコンの描画サイズは `md` 24px / `sm` 20px とし、`Input` のアドーンメント（`--zds-input-icon-size`）と揃える
-  - 当初は現状の出し分け（`md` 16px / `sm` 14px）を引き継ぐ予定だったが、設計フェーズで変更した。16 / 14 は「22 × 20.6px のボタンに収める」ための値であり、ボタンが 24 × 42.1px になると前提が変わる。理由は [`design.md` の「要件からの変更点」](./design.md#要件からの変更点要確認) を参照
+  - 当初は現状の出し分け（`md` 16px / `sm` 14px）を引き継ぐ予定だったが、設計フェーズで変更した。16 / 14 は「22 × 20.6px のボタンに収める」ための値であり、ボタンが 24 × 42.1px になると前提が変わる。理由は [`design.md` の「要件からの変更点（承認済み）」](./design.md#要件からの変更点承認済み) を参照
 - hover / disabled / error の配色、`border-radius`、`focus-within` の outline は現状のまま
 - 角の内側にボタンがはみ出さないよう、ルートの `overflow: hidden` は維持する
 
@@ -146,7 +146,8 @@ Issue にあるとおり `axe-core` は target size を検査しない。**目�
 ### R9. 配布物の検査を通すこと【必須】
 
 - `pnpm verify:dist` を通す（`plus` が `dist/AGENTS.md` の一覧へ入ることの確認を含む）
-- 公開 API（`InputNumberProps` / `InputNumberSize`）は変えないため、`README.md` のコンポーネント一覧と `docs/agent-guide.template.md` の `descriptions` は変更不要
+- `InputNumber` の公開 API（`InputNumberProps` / `InputNumberSize`）は変えないため、`README.md` のコンポーネント一覧と `docs/agent-guide.template.md` の `descriptions` は変更不要
+- ただし `IconName` / `iconNames` は `src/main.tsx` から export しており、**`plus` の追加はそれ自体が公開 API の変更にあたる**（後方互換の追加）。ファイルを触る必要は無いが、リリースノートには書く
 
 ## やらないこと
 

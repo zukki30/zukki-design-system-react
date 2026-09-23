@@ -262,11 +262,12 @@ export const SizeSm: Story = {
 
 | 確認 | 期待 |
 | --- | --- |
-| `a11y-light` / `a11y-dark` で `play` が実行されるか | `pnpm test:a11y` のテスト件数が 4 件（2 ストーリー × 2 配色）増える |
 | **わざと壊したとき落ちるか** | `--zds-input-number-spin-button-width` を一時的に `20px` にして `pnpm test:a11y` が**失敗する**ことを確認し、元に戻す |
 | `storybook/test` の import 経路 | `within` / `expect` が取れること。取れない場合は `play` コンテキストの `canvas` を使う形に切り替える |
 
-2 つ目は省略しない。**通ることより、壊れたときに落ちることのほうが重要**で、それを確かめないと「検査を足した」と言えない。
+1 つ目は省略しない。**通ることより、壊れたときに落ちることのほうが重要**で、それを確かめないと「検査を足した」と言えない。
+
+> **計画時の誤り（実装後に修正）.** ここには当初「`pnpm test:a11y` のテスト件数が 4 件（2 ストーリー × 2 配色）増える」という確認項目を置いていたが、**件数は増えない**。ストーリーは元から各プロジェクトで 1 件ずつテストになっており、`play` はその既存テストの中で実行されるため、228 件のまま変わらない。件数では実行を確認できないので、残る確認手段は上の「わざと壊す」ほうだけになる。詳細は [`results.md`](./results.md) を参照。
 
 ### 3-3. 確認
 
@@ -300,7 +301,7 @@ L99-107 の「`InputNumber` のスピンボタンだけは満たせない」節�
 | --- | --- |
 | `src/components/InputNumber/InputNumber.spec.tsx` | `git diff` に出ないこと |
 | `src/components/InputNumber/InputNumber.module.css.d.ts` | 同上 |
-| `src/main.tsx` / `README.md` / `docs/agent-guide.template.md` | 同上（公開 API とコンポーネント一覧に変化がないため） |
+| `src/main.tsx` / `README.md` / `docs/agent-guide.template.md` | 同上。`IconName` / `iconNames` は `Icon` からの再 export なので、`plus` の追加はこれらのファイルを触らずに公開 API まで伝わる |
 
 ### 4-4. 全体の検証
 
@@ -340,8 +341,8 @@ pnpm verify:dist
 - 利用側から見た変更点として次を書く
   - スピンボタンが縦並び（`▲` / `▼`）から横並び（`−` / `+`）になった
   - `InputNumber` の全体幅が 27px 広がった（`md` で最小 105px → 132px）
-  - `plus` アイコンが `iconNames` に増えた
-  - 公開 API（`InputNumberProps` / `InputNumberSize`）に変更はない
+  - `plus` アイコンが `iconNames` に増えた（`IconName` にも `'plus'` が加わる後方互換の追加）
+  - `InputNumber` の公開 API（`InputNumberProps` / `InputNumberSize`）に変更はない
 
 破壊的な API 変更とトークンの再生成はどちらも無い。
 

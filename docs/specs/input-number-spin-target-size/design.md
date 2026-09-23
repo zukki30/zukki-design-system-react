@@ -339,7 +339,7 @@ export const SizeSm: Story = {
 | --- | --- |
 | `InputNumber.spec.tsx` | 3 章のとおり、既存のまま通ることが担保になる |
 | `InputNumber.module.css.d.ts` | クラス名を増減しないため内容は変わらない（`pnpm build:css-types` で差分が出ないことは確認する） |
-| `src/main.tsx` / `README.md` / `docs/agent-guide.template.md` | 公開 API とコンポーネント一覧に変化がないため。アイコン一覧は自動生成 |
+| `src/main.tsx` / `README.md` / `docs/agent-guide.template.md` | コンポーネント一覧に変化がないため。`IconName` / `iconNames` は `Icon` からの再 export なので、`plus` の追加は `src/main.tsx` を触らずに公開 API まで伝わる（`README.md` のアイコン一覧は手書きしておらず、`dist/AGENTS.md` は自動生成） |
 | `Icon.spec.tsx` / `Icon.stories.tsx` | 全アイコンを列挙していないため、追加による変更は不要 |
 
 ---
