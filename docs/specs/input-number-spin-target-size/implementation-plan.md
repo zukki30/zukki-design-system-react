@@ -78,28 +78,28 @@ pnpm typecheck && pnpm lint:check && pnpm format:check && pnpm test
    */
   --zds-input-number-spin-button-width: 24px;
   --zds-input-number-field-min-width: 80px;
-  --zds-input-number-icon-size: 24px;
+  --zds-input-number-icon-size: 16px;
   --zds-input-number-padding-block: var(--spacing-md);
 ```
 
 | 変更前 | 変更後 |
 | --- | --- |
 | `--zds-input-number-spin-width: 22px` | `--zds-input-number-spin-button-width: 24px` |
-| `--zds-input-number-arrow-size: 16px` | `--zds-input-number-icon-size: 24px` |
+| `--zds-input-number-arrow-size: 16px` | `--zds-input-number-icon-size: 16px`（改名のみ。値は据え置き） |
 
 **(b) `[data-size='sm']` ブロック**
 
 ```css
   &[data-size='sm'] {
     --zds-input-number-field-min-width: 64px;
-    --zds-input-number-icon-size: 20px;
+    --zds-input-number-icon-size: 14px;
     --zds-input-number-padding-block: var(--spacing-sm);
 
     border-radius: var(--border-radius-md);
   }
 ```
 
-`--zds-input-number-arrow-size: 14px` → `--zds-input-number-icon-size: 20px`。スピンボタンの幅は `sm` でも上書きしない。
+`--zds-input-number-arrow-size: 14px` → `--zds-input-number-icon-size: 14px`（改名のみ）。スピンボタンの幅は `sm` でも上書きしない。
 
 **(c) `.inputNumber__spin`**
 

@@ -41,7 +41,7 @@
 
   &[data-size='sm'] {
     --zds-input-number-field-min-width: 64px;
-    --zds-input-number-icon-size: 20px;
+    --zds-input-number-icon-size: 14px;
     --zds-input-number-padding-block: var(--spacing-sm);
 
     border-radius: var(--border-radius-md);

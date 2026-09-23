@@ -12,11 +12,13 @@
 
 ---
 
-## 要件からの変更点（承認済み）
+## 要件からの変更点（実装後に差し戻し）
 
-要件 R5 は当初「アイコンの描画サイズは現状の出し分けを引き継ぐ（`md` 16px / `sm` 14px）」としていたが、**`md` 24px / `sm` 20px に変更する**ことで合意した（`requirements.md` の R5 も更新済み）。
+> **この節の決定は取り消した（実装後のレビュー）.** アイコンの描画サイズは要件 R5 どおり **`md` 16px / `sm` 14px** を維持する。以下は一度合意した経緯として残す。差し戻しの理由は [`results.md`](./results.md) を参照。
 
-理由は 3 つ。
+要件 R5 は当初「アイコンの描画サイズは現状の出し分けを引き継ぐ（`md` 16px / `sm` 14px）」としていたが、**`md` 24px / `sm` 20px に変更する**ことで一度合意した。
+
+理由は 3 つだった。
 
 | 観点 | 内容 |
 | --- | --- |
@@ -24,7 +26,7 @@
 | 同じグリフの既存の扱いと揃う | `Checkbox` の indeterminate は `baselineMinus` を箱いっぱい、すなわち `md` 24px / `sm` 20px で描いている。同じリポジトリで同じ絵が別の寸法になるのを避ける |
 | 線の太さ | `baselineMinus` の線は viewBox 上で 2px。16px で描くと 1.33px、14px では 1.17px になり、非 Retina でにじむ。24px なら 2px、20px でも 1.67px 残る |
 
-値は `Input` のアドーンメント（`--zds-input-icon-size: 24px` / `sm` 20px）と同じにする。16px / 14px は「22 × 20.6px のボタンに収める」ための値であり、ボタンが 24 × 42.1px になった今は前提が変わっている。
+実装して並べたところ、24px の `−` / `+` は入力欄の数値に対して主張が強すぎた。スピンボタンはポインタ専用の補助であり、**当たり判定 24px はボタンの `width` が持っているのでアイコンを大きくする必要はない**という整理になり、16 / 14 へ戻した。
 
 ---
 
@@ -122,12 +124,12 @@ sm のボタン高 = 16px × 113.4% + --spacing-sm × 2 = 34.1px
    */
   --zds-input-number-spin-button-width: 24px;
   --zds-input-number-field-min-width: 80px;
-  --zds-input-number-icon-size: 24px;
+  --zds-input-number-icon-size: 16px;
   --zds-input-number-padding-block: var(--spacing-md);
 
   &[data-size='sm'] {
     --zds-input-number-field-min-width: 64px;
-    --zds-input-number-icon-size: 20px;
+    --zds-input-number-icon-size: 14px;
     --zds-input-number-padding-block: var(--spacing-sm);
 
     border-radius: var(--border-radius-md);
@@ -138,7 +140,7 @@ sm のボタン高 = 16px × 113.4% + --spacing-sm × 2 = 34.1px
 | 変数 | 変更 |
 | --- | --- |
 | `--zds-input-number-spin-width: 22px` | → `--zds-input-number-spin-button-width: 24px` に改名。列全体ではなくボタン 1 つの幅を指すようになるため |
-| `--zds-input-number-arrow-size: 16px` | → `--zds-input-number-icon-size: 24px` に改名（`sm` 20px）。矢印ではなくなるため名前も合わせる |
+| `--zds-input-number-arrow-size: 16px` | → `--zds-input-number-icon-size: 16px` に改名（`sm` 14px）。矢印ではなくなるため名前も合わせる。**値は据え置き** |
 | `--zds-input-number-field-min-width` | 変更なし |
 | `--zds-input-number-padding-block` | 変更なし |
 
