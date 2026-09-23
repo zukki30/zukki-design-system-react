@@ -307,6 +307,53 @@ src/utils/
 - スタイルはすべて `ComponentName.module.css` に書く。TSX からは `import styles from './ComponentName.module.css'` で読む
 - **クラス名は BEM に従い、修飾子（`--`）は使わない。** ブロックはコンポーネント名の camelCase、要素は `__` で継ぐ（`.button` / `.button__inner` / `.button__label`）。`__` を含む名前は JavaScript の識別子として妥当なので `styles.button__inner` とドットで引ける。`-` を含む名前を作らないのはこのため
 - 値は意味的な CSS 変数を `var(--color-primary-default)` の形で直接参照する（色・余白などのハードコード禁止）
+- **ルールは入れ子（[CSS Nesting](https://developer.mozilla.org/ja/docs/Web/CSS/Guides/Nesting/Using)）で書く。** トップレベルのルールはクラス 1 つにつき 1 つにし、そのクラスで始まるルールはその中へ入れる。行き先は**セレクタの先頭に現れるクラス**で決まるため判断が要らない
+
+  ```css
+  .tag {
+    …
+
+    &[data-variant='red'] {
+      background-color: var(--color-red-50);
+
+      /* .tag[data-variant='red'] .tag__closeButton:hover と同じセレクタになる */
+      & .tag__closeButton {
+        color: var(--color-red-600);
+
+        &:hover {
+          color: var(--color-red-700);
+        }
+      }
+    }
+  }
+  ```
+
+  - ネストしたセレクタは `&` から書き始める。素の要素セレクタも `& option` / `& > svg` と書く。例外は型セレクタが前に付く `a&:hover` だけ
+  - 深さはトップレベルから 3 段まで。段を作るのは、その中間セレクタを 2 つ以上のルールで共有するときだけにする
+  - **宣言はネストしたルールより前にまとめる。** ネストの後ろに続く宣言（`CSSNestedDeclarations`）は対応が新しく、`build.cssTarget` の下限として並べている Chrome 123 はそれ以前にあたる。順序に依存しない書き方に統一する
+  - `composes` はトップレベルのルール直下の先頭にだけ書ける。ネストの中に書くとビルドが落ちる
+  - **セレクタリスト（`.a, .b`）を書くのは構わないが、そのルールの中へさらにネストしない。** リストの各セレクタは自分の詳細度で当たるので、リストを書くこと自体は詳細度を変えない。変わるのは**その中で `&` を使ったとき**で、`&` は `:is()` と同じ扱いのため詳細度がリスト中の**最大**に揃ってしまう
+
+    ```css
+    .button {
+      /* OK: 宣言だけを持つ葉のルール。各セレクタは元どおりの詳細度で当たる */
+      &[data-selected='true'],
+      &:disabled,
+      &[data-loading='true'] {
+        pointer-events: none;
+      }
+
+      /* NG: この & は :is(:is(.button)[data-selected='true'], :is(.button):disabled) になる */
+      &[data-selected='true'],
+      &:disabled {
+        & .button__label {
+          opacity: 0.5;
+        }
+      }
+    }
+    ```
+  - 書き換えで生成されるセレクタが変わっていないかは `docs/specs/css-nesting/compare-flat-css.ts` で照合できる
+
 - **相互排他な見た目の選択肢は `data-*` 属性で表す。** 既存の `data-selected` / `data-error` / `data-loading` と書き味が揃い、パーツの出し分けを親セレクタから書けるため TSX 側で `buttonLabel[size]` のような受け渡しが要らなくなる
 
   ```tsx
@@ -316,23 +363,31 @@ src/utils/
   ```
 
   ```css
-  .button[data-variant='primary'] {
-    background-color: var(--color-primary-default);
-  }
-  .button[data-size='sm'] .button__label {
-    font-size: var(--font-size-xs);
+  .button {
+    &[data-variant='primary'] {
+      background-color: var(--color-primary-default);
+    }
+
+    &[data-size='sm'] {
+      & .button__label {
+        font-size: var(--font-size-xs);
+      }
+    }
   }
   ```
 
+- **パーツをブロックのルールへ子孫セレクタとして畳まない。** `.button__label` は `.button` の中に入れず、トップレベルのルールとして並べる。畳むと詳細度が (0,1,0) から (0,2,0) へ上がる。上の例のように**ブロックの状態からパーツを指す**のは、元から子孫セレクタだったものなので問題ない
 - **入れ子にできるコンポーネントは、子孫セレクタで値を配らない。** `Card` のように自身の内側へ自身を置けるものは、`.card[data-size='sm'] .card__body` が内側のパーツにも同じ詳細度で当たり、勝敗が出力順で決まってしまう。**継承するカスタムプロパティに値を持たせ**、内側が上書きする形にする。パーツがルート直下にあるかどうかにも依存しなくなる
 
   ```css
   .card {
     --zds-card-padding: var(--spacing-2xl);
+
+    &[data-size='sm'] {
+      --zds-card-padding: var(--spacing-xl);
+    }
   }
-  .card[data-size='sm'] {
-    --zds-card-padding: var(--spacing-xl);
-  }
+
   .card__body {
     padding: var(--zds-card-padding);
   }
@@ -363,8 +418,8 @@ src/utils/
 
   同じ理由で、`mixins.module.css` に置いてよいのは「宣言だけで、引く側の宣言と衝突しないもの」に限る
 
-- **要素セレクタはスコープされない。** `option` や `svg` は素の要素セレクタとして書ける（`.select__field option { … }`）。グローバルへ書き出す仕掛けは要らない
-- **サイズなど、CSS と TSX の両方が知る必要のある値は CSS に寄せる。** 例えば `Tag` の閉じるアイコンは `.tag__closeButton > svg { width: 100% }` で大きさを決め、`<Icon>` に `width` / `height` を渡さない。両方に数値を書くと必ず片方が古くなる
+- **要素セレクタはスコープされない。** `option` や `svg` は素の要素セレクタとして書ける（`.select__field { & option { … } }`）。グローバルへ書き出す仕掛けは要らない
+- **サイズなど、CSS と TSX の両方が知る必要のある値は CSS に寄せる。** 例えば `Tag` の閉じるアイコンは `.tag__closeButton { & > svg { width: 100% } }` で大きさを決め、`<Icon>` に `width` / `height` を渡さない。両方に数値を書くと必ず片方が古くなる
 - **クラス名の型は生成物。** `*.module.css.d.ts` を `pnpm build:css-types` で生成してコミットする。これが無いと `vite/client` の索引シグネチャが効き、`styles.buttonn` のような綴り違いが型エラーにならず黙って「クラス未適用」になる。クラス名は Vite の `css.modules.getJSON` から受け取っているので、`composes` の扱いも含めて実ビルドと必ず一致する
 
 **配色トークンの使い分け:**
@@ -402,6 +457,7 @@ src/utils/
 - テストは 2 系統に分かれる。`vitest.config.ts` の `projects` で環境ごとに分離している
   - `pnpm test` … jsdom 上のユニットテスト（`unit` プロジェクト）
   - `pnpm test:a11y` … 全ストーリーを Chromium で描画し `axe-core` にかける（`a11y-light` / `a11y-dark` プロジェクト）
+- **jsdom は CSS の入れ子を解析できない。** `&` を含むスタイルシートを丸ごと捨てるため、`getComputedStyle` で当たり方を確かめているテストが「スタイルが当たらない」側だけ黙って通ってしまう。`unit` プロジェクトには `*.module.css` の入れ子を展開してから渡すプラグインを入れてある（`vitest.config.ts`）。ブラウザで動く a11y のプロジェクトと配布物は入れ子のまま扱う
 
 **a11y の検査:**
 
