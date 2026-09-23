@@ -17,7 +17,7 @@
    */
   --zds-input-number-spin-button-width: 24px;
   --zds-input-number-field-min-width: 80px;
-  --zds-input-number-icon-size: 24px;
+  --zds-input-number-icon-size: 16px;
   --zds-input-number-padding-block: var(--spacing-md);
 
   box-sizing: border-box;
