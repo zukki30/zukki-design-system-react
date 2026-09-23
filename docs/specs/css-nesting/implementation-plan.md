@@ -111,6 +111,8 @@ pnpm exec tsx docs/specs/migrate-to-css-modules/diff-computed-styles.ts .tmp/nes
 
 全ストーリー × ライト / ダークで差分ゼロであること。
 
+> 実際には、このスクリプトが**描画途中を測っていた**ことが分かったため、待ちを足した写しで測っている。経緯は [results.md](./results.md) を参照。
+
 ### 4-3. 既存の検査
 
 ```bash
@@ -151,20 +153,20 @@ pnpm verify:dist
 
 ## チェックリスト
 
-- [ ] 1-1 `compare-flat-css.ts` を作る
-- [ ] 1-2 変更前の `.tmp/flat-before.json` と `.tmp/nest-before.json` を取る
-- [ ] 2-1 小さいもの（Skeleton / Spinner / Steps / TextArea）
-- [ ] 2-2 Button / IconButton
-- [ ] 2-3 Tag
-- [ ] 2-4 Tooltip / Breadcrumb
-- [ ] 2-5 Card / Dialog
-- [ ] 2-6 Input / InputNumber / Select
-- [ ] 2-7 Checkbox / Radio / Switch
-- [ ] 2-8 FormField / StepsItem
-- [ ] 3-1 `AGENTS.md`
-- [ ] 4-1 フラット CSS の照合（差分 0）
-- [ ] 4-2 計算後スタイルの突き合わせ（差分 0）
-- [ ] 4-3 既存の検査をすべて通す
-- [ ] 4-4 `dist/styles.css` の目視確認
-- [ ] 5-1 `results.md`
-- [ ] 5-2 PR
+- [x] 1-1 `compare-flat-css.ts` を作る
+- [x] 1-2 変更前の `.tmp/flat-before.json` と `.tmp/nest-before.json` を取る
+- [x] 2-1 小さいもの（Skeleton / Spinner / Steps / TextArea）
+- [x] 2-2 Button / IconButton
+- [x] 2-3 Tag
+- [x] 2-4 Tooltip / Breadcrumb
+- [x] 2-5 Card / Dialog
+- [x] 2-6 Input / InputNumber / Select
+- [x] 2-7 Checkbox / Radio / Switch
+- [x] 2-8 FormField / StepsItem
+- [x] 3-1 `AGENTS.md`
+- [x] 4-1 フラット CSS の照合（差分 0）
+- [x] 4-2 計算後スタイルの突き合わせ（差分 0）
+- [x] 4-3 既存の検査をすべて通す
+- [x] 4-4 `dist/styles.css` の目視確認
+- [x] 5-1 `results.md`
+- [x] 5-2 PR

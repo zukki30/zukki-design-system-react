@@ -332,7 +332,26 @@ src/utils/
   - 深さはトップレベルから 3 段まで。段を作るのは、その中間セレクタを 2 つ以上のルールで共有するときだけにする
   - **宣言はネストしたルールより前にまとめる。** ネストの後ろに続く宣言（`CSSNestedDeclarations`）は対応が新しく、`build.cssTarget` の下限として並べている Chrome 123 はそれ以前にあたる。順序に依存しない書き方に統一する
   - `composes` はトップレベルのルール直下の先頭にだけ書ける。ネストの中に書くとビルドが落ちる
-  - **セレクタリスト（`.a, .b`）のルールの中にはネストしない。** `&` は `:is()` と同じ扱いで、詳細度がリスト中の最大になるため
+  - **セレクタリスト（`.a, .b`）を書くのは構わないが、そのルールの中へさらにネストしない。** リストの各セレクタは自分の詳細度で当たるので、リストを書くこと自体は詳細度を変えない。変わるのは**その中で `&` を使ったとき**で、`&` は `:is()` と同じ扱いのため詳細度がリスト中の**最大**に揃ってしまう
+
+    ```css
+    .button {
+      /* OK: 宣言だけを持つ葉のルール。各セレクタは元どおりの詳細度で当たる */
+      &[data-selected='true'],
+      &:disabled,
+      &[data-loading='true'] {
+        pointer-events: none;
+      }
+
+      /* NG: この & は :is(:is(.button)[data-selected='true'], :is(.button):disabled) になる */
+      &[data-selected='true'],
+      &:disabled {
+        & .button__label {
+          opacity: 0.5;
+        }
+      }
+    }
+    ```
   - 書き換えで生成されるセレクタが変わっていないかは `docs/specs/css-nesting/compare-flat-css.ts` で照合できる
 
 - **相互排他な見た目の選択肢は `data-*` 属性で表す。** 既存の `data-selected` / `data-error` / `data-loading` と書き味が揃い、パーツの出し分けを親セレクタから書けるため TSX 側で `buttonLabel[size]` のような受け渡しが要らなくなる
