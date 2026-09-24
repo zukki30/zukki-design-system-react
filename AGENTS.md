@@ -525,6 +525,18 @@ parameters: {
 
 作業は `main` ブランチから派生したブランチで行ってください。ブランチ名は `feature/xxx`、`fix/xxx`、`chore/xxx` の形式で作成します。
 
+`main` は ruleset「protect main」で保護しています。
+
+| 規則 | 内容 |
+| --- | --- |
+| PR 必須 | 承認数は 0（メンテナが 1 人のため、1 以上にすると自分の PR を承認できず何もマージできなくなる） |
+| 必須チェック | `lint:check` / `format:check` / `typecheck` / `test` / `check:css-types` / `a11y` / `dist` の 7 件 |
+| 最新同期の要求 | **なし**（`strict: false`）。有効にすると Dependabot の PR をマージするたび残り全部の rebase と CI 再実行が起きるため |
+| force push / 削除 | 禁止 |
+| バイパス | リポジトリ管理者のみ。緊急時の逃げ道として残しています |
+
+対象はブランチだけなので `refs/tags/*` には効きません。リリースのタグ作成はこの保護の影響を受けません。
+
 ## リリース
 
 `package.json` の `version` を上げて `main` にマージすると、`.github/workflows/release.yml` が `v<version>` のタグと GitHub Release を自動で作ります。手作業は要りません。
@@ -533,5 +545,5 @@ parameters: {
 
 - **バージョンは人が上げます。** 破壊的変更かどうかの判断は機械に任せられないため、コミットメッセージからの自動採番（semantic-release 等）は入れていません
 - タグが既にある場合は何も作らず、理由を Actions の実行サマリに出します。上げ忘れても壊れません
-- タグを打つ前に `pnpm install`（`prepare` でビルド）と `pnpm verify:dist` を実行します。`main` は branch protection されていないため、リリース側で配布物の成立を確かめています
+- タグを打つ前に `pnpm install`（`prepare` でビルド）と `pnpm verify:dist` を実行します。必須チェックは「PR の時点で通ったこと」しか保証しないため、マージ後の状態をリリース側でもう一度確かめています
 - リリースノートは GitHub が自動生成します。分類は `.github/release.yml` で決めます。`CHANGELOG.md` は持ちません（二重管理になるため）
