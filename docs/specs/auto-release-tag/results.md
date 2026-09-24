@@ -27,6 +27,51 @@
 
 ノートの行数は事前にドラフトで測ったとき 86 行だったが、実際は 91 行だった。ドラフトを作ってから #128 がマージされるまでに PR が増えたぶんの差である。
 
+## 実地の結果（#130 のマージ / スキップ経路）
+
+スキップ経路は「既存タグがある」状態でしか確かめられず、タグが 0 件の時点では手元で再現できなかった。`results.md` を別 PR に分けることで、**記録を残すという手順がそのまま 2 経路目の検証になる**ようにした（[`implementation-plan.md`](./implementation-plan.md) の「2 回のマージで両方の経路を確認する」）。
+
+`version` を `3.0.0` のまま #130 をマージした結果（run `35944596430`）。
+
+| 確認 | 結果 |
+| --- | --- |
+| `check version` ジョブ | **success**（スキップ時もエラーにしない / FR-2） |
+| `release` ジョブ | **skipped**（`if:` が効いている） |
+| タグ | `v3.0.0` のみ。増えていない |
+| Release | `v3.0.0` のみ。増えていない |
+
+**これで受け入れ条件がすべて埋まった。**
+
+### 実行サマリの本文は API から取れない
+
+FR-3 の出力先である `$GITHUB_STEP_SUMMARY` の中身は、公開 API では取得できない。
+
+```
+GET /repos/{owner}/{repo}/commits/{sha}/check-runs
+→ output.summary: null
+```
+
+サマリの分岐は手元で全パターン実行して確認済みだが（後述）、**CI 上で実際に描画された本文は run のページでしか読めない**。自動で検証したいなら、サマリではなくログへ出す形にする必要がある。今回はそこまでの必要がないと判断し、現状のままとした。
+
+### リリースノートの分類（繰り越しの解消）
+
+`v3.0.0` の直後は対象 PR が無く確認できなかったが、#130 がマージされて 1 件できたため検証した。`generate-notes` API は**何も作成せずにノートを計算できる**ので、ドラフトを作って消す必要はない。
+
+```bash
+gh api repos/zukki30/zukki-design-system-react/releases/generate-notes \
+  -f tag_name=v3.1.0 -f target_commitish=main --jq '.body'
+```
+
+```
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Changes
+* docs: record auto release tag results and fix the install instructions by @zukki30 in …/pull/130
+```
+
+GitHub 自身が `.github/release.yml` を使ったと明記しており、PR は `### Changes` に入った。`Dependencies` の見出しが出ていないのは、`v3.0.0` 以降に Dependabot の PR が無いためである（該当 PR が無いカテゴリは出力されない）。
+
 ## 事前検証でやったこと
 
 `on: push: branches: [main]` のため **PR ではワークフローが一切起動しない**。構文エラーすらマージ前には出ない。そこで手元で検証できるものを洗い出して全部実行した。
@@ -114,6 +159,5 @@ pnpm 10 は既定で依存パッケージのビルドスクリプトを実行し
 
 ## 繰り越し
 
-- **リリースノートの分類（`.github/release.yml`）が効いているかは未確認。** `--generate-notes` は「前回リリース以降」で作るため、`v3.0.0` の直後は対象の PR が無く検証できない。**次の実リリースのノートで確認する**
 - `main` の branch protection は未設定のまま。設計の論点 1 案 D にあたり、リポジトリ設定の変更なので本 spec では扱わなかった。`release` ジョブの検証があるため、壊れたコミットにタグが付くことは防げている
 - 既存の `.github/workflows/codex-review.yml` に `actionlint` の指摘が 1 件ある（`permission-profile is not defined in action "openai/codex-action@v1"`）。本 spec の範囲外として触っていない
