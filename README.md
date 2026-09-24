@@ -16,6 +16,8 @@ npm には publish していないため、git から install する。
 }
 ```
 
+既に `onlyBuiltDependencies` がある場合は、**配列を置き換えず `zukki-design-system` を追加する**。既存の要素を消すと、そのパッケージのビルドまで止まる。
+
 そのうえで install する。
 
 ```bash
