@@ -524,3 +524,12 @@ parameters: {
 ## ブランチ
 
 作業は `main` ブランチから派生したブランチで行ってください。ブランチ名は `feature/xxx`、`fix/xxx`、`chore/xxx` の形式で作成します。
+
+## リリース
+
+`package.json` の `version` を上げて `main` にマージすると、`.github/workflows/release.yml` が `v<version>` のタグと GitHub Release を自動で作ります。手作業は要りません。
+
+- **バージョンは人が上げます。** 破壊的変更かどうかの判断は機械に任せられないため、コミットメッセージからの自動採番（semantic-release 等）は入れていません
+- `version` を上げずにマージした場合はタグを作らず、理由を Actions の実行サマリに出します。上げ忘れても壊れません
+- タグを打つ前に `pnpm install`（`prepare` でビルド）と `pnpm verify:dist` を実行します。`main` は branch protection されていないため、リリース側で配布物の成立を確かめています
+- リリースノートは GitHub が自動生成します。分類は `.github/release.yml` で決めます。`CHANGELOG.md` は持ちません（二重管理になるため）

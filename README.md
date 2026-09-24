@@ -10,6 +10,14 @@ npm には publish していないため、git から install する。
 pnpm add github:zukki30/zukki-design-system-react
 ```
 
+上の形式は **main の最新**を指す。バージョンを固定するときはリリースタグを付ける。
+
+```bash
+pnpm add github:zukki30/zukki-design-system-react#v3.0.0
+```
+
+利用できるバージョンは [Releases](https://github.com/zukki30/zukki-design-system-react/releases) を参照。
+
 `react` / `react-dom` は peer dependency なので、利用側で用意する（v19 以上）。
 
 ## 使い方
