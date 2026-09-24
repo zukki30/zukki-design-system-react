@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+# 既定を読み取りのみにし、必要なジョブでだけ書き込みを与える
+permissions:
+  contents: read
+
+# リリースは途中でキャンセルしない。検証は通ったのにタグが作られていない、という
+# 中途半端な状態を避けるため、ci.yml とは逆に cancel-in-progress を false にする。
+#
+# group に sha を含めるのは、同じグループでは pending の run が 1 件しか保持されず、
+# 後から来た push が待機中の run を置き換えてしまうため。main へ短時間に続けてマージすると
+# 途中のバージョンの run が実行されないまま消え、そのタグだけが永久に欠落する。
+# commit ごとに別グループにすれば、どの push も必ず処理される
+# （まとめられるのは同じ sha の re-run だけになる）
+concurrency:
+  group: release-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  # package.json の version を読み、タグが未作成かを判定するだけのジョブ。
+  # main への push の大半はリリースを伴わないため、重いビルドへ進む前にここで振り分ける
+  check:
+    name: check version
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.check.outputs.tag }}
+      should-release: ${{ steps.check.outputs.should-release }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: check
+        run: |
+          # ci.yml と同じく node で読む。runner に jq 等を要求しない。
+          # package.json は type: module だが、node -p の評価は CJS なので require が使える
+          version="$(node -p "require('./package.json').version")"
+          if [ -z "$version" ] || [ "$version" = "undefined" ]; then
+            echo "::error::package.json の version を読み取れませんでした"
+            exit 1
+          fi
+
+          tag="v$version"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+          # タグの存在確認に git ls-remote を使う理由:
+          #   - 完全一致で判定できる（REST の /git/ref/ は前方一致で返す場合がある）
+          #   - タグを fetch せずに済む（checkout は既定で depth 1・タグ無し）
+          #
+          # 「コマンドが失敗した」と「一致が無かった」は必ず分ける。$( ) を if の条件へ
+          # 直接置くと set -e が効かず、通信・認証の一時障害でも空文字列になって
+          # 「タグが無い」と読んでしまう。確認できないときは fail closed で止める
+          if ! existing="$(git ls-remote --tags origin "refs/tags/$tag")"; then
+            echo "::error::タグの存在を確認できませんでした（git ls-remote が失敗）"
+            exit 1
+          fi
+
+          if [ -n "$existing" ]; then
+            echo "should-release=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "### リリースをスキップしました"
+              echo
+              echo "タグ \`$tag\` は既に存在します。"
+              echo "リリースするには \`package.json\` の \`version\` を上げてください。"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "should-release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    name: release
+    needs: check
+    if: needs.check.outputs.should-release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      # タグと Release の作成に必要。個人の PAT は使わない
+      # （GITHUB_TOKEN は実行ごとに発行され、終了時に失効する）
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      # pnpm のバージョンは package.json の packageManager から解決される
+      - uses: pnpm/action-setup@v6.1.0
+
+      - uses: actions/setup-node@v7
+        with:
+          # setup-node は .mise.toml を読めないため直書き。.mise.toml と揃えること
+          node-version: 24.14.1
+          cache: pnpm
+
+      # main は branch protection されておらず、マージ時点で CI が通っている保証が無い。
+      # 壊れたコミットにタグが付くと、利用側が #v3.1.0 で固定した先が install できなくなるため、
+      # タグを打つ前にここで配布物として成立することを確かめる。
+      # install 時の prepare でビルドまで走る（利用側が install したときと同じ経路）
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm verify:dist
+
+      # タグ作成・Release 作成・ノート生成を 1 コマンドで行う。
+      # タグが無ければ GitHub 側が --target のコミットに軽量タグを作る。
+      #
+      # --target を明示しているのは、省略すると default branch の HEAD に打たれるため。
+      # 実行中に別の push が入ると、検証したコミットとタグがずれる
+      #
+      # なお GITHUB_TOKEN で作ったタグは他のワークフローを発火しない（無限ループ防止の仕様）。
+      # 「タグ作成をトリガーに publish」のような構成にはできないので、
+      # 処理を足すときはこのジョブの中へ追加すること
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.check.outputs.tag }}
+        run: |
+          # check の判定からここまでにビルドを挟むため、その間に別の push の run が
+          # 同じ version をリリースしている可能性がある（concurrency を sha ごとに
+          # 分けたので run は並走しうる）。失敗したらタグの有無を見て、
+          # 既にあるなら冪等に成功扱いとする。権限不足などの本当の失敗は落とす
+          if ! url="$(gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --generate-notes)"; then
+            if [ -n "$(git ls-remote --tags origin "refs/tags/$TAG")" ]; then
+              {
+                echo "### リリース済みでした"
+                echo
+                echo "タグ \`$TAG\` は並走した実行が作成済みのため、何もしませんでした。"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "::error::Release の作成に失敗しました"
+            exit 1
+          fi
+
+          {
+            echo "### リリースしました"
+            echo
+            echo "- タグ: \`$TAG\`"
+            echo "- Release: $url"
+          } >> "$GITHUB_STEP_SUMMARY"

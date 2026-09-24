@@ -1,0 +1,17 @@
+# GitHub Release の「リリースノートを自動生成」の分類設定。
+# .github/workflows/release.yml（ワークフロー本体）とは別物なので混同しないこと
+changelog:
+  categories:
+    # PR は先にマッチしたカテゴリへ入る。'*' を先頭に置くとすべてを吸ってしまうため、
+    # Changes 側で dependencies を除外して「変更が上・依存更新が下」の並びにする
+    - title: Changes
+      labels:
+        - '*'
+      exclude:
+        labels:
+          - dependencies
+    # Dependabot は自分の PR に dependencies ラベルを自動で付ける。
+    # 人がラベルを付ける運用には依存しない
+    - title: Dependencies
+      labels:
+        - dependencies
