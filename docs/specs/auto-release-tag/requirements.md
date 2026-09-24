@@ -23,6 +23,10 @@ pnpm add github:zukki30/zukki-design-system-react
 
 すべて実測で確認した事実である。
 
+> **これは spec 作成時点（2026-09-24）の記録である。本文は当時のまま残す。**
+> 以降「`main` に branch protection が無い」を前提に書いている箇所（この節、FR-5、論点 1）があるが、**ブランチ保護はその後 ruleset「protect main」として設定済み**である。現在の設定は `AGENTS.md` の「ブランチ」節を、経緯は [`results.md`](./results.md) の「繰り越し」を参照。
+> なお FR-5（タグを打つ前の検証）は保護の設定後も要件として残している。理由は `results.md` に書いた。
+
 ### リポジトリの設定
 
 | 項目 | 現状 | 影響 |
