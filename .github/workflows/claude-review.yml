@@ -54,5 +54,11 @@ jobs:
             Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) to highlight specific code issues.
             Only post GitHub comments - don't submit review text as messages.
 
+          # モデルは明示的に固定する。指定しないと action の既定値に従うが、
+          # v1.0.217 以降の既定は claude-opus-5[1m]（1M コンテキスト版）で、
+          # このアカウントからは使えず即座に弾かれていた
+          # （modelUsage が空・コスト 0・400ms 前後で is_error になる）。
+          # action を更新するたびに既定が変わって壊れるのを防ぐため、ここで固定する
           claude_args: |
+            --model claude-opus-5
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
