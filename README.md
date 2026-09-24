@@ -6,6 +6,18 @@ https://github.com/zukki30/zukki-design-system の React only のデザインシ
 
 npm には publish していないため、git から install する。
 
+**pnpm 10 以降では、先に利用側の `package.json` でビルドを許可すること。** このライブラリは `dist/` をリポジトリに含めず install 時の `prepare` でビルドするが、pnpm 10 は既定で依存パッケージのビルドスクリプトを実行しないため、許可が無いと `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` で install に失敗する。
+
+```json
+{
+  "pnpm": {
+    "onlyBuiltDependencies": ["zukki-design-system"]
+  }
+}
+```
+
+そのうえで install する。
+
 ```bash
 pnpm add github:zukki30/zukki-design-system-react
 ```
@@ -13,7 +25,11 @@ pnpm add github:zukki30/zukki-design-system-react
 上の形式は **main の最新**を指す。バージョンを固定するときはリリースタグを付ける。
 
 ```bash
+# 特定のバージョンに固定する
 pnpm add github:zukki30/zukki-design-system-react#v3.0.0
+
+# 3.x の最新に追従する
+pnpm add github:zukki30/zukki-design-system-react#semver:^3.0.0
 ```
 
 利用できるバージョンは [Releases](https://github.com/zukki30/zukki-design-system-react/releases) を参照。
