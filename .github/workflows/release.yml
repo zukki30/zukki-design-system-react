@@ -90,10 +90,14 @@ jobs:
           node-version: 24.14.1
           cache: pnpm
 
-      # main は branch protection されておらず、マージ時点で CI が通っている保証が無い。
       # 壊れたコミットにタグが付くと、利用側が #v3.1.0 で固定した先が install できなくなるため、
       # タグを打つ前にここで配布物として成立することを確かめる。
       # install 時の prepare でビルドまで走る（利用側が install したときと同じ経路）
+      #
+      # main は ruleset「protect main」で保護しているが、この検証は省けない。
+      #   - 必須チェックは「PR の時点で通ったこと」しか保証しない。最新同期は要求していない
+      #     （strict: false）ため、マージ後に他の PR と組み合わさった状態は検証されていない
+      #   - 管理者は ruleset をバイパスして直接 push できる
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm verify:dist

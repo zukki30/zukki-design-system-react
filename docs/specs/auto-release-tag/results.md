@@ -159,5 +159,12 @@ pnpm 10 は既定で依存パッケージのビルドスクリプトを実行し
 
 ## 繰り越し
 
-- `main` の branch protection は未設定のまま。設計の論点 1 案 D にあたり、リポジトリ設定の変更なので本 spec では扱わなかった。`release` ジョブの検証があるため、壊れたコミットにタグが付くことは防げている
+- ~~`main` の branch protection は未設定のまま。~~ **設定した（2026-09-24）。** 設計の論点 1 案 D にあたる。ruleset「protect main」で PR 必須・CI 7 件必須・force push / 削除の禁止を課した。詳細は `AGENTS.md` の「ブランチ」節を参照
+
+  **案 A（`release` ジョブでの検証）は残した。** 設計で「D を設定した後も A を残す価値はある」と書いたとおりで、実際に設定してみて理由が 2 つに増えた。
+
+  - 必須チェックは「PR の時点で通ったこと」しか保証しない。最新同期を要求していない（`strict: false`）ため、**マージ後に他の PR と組み合わさった状態は検証されていない**
+  - 管理者は ruleset をバイパスして直接 push できる（`bypass_mode: always`）
+
+  ruleset の対象はブランチのみなので `refs/tags/*` には効かず、リリースのタグ作成は影響を受けない
 - 既存の `.github/workflows/codex-review.yml` に `actionlint` の指摘が 1 件ある（`permission-profile is not defined in action "openai/codex-action@v1"`）。本 spec の範囲外として触っていない

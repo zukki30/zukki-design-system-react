@@ -2,6 +2,10 @@
 
 対応する要件: [requirements.md](./requirements.md)
 
+> **これは設計時点（2026-09-24）の記録である。本文は当時のまま残す。**
+> 以降「`main` に branch protection が無い」を前提に書いている箇所（論点 1、ワークフローと `AGENTS.md` の記載例、残るリスク）があるが、**ブランチ保護はその後 ruleset「protect main」として設定済み**である（論点 1 の案 D にあたる）。
+> 併せて、ワークフローと `AGENTS.md` の記載例は実装後にレビュー指摘の反映などで変わっている。**現物は `.github/workflows/release.yml` と `AGENTS.md` を見ること。** 設計からの変更点は下の「設計時の誤り」節と [`results.md`](./results.md) に記録した。
+
 ## 概要
 
 `.github/workflows/release.yml` を新規に追加する。`main` への push をトリガーに、**判定**と**リリース**の 2 ジョブに分ける。
