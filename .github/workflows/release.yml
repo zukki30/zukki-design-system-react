@@ -10,9 +10,14 @@ permissions:
 
 # リリースは途中でキャンセルしない。検証は通ったのにタグが作られていない、という
 # 中途半端な状態を避けるため、ci.yml とは逆に cancel-in-progress を false にする。
-# main でしか動かないため group に ref は含めず、リリース処理全体を直列化する
+#
+# group に sha を含めるのは、同じグループでは pending の run が 1 件しか保持されず、
+# 後から来た push が待機中の run を置き換えてしまうため。main へ短時間に続けてマージすると
+# 途中のバージョンの run が実行されないまま消え、そのタグだけが永久に欠落する。
+# commit ごとに別グループにすれば、どの push も必ず処理される
+# （まとめられるのは同じ sha の re-run だけになる）
 concurrency:
-  group: release
+  group: release-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -43,7 +48,16 @@ jobs:
           # タグの存在確認に git ls-remote を使う理由:
           #   - 完全一致で判定できる（REST の /git/ref/ は前方一致で返す場合がある）
           #   - タグを fetch せずに済む（checkout は既定で depth 1・タグ無し）
-          if [ -n "$(git ls-remote --tags origin "refs/tags/$tag")" ]; then
+          #
+          # 「コマンドが失敗した」と「一致が無かった」は必ず分ける。$( ) を if の条件へ
+          # 直接置くと set -e が効かず、通信・認証の一時障害でも空文字列になって
+          # 「タグが無い」と読んでしまう。確認できないときは fail closed で止める
+          if ! existing="$(git ls-remote --tags origin "refs/tags/$tag")"; then
+            echo "::error::タグの存在を確認できませんでした（git ls-remote が失敗）"
+            exit 1
+          fi
+
+          if [ -n "$existing" ]; then
             echo "should-release=false" >> "$GITHUB_OUTPUT"
             {
               echo "### リリースをスキップしました"
@@ -98,10 +112,26 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.check.outputs.tag }}
         run: |
-          url="$(gh release create "$TAG" \
+          # check の判定からここまでにビルドを挟むため、その間に別の push の run が
+          # 同じ version をリリースしている可能性がある（concurrency を sha ごとに
+          # 分けたので run は並走しうる）。失敗したらタグの有無を見て、
+          # 既にあるなら冪等に成功扱いとする。権限不足などの本当の失敗は落とす
+          if ! url="$(gh release create "$TAG" \
             --target "$GITHUB_SHA" \
             --title "$TAG" \
-            --generate-notes)"
+            --generate-notes)"; then
+            if [ -n "$(git ls-remote --tags origin "refs/tags/$TAG")" ]; then
+              {
+                echo "### リリース済みでした"
+                echo
+                echo "タグ \`$TAG\` は並走した実行が作成済みのため、何もしませんでした。"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "::error::Release の作成に失敗しました"
+            exit 1
+          fi
+
           {
             echo "### リリースしました"
             echo

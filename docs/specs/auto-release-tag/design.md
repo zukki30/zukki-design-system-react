@@ -212,11 +212,55 @@ jobs:
 | `release` ジョブだけ `contents: write` | 必要な場所にだけ与える | タグと Release の作成に必要なのはこれだけ。`packages: write` 等は与えない |
 | PAT を使わない | `GITHUB_TOKEN` で完結 | 実行ごとに自動発行され終了時に失効する。期限管理も漏洩時の影響範囲も PAT より小さい |
 | `cancel-in-progress: false` | `ci.yml` と逆 | 検証は通ったのにタグが作られていない、という中途半端な状態を避ける |
-| `concurrency.group` を定数 `release` に | ref を含めない | main でしか動かないため。リリース処理全体を直列化する意図を明示する |
+| `concurrency.group` に `github.sha` を含める | commit ごとに別グループ | 下の訂正を参照 |
 | `--target "$GITHUB_SHA"` | 明示する | 検証したコミットとタグを一致させる（論点 2 参照） |
 | `git ls-remote` でタグ確認 | API を使わない | 完全一致で判定でき、タグの fetch も不要 |
 | `node -p` で version 読み取り | jq を使わない | `ci.yml` の playwright バージョン解決と同じ流儀 |
 | version の空チェック | 早期に失敗させる | `undefined` から `vundefined` というタグが作られるのを防ぐ |
+
+### 設計時の誤り（PR #128 のレビューで判明し、実装で修正）
+
+レビューで 2 件の欠陥を指摘され、どちらも妥当だったため実装時に直した。設計の判断が誤っていた記録として残す。
+
+**1. `concurrency.group` を定数 `release` にしてはいけない**
+
+当初は「main でしか動かないのでリリース処理全体を直列化する」意図で定数にした。`cancel-in-progress: false` なので実行中の run は止まらず、後続は待つだけだと考えていた。
+
+**これは誤りである。** GitHub Actions の concurrency は同じグループで **pending の run を 1 件しか保持しない**。新しい push が来ると、待機中の run は実行されないまま置き換えられる。
+
+```
+run X（3.0.0）実行中
+  → push A（3.1.0）が pending
+  → push B（3.2.0）が pending に入り、A を置き換える
+  → X 完了後に B だけが走り、v3.2.0 を作る
+  → v3.1.0 のタグは永久に作られない
+```
+
+「version チェックは冪等だから後勝ちでよい」と考えたのが取り違えだった。**冪等性は「同じバージョンを二重に作らない」ことしか保証せず、飛ばされたバージョンは救えない。** 単一メンテナでも PR を続けてマージすれば起こりうる。
+
+`group` に `github.sha` を含め、commit ごとに別グループへ分けた。まとめられるのは同じ sha の re-run だけになり、どの push も必ず処理される。
+
+**その結果、run は並走しうるようになった。** 直列化を捨てたぶん、同じ version の run が重なると 2 つ目の `gh release create` が「タグが既にある」で落ちる。`gh release create` の失敗時にタグの有無を見て、既にあれば冪等に成功扱いとする分岐を足した。権限不足などの本当の失敗は従来どおり落ちる。
+
+**2. `git ls-remote` の失敗を「タグが無い」と読んではいけない**
+
+当初の書き方には、コマンドの失敗と一致なしを区別する仕組みが無かった。
+
+```bash
+# NG: ls-remote が失敗しても空文字列になり、else（= タグが無い）へ進む
+if [ -n "$(git ls-remote --tags origin "refs/tags/$tag")" ]; then
+```
+
+`$( )` を `if` の条件へ直接置くと `set -e` が効かない。通信や認証の一時障害でも「タグが無い」と判定し、**確認できていないバージョンのリリースへ進んでしまう**。
+
+代入の成否で分け、確認できないときは fail closed で停止する形に変えた。
+
+```bash
+if ! existing="$(git ls-remote --tags origin "refs/tags/$tag")"; then
+  echo "::error::タグの存在を確認できませんでした（git ls-remote が失敗）"
+  exit 1
+fi
+```
 
 ## 導入手順（最初のリリースをどうするか）
 
@@ -268,8 +312,10 @@ pnpm add github:zukki30/zukki-design-system-react#v3.0.0
 
 `package.json` の `version` を上げて `main` にマージすると、`.github/workflows/release.yml` が `v<version>` のタグと GitHub Release を自動で作る。手作業は要らない。
 
+判定しているのは「`version` が変わったか」ではなく **「`v<version>` のタグがまだ無いか」** である。初回はこの違いが表に出る（`version` 据え置きでも `v3.0.0` が作られる）ため、`AGENTS.md` にもその旨を書く。
+
 - **バージョンは人が上げる。** 破壊的変更かどうかの判断は機械に任せられないため、コミットメッセージからの自動採番（semantic-release 等）は入れていない
-- `version` を上げずにマージした場合はタグを作らず、理由を Actions の実行サマリに出す。上げ忘れても壊れない
+- タグが既にある場合は何も作らず、理由を Actions の実行サマリに出す。上げ忘れても壊れない
 - タグを打つ前に `pnpm install`（`prepare` でビルド）と `pnpm verify:dist` を実行する。`main` は branch protection されていないため、リリース側で配布物の成立を確かめている
 - リリースノートは GitHub が自動生成する。分類は `.github/release.yml` で決める。`CHANGELOG.md` は持たない（二重管理になるため）
 ```

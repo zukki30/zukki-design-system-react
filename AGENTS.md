@@ -529,7 +529,9 @@ parameters: {
 
 `package.json` の `version` を上げて `main` にマージすると、`.github/workflows/release.yml` が `v<version>` のタグと GitHub Release を自動で作ります。手作業は要りません。
 
+判定しているのは「`version` が変わったか」ではなく **「`v<version>` のタグがまだ無いか」** です。そのため `version` を据え置いたままマージしても、そのバージョンのタグが未作成であれば作られます（この仕組みを導入した初回がこれにあたります）。運用上は「リリースしたいときに `version` を上げる」で読み替えて構いません。
+
 - **バージョンは人が上げます。** 破壊的変更かどうかの判断は機械に任せられないため、コミットメッセージからの自動採番（semantic-release 等）は入れていません
-- `version` を上げずにマージした場合はタグを作らず、理由を Actions の実行サマリに出します。上げ忘れても壊れません
+- タグが既にある場合は何も作らず、理由を Actions の実行サマリに出します。上げ忘れても壊れません
 - タグを打つ前に `pnpm install`（`prepare` でビルド）と `pnpm verify:dist` を実行します。`main` は branch protection されていないため、リリース側で配布物の成立を確かめています
 - リリースノートは GitHub が自動生成します。分類は `.github/release.yml` で決めます。`CHANGELOG.md` は持ちません（二重管理になるため）
