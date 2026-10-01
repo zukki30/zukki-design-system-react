@@ -99,7 +99,7 @@
     "globals": "^17.12.0",
     "jsdom": "^30.1.0",
     "playwright": "^1.63.0",
-    "prettier": "^3.9.8",
+    "prettier": "^3.9.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "storybook": "^10.6.0",
@@ -107,7 +107,7 @@
     "token-transformer": "^0.0.33",
     "tsx": "^4.23.13",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.70.0",
+    "typescript-eslint": "^8.70.1",
     "vite": "^8.3.0",
     "vite-plugin-dts": "^5.1.0",
     "vitest": "^5.0.1"
