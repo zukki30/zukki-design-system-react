@@ -2,6 +2,8 @@
 
 https://github.com/zukki30/zukki-design-system の React only のデザインシステム
 
+公開 Storybook: https://6abdd879d77f1b3c4d923aa9-dfkbhjalgl.chromatic.com/?path=/docs/configure-your-project--docs
+
 ## インストール
 
 npm には publish していないため、git から install する。
