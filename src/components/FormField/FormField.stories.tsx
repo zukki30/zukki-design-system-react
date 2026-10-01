@@ -77,6 +77,10 @@ const docsDescription = [
   '',
   '横並びのレイアウトはルートの grid で組んでいます。**パーツはルートの直下に置いてください。**',
   '別の要素で囲むと列の割り当てが崩れます。',
+  '',
+  'ラベル列の幅は固定です（`md` で 100px、`sm` で 80px）。収まらないラベルは列の中で折り返し、',
+  '必須マークはラベルの文字列に続けて流れます。入る余地が無いときだけ次の行へ送られるため、',
+  '入力欄の側へはみ出すことはありません。',
 ].join('\n');
 
 const meta = {
@@ -166,6 +170,51 @@ export const RequiredAsterisk: Story = {
     required: true,
     requiredMark: 'asterisk',
   },
+};
+
+/**
+ * 列の幅に収まらない長さのテキストを置いた例。
+ *
+ * 横並びのラベル列は固定幅のため、長いラベルは折り返ります。必須マークはラベルの文字列に
+ * 続けて流れ、入る余地が無いときだけ次の行へ送られます（入力欄の側へははみ出しません）。
+ *
+ * 区切りの無い長い文字列（URL など）は、ラベルも補助テキストも自身の列の中で折り返します。
+ */
+export const LongText: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '320px' }}>
+      <FormField required requiredMark="badge">
+        <FormField.Label>requiredMark = badge</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="必須項目" />
+        </FormField.Control>
+      </FormField>
+
+      <FormField required requiredMark="asterisk">
+        <FormField.Label>requiredMark = asterisk</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="必須項目" />
+        </FormField.Control>
+      </FormField>
+
+      <FormField required requiredMark="both" size="sm">
+        <FormField.Label>requiredMark = both</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="必須項目" />
+        </FormField.Control>
+      </FormField>
+
+      <FormField required requiredMark="badge">
+        <FormField.Label>verylongsinglewordlabel</FormField.Label>
+        <FormField.Control>
+          <Input placeholder="必須項目" />
+        </FormField.Control>
+        <FormField.HelperText>
+          https://example.com/very/long/url/that/never/breaks?query=value
+        </FormField.HelperText>
+      </FormField>
+    </div>
+  ),
 };
 
 export const ErrorText: Story = {
