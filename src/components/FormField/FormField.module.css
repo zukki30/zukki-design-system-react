@@ -70,12 +70,22 @@
   min-width: 0;
 }
 
-/* 横並びの padding と、無効時の色は .formField[data-…] 側で当てている */
+/*
+ * 横並びの padding と、無効時の色は .formField[data-…] 側で当てている。
+ *
+ * 必須マークは flex ではなくインラインで流す。横並びのラベル列は固定幅のため、
+ * flex の行に並べると縮められないマークがラベル列からあふれ、入力欄に重なる。
+ * インラインなら文字列の続きとして扱われ、入る余地が無いときだけ次の行へ送られる
+ */
 .formField__label {
   grid-column: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+  display: block;
+  /*
+   * 区切りの無い長い文字列もラベル列の中で折る。
+   * ラベル列は固定幅で、箱は中身に合わせて広がらない。
+   * これが無いと折り返す場所の無い文字列が箱からあふれ、入力欄の上に流れる
+   */
+  overflow-wrap: anywhere;
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--zds-form-field-label-font-size);
@@ -83,8 +93,9 @@
   color: var(--color-text-on-surface-default);
 }
 
+/* マークはラベルの文字列に続けて置くため、間隔は gap ではなく margin で取る */
 .formField__requiredAsterisk {
-  flex-shrink: 0;
+  margin-inline-start: var(--spacing-sm);
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--zds-form-field-label-font-size);
@@ -96,7 +107,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  margin-inline-start: var(--spacing-sm);
   padding-inline: var(--zds-form-field-required-badge-padding-inline);
   padding-block: var(--spacing-2xs);
   border-radius: var(--border-radius-xs);
@@ -117,8 +128,15 @@
   gap: var(--zds-form-field-gap);
 }
 
+/*
+ * 文字の折り返しは入力欄と同じ列に閉じ込める。
+ * min-width: 0 で縮むのは箱だけで、区切りの無い長い文字列（URL など）は
+ * 箱からあふれてフィールドの外側へ流れる。
+ * overflow-wrap は継承するため、入力欄を含む .formField__control には指定しない
+ */
 .formField__helperText {
   composes: formField__controlColumn;
+  overflow-wrap: anywhere;
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-xs);
@@ -126,8 +144,10 @@
   color: var(--color-text-on-surface-subtle);
 }
 
+/* 折り返しの扱いは補助テキストと同じ */
 .formField__errorText {
   composes: formField__controlColumn;
+  overflow-wrap: anywhere;
   font-family: var(--font-family-default);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-xs);
