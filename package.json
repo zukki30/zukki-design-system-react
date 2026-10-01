@@ -2,7 +2,7 @@
   "name": "zukki-design-system",
   "type": "module",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "デザインシステム",
   "main": "./dist/zukki-design-system.cjs",
   "module": "./dist/zukki-design-system.js",
