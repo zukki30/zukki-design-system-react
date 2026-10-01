@@ -82,8 +82,8 @@
   display: block;
   /*
    * 区切りの無い長い文字列もラベル列の中で折る。
-   * grid の固定トラックに置く要素は min-width: auto が min-content になるため、
-   * これが無いと長い単語 1 つでラベルの箱ごと入力欄の側へ広がる
+   * ラベル列は固定幅で、箱は中身に合わせて広がらない。
+   * これが無いと折り返す場所の無い文字列が箱からあふれ、入力欄の上に流れる
    */
   overflow-wrap: anywhere;
   font-family: var(--font-family-default);

@@ -1,10 +1,48 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
 
 import { Checkbox } from '../Checkbox';
 import { Input } from '../Input';
 import { Select } from '../Select';
 
 import { FormField } from './FormField';
+
+/**
+ * ラベルと入力欄が互いの列へはみ出していないことを確かめる。
+ *
+ * 横並びのラベル列は固定幅のため、必須マークや折り返す場所の無い文字列が
+ * 列からあふれると入力欄に重なる（#143）。
+ * 重なりはレイアウトしないと分からず jsdom では測れないので、
+ * ブラウザで動く test:a11y 側で測る
+ */
+const expectTextStaysInItsColumn = async (canvasElement: HTMLElement) => {
+  // 縦並びはラベルと入力欄が同じ列に重なって並ぶため、列の境界を測れるのは横並びだけ
+  const fields = canvasElement.querySelectorAll('[data-orientation="horizontal"]');
+
+  await expect(fields.length).toBeGreaterThan(0);
+
+  for (const field of fields) {
+    const label = field.querySelector('label');
+    // パーツはルート直下に並ぶため、ラベルの次の要素が入力欄の列になる
+    const control = field.querySelector('label + div');
+
+    if (label === null || control === null) {
+      throw new Error('ラベルと入力欄の列が見つかりません');
+    }
+
+    const controlLeft = control.getBoundingClientRect().left;
+
+    // 必須マークは入力欄の列へ入り込まない
+    for (const mark of label.querySelectorAll('span')) {
+      await expect(mark.getBoundingClientRect().right).toBeLessThanOrEqual(controlLeft);
+    }
+
+    // 文字列は自分の箱の中で折り返す（あふれると scrollWidth が clientWidth を超える）
+    for (const text of [label, ...field.querySelectorAll('p')]) {
+      await expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth);
+    }
+  }
+};
 
 const docsDescription = [
   'ラベル・補助テキスト・エラーメッセージをまとめて扱うフォームフィールドです。',
@@ -80,7 +118,7 @@ const docsDescription = [
   '',
   'ラベル列の幅は固定です（`md` で 100px、`sm` で 80px）。収まらないラベルは列の中で折り返し、',
   '必須マークはラベルの文字列に続けて流れます。入る余地が無いときだけ次の行へ送られるため、',
-  '入力欄の側へはみ出すことはありません。',
+  '入力欄の側にはみ出すことはありません。',
 ].join('\n');
 
 const meta = {
@@ -176,7 +214,7 @@ export const RequiredAsterisk: Story = {
  * 列の幅に収まらない長さのテキストを置いた例。
  *
  * 横並びのラベル列は固定幅のため、長いラベルは折り返ります。必須マークはラベルの文字列に
- * 続けて流れ、入る余地が無いときだけ次の行へ送られます（入力欄の側へははみ出しません）。
+ * 続けて流れ、入る余地が無いときだけ次の行へ送られます（入力欄の側にはみ出しません）。
  *
  * 区切りの無い長い文字列（URL など）は、ラベルも補助テキストも自身の列の中で折り返します。
  */
@@ -212,9 +250,13 @@ export const LongText: Story = {
         <FormField.HelperText>
           https://example.com/very/long/url/that/never/breaks?query=value
         </FormField.HelperText>
+        <FormField.ErrorText>
+          verylongsinglewordvalueisnotavalidformatforthisfield
+        </FormField.ErrorText>
       </FormField>
     </div>
   ),
+  play: ({ canvasElement }) => expectTextStaysInItsColumn(canvasElement),
 };
 
 export const ErrorText: Story = {
@@ -386,4 +428,6 @@ export const AllStates: Story = {
       </FormField>
     </div>
   ),
+  // 収まる長さのラベルでも列の境界を越えないことを、まとめて見ているここで確かめる
+  play: ({ canvasElement }) => expectTextStaysInItsColumn(canvasElement),
 };
