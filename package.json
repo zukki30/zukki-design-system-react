@@ -105,7 +105,7 @@
     "storybook": "^10.6.0",
     "style-dictionary": "^5.5.5",
     "token-transformer": "^0.0.33",
-    "tsx": "^4.23.13",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.70.1",
     "vite": "^8.3.1",
