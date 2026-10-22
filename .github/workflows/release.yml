@@ -86,8 +86,9 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          # setup-node は .mise.toml を読めないため直書き。.mise.toml と揃えること
-          node-version: 24.14.1
+          # バージョンは .mise.toml の [tools] node から読む（setup-node v7.1.0 以降が対応）。
+          # ローカルの mise と CI の固定箇所を 1 つにまとめ、片方だけ古くなるのを防ぐ
+          node-version-file: .mise.toml
           cache: pnpm
 
       # 壊れたコミットにタグが付くと、利用側が #v3.1.0 で固定した先が install できなくなるため、
