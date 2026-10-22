@@ -104,7 +104,7 @@
     "prettier": "^3.9.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "storybook": "^10.6.0",
+    "storybook": "^10.6.2",
     "style-dictionary": "^5.5.5",
     "token-transformer": "^0.0.33",
     "tsx": "^4.23.15",
