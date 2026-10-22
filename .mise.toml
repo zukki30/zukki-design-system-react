@@ -1,5 +1,6 @@
 [tools]
-# ここを上げるときは .github/workflows/ci.yml の node-version と、
-# .github/dependabot.yml で ignore している @types/node のメジャーも揃えること
-node = "24.14.1"
+# ワークフローは node-version-file でこのファイルを読むため、CI 側の追従は要らない。
+# メジャーを上げるときは .github/dependabot.yml で ignore している
+# @types/node のメジャーも揃えること
+node = "24.22.1"
 pnpm = "10.33.0"

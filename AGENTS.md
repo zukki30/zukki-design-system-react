@@ -28,7 +28,7 @@
 
 ## 開発環境
 
-ツールチェーンは `.mise.toml` で固定しています（Node 24.14.1 / pnpm 10.33.0）。`mise install` でセットアップしてください。パッケージマネージャは pnpm です（`package.json` の `packageManager` で固定）。
+ツールチェーンは `.mise.toml` で固定しています（Node 24.22.1 / pnpm 10.33.0）。`mise install` でセットアップしてください。パッケージマネージャは pnpm です（`package.json` の `packageManager` で固定）。
 
 ## コマンド
 
