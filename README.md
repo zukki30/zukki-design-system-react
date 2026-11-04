@@ -61,7 +61,49 @@ pnpm add @zukki30/zukki-design-system@4.0.0
 
 このリポジトリ以外のワークフローから install する場合は、パッケージ側でそのリポジトリへの read を許可するか、`read:packages` の classic PAT を Secrets に置いて `NODE_AUTH_TOKEN` に渡す。
 
-> **3.x から 4.0.0 への移行:** パッケージ名が `zukki-design-system` から `@zukki30/zukki-design-system` に変わった（GitHub Packages はスコープ付きの名前のみ対応するため）。`import` 元の書き換えが必要になる。コンポーネントの API は変わっていない。
+## 3.x からの移行
+
+3.x は git（`github:zukki30/zukki-design-system-react`）から install する形で配布していた。4.0.0 で GitHub Packages へ移したため、パッケージ名が `zukki-design-system` から **`@zukki30/zukki-design-system`** に変わった（GitHub Packages はスコープ付きの名前のみ対応し、スコープは所有者と一致する必要があるため）。
+
+**コンポーネントの API は変わっていない。** 書き換えるのは install の設定と `import` 元だけ。
+
+### 1. 旧パッケージを外す
+
+```bash
+pnpm remove zukki-design-system
+```
+
+### 2. レジストリとトークンを設定する
+
+上の「インストール」の手順 1・2（プロジェクトの `.npmrc` と `~/.npmrc`）を済ませる。
+
+### 3. 新しいパッケージを入れる
+
+```bash
+pnpm add @zukki30/zukki-design-system
+```
+
+### 4. `import` 元を書き換える
+
+```diff
+-import { Button, Card } from 'zukki-design-system';
+-import 'zukki-design-system/styles.css';
++import { Button, Card } from '@zukki30/zukki-design-system';
++import '@zukki30/zukki-design-system/styles.css';
+```
+
+まとめて置き換える場合（macOS の `sed`。Linux は `-i ''` を `-i` にする）。
+
+```bash
+grep -rl "zukki-design-system" src | xargs sed -i '' "s|'zukki-design-system|'@zukki30/zukki-design-system|g"
+```
+
+引用符の直後だけを対象にしているため、`'@zukki30/zukki-design-system`（スコープの `/` が直前に来る）には二重に当たらない。二重引用符で書いている場合は `'` を `\"` に替えてもう一度実行する。
+
+### 5. 不要になった設定を消す
+
+- **`package.json` の `pnpm.onlyBuiltDependencies` から `zukki-design-system` を外す。** publish 済みの成果物を配るようになったため、install 時のビルドは起きない。**配列ごと削除しないこと**（他のパッケージのビルドまで止まる）
+- **AI エージェント向けガイドの読み込みパスを変える。** `@./node_modules/zukki-design-system/dist/AGENTS.md` → `@./node_modules/@zukki30/zukki-design-system/dist/AGENTS.md`
 
 ## 使い方
 
