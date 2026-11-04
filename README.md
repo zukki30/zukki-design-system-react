@@ -6,47 +6,70 @@ https://github.com/zukki30/zukki-design-system の React only のデザインシ
 
 ## インストール
 
-npm には publish していないため、git から install する。
+[GitHub Packages](https://github.com/zukki30/zukki-design-system-react/packages) で配布している。npmjs には publish していない。
 
-**pnpm 10 以降では、先に利用側の `package.json` でビルドを許可すること。** このライブラリは `dist/` をリポジトリに含めず install 時の `prepare` でビルドするが、pnpm 10 は既定で依存パッケージのビルドスクリプトを実行しないため、許可が無いと `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` で install に失敗する。
+**公開パッケージだが、install には認証が必要**（GitHub Packages の仕様）。
 
-```json
-{
-  "pnpm": {
-    "onlyBuiltDependencies": ["zukki-design-system"]
-  }
-}
+### 1. スコープのレジストリを指定する
+
+プロジェクトの `.npmrc` に次の 1 行を書く。**トークンはここに書かない**（このファイルはコミットされる）。
+
+```
+@zukki30:registry=https://npm.pkg.github.com
 ```
 
-既に `onlyBuiltDependencies` がある場合は、**配列を置き換えず `zukki-design-system` を追加する**。既存の要素を消すと、そのパッケージのビルドまで止まる。
+### 2. トークンを用意する
 
-そのうえで install する。
+GitHub Packages の npm レジストリは **classic の personal access token のみ**に対応している。[Settings → Developer settings → Personal access tokens (classic)](https://github.com/settings/tokens) で `read:packages` だけを付けて作成し、`~/.npmrc` に書く（コミットされない場所に置く）。
 
-```bash
-pnpm add github:zukki30/zukki-design-system-react
+```
+//npm.pkg.github.com/:_authToken=<TOKEN>
 ```
 
-上の形式は **main の最新**を指す。バージョンを固定するときはリリースタグを付ける。
+### 3. install する
 
 ```bash
+pnpm add @zukki30/zukki-design-system
+```
+
+バージョンは通常の semver 範囲で指定できる。
+
+```bash
+# 4.x の最新に追従する
+pnpm add @zukki30/zukki-design-system@^4.0.0
+
 # 特定のバージョンに固定する
-pnpm add github:zukki30/zukki-design-system-react#v3.0.0
-
-# 3.x の最新に追従する
-pnpm add github:zukki30/zukki-design-system-react#semver:^3.0.0
+pnpm add @zukki30/zukki-design-system@4.0.0
 ```
 
 利用できるバージョンは [Releases](https://github.com/zukki30/zukki-design-system-react/releases) を参照。
 
 `react` / `react-dom` は peer dependency なので、利用側で用意する（v19 以上）。
 
+### CI（GitHub Actions）から install する
+
+```yaml
+- uses: actions/setup-node@v7
+  with:
+    node-version-file: .mise.toml
+    registry-url: https://npm.pkg.github.com
+    scope: '@zukki30'
+- run: pnpm install --frozen-lockfile
+  env:
+    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+このリポジトリ以外のワークフローから install する場合は、パッケージ側でそのリポジトリへの read を許可するか、`read:packages` の classic PAT を Secrets に置いて `NODE_AUTH_TOKEN` に渡す。
+
+> **3.x から 4.0.0 への移行:** パッケージ名が `zukki-design-system` から `@zukki30/zukki-design-system` に変わった（GitHub Packages はスコープ付きの名前のみ対応するため）。`import` 元の書き換えが必要になる。コンポーネントの API は変わっていない。
+
 ## 使い方
 
 **コンポーネントと合わせて CSS を必ず読み込む。** 配色や余白は CSS 変数で定義されているため、読み込まないと色も余白も当たらない。
 
 ```tsx
-import { Button, Card } from 'zukki-design-system';
-import 'zukki-design-system/styles.css';
+import { Button, Card } from '@zukki30/zukki-design-system';
+import '@zukki30/zukki-design-system/styles.css';
 
 export const App = () => (
   <Card>
@@ -103,7 +126,7 @@ export const App = () => (
 props の型はすべて公開しているので、ラッパーを作るときに使える。
 
 ```tsx
-import { Button, type ButtonProps } from 'zukki-design-system';
+import { Button, type ButtonProps } from '@zukki30/zukki-design-system';
 
 export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
   <Button {...props} type="submit" />
@@ -116,7 +139,7 @@ export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
 
 ```markdown
 <!-- 利用側の AGENTS.md / CLAUDE.md -->
-@./node_modules/zukki-design-system/dist/AGENTS.md
+@./node_modules/@zukki30/zukki-design-system/dist/AGENTS.md
 ```
 
 ガイドは install したバージョンの実際の中身から生成されているため、ライブラリを更新すれば内容も追従する。
@@ -127,9 +150,9 @@ export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
 
 | CSS | 配色 |
 | --- | --- |
-| `zukki-design-system/styles.css` | `color-scheme` に従ってライト / ダークが切り替わる |
-| `zukki-design-system/styles-light.css` | ライトに固定 |
-| `zukki-design-system/styles-dark.css` | ダークに固定 |
+| `@zukki30/zukki-design-system/styles.css` | `color-scheme` に従ってライト / ダークが切り替わる |
+| `@zukki30/zukki-design-system/styles-light.css` | ライトに固定 |
+| `@zukki30/zukki-design-system/styles-dark.css` | ダークに固定 |
 
 既定（`styles.css`）は `light-dark()` で定義されており、OS の設定に追従する。特定の範囲だけ配色を固定したい場合は `color-scheme` を指定する。
 

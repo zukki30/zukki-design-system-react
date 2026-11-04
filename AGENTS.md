@@ -82,7 +82,9 @@ TypeScript と CSS Modules で構築した **React コンポーネントライ�
 
 ## 配布物
 
-このライブラリは git 経由で install して使われます。`dist/` はリポジトリに含めず、`prepare` スクリプトが install 時にビルドします。
+このライブラリは **GitHub Packages で `@zukki30/zukki-design-system` として配布**します。`dist/` はリポジトリに含めず、`prepare` スクリプトがビルドします（publish のときに走ります。利用側は publish 済みの `dist` を受け取るだけなので、ビルドは走りません）。
+
+**パッケージ名はスコープ付きである必要があります。** GitHub Packages はスコープ付きの名前のみを受け付け、スコープは所有者（`zukki30`）と一致していなければなりません。`verify:dist` が `repository` から所有者を読み、名前のスコープと一致するかを検査しています。
 
 **`pnpm build` が作るもの:**
 
@@ -104,11 +106,13 @@ TypeScript と CSS Modules で構築した **React コンポーネントライ�
 - **CJS の拡張子** — `package.json` が `type: module` なので、CJS を `.js` で出すと Node が ESM として解釈します。`require()` は例外を投げないまま **export が空になる**ため気づきにくく、`.cjs` である必要があります
 - **`exports` の `types` 条件** — 外れると利用側が `TS2882`（CSS の副作用 import）や `TS7016`（本体）で落ちます。ファイル自体は出力されているため、存在だけを見る検査では気づけません
 
-最後の 1 つがあるため、**`scripts/probes/` の probe は import 元をパッケージ名（`zukki-design-system`）で書きます。** `../../dist/main` のような相対パスにすると `exports` を一度も通らず、壊れていても検査が通ってしまいます。自分自身をパッケージ名で解決できるのは Node / TypeScript の self-reference によるもので、`name` と `exports` があれば効くため symlink も一時的な install も要りません。
+最後の 1 つがあるため、**`scripts/probes/` の probe は import 元をパッケージ名（`@zukki30/zukki-design-system`）で書きます。** `../../dist/main` のような相対パスにすると `exports` を一度も通らず、壊れていても検査が通ってしまいます。自分自身をパッケージ名で解決できるのは Node / TypeScript の self-reference によるもので、`name` と `exports` があれば効くため symlink も一時的な install も要りません。
 
 配色を固定した CSS は、ビルド済み CSS から `:root { … }` を丸ごと落とし、`src/styles/variables-{light,dark}-only.css` を前置して作ります（`scripts/build-css-variants.ts`）。コンポーネントは `:root` を使わないため、これで変数定義だけを正確に切り離せます。
 
 **落とし残しと落としすぎの両方を検査しています。** 残せば固定版に `light-dark()` が残り、落としすぎれば固定版から変数が消えます。後者はファイルが出力されているぶん気づきにくいため、`verify:dist` が「固定版に既定 CSS と同じ変数がそろっている」ことを見ています。
+
+**配るものの境界は `files` が決めます。** `verify:dist` は `npm pack --dry-run` のファイル一覧を見て、開発用のファイルが混ざっていないことと、配布に必要なファイルが入っていることの**両方**を検査します。`private` の復活や `publishConfig.registry` の消失も同じところで見ています（どちらもビルドを壊さないまま publish 先を変えてしまうため、ファイルを見る検査では気づけません）。
 
 ### 利用側に届ける情報
 
@@ -539,11 +543,19 @@ parameters: {
 
 ## リリース
 
-`package.json` の `version` を上げて `main` にマージすると、`.github/workflows/release.yml` が `v<version>` のタグと GitHub Release を自動で作ります。手作業は要りません。
+`package.json` の `version` を上げて `main` にマージすると、`.github/workflows/release.yml` が次の順で実行します。手作業は要りません。
+
+1. `pnpm install`（`prepare` でビルド）と `pnpm verify:dist` で配布物として成立することを確かめる
+2. **GitHub Packages へ publish する**
+3. `v<version>` のタグと GitHub Release を作る
 
 判定しているのは「`version` が変わったか」ではなく **「`v<version>` のタグがまだ無いか」** です。そのため `version` を据え置いたままマージしても、そのバージョンのタグが未作成であれば作られます（この仕組みを導入した初回がこれにあたります）。運用上は「リリースしたいときに `version` を上げる」で読み替えて構いません。
 
 - **バージョンは人が上げます。** 破壊的変更かどうかの判断は機械に任せられないため、コミットメッセージからの自動採番（semantic-release 等）は入れていません
 - タグが既にある場合は何も作らず、理由を Actions の実行サマリに出します。上げ忘れても壊れません
-- タグを打つ前に `pnpm install`（`prepare` でビルド）と `pnpm verify:dist` を実行します。必須チェックは「PR の時点で通ったこと」しか保証しないため、マージ後の状態をリリース側でもう一度確かめています
+- **publish はタグより先に行います。** 判定基準がタグの有無であるため、タグは「このバージョンは完了した」という最後の印でなければなりません。タグを先に作ると、publish だけ失敗した状態から再実行で復帰できなくなります（タグがある = リリース済みと判定されるため）
+- **publish は冪等です。** 既に同じバージョンが公開されていればスキップします。ただし「公開されていない」と「確認できない」は区別し、確認できないときは止めます
+- publish には `GITHUB_TOKEN`（`permissions: packages: write`）を使います。個人の PAT は Secrets に置きません
+- publish のコマンドだけ pnpm ではなく npm を使います。`.npmrc` は `actions/setup-node` が npm 向けに書き出すものであり、`pnpm publish` は CI では無意味な git の状態検査を行うためです
 - リリースノートは GitHub が自動生成します。分類は `.github/release.yml` で決めます。`CHANGELOG.md` は持ちません（二重管理になるため）
+- **同じバージョン番号は再利用できません。** publish をやり直すときは必ず `version` を上げます
