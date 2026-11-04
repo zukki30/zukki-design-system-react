@@ -61,8 +61,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5(playwright@1.64.1)(vite@8.3.5(@types/node@24.13.6)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.0))(vitest@5.0.5)
       chromatic:
-        specifier: ^18.10.1
-        version: 18.10.1
+        specifier: ^18.13.6
+        version: 18.13.6
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -1817,24 +1817,8 @@ packages:
     resolution: {integrity: sha512-PAJdDJusoxnwm1VwW07VWwUN1sl7smmC3OKggvndJFadxxDRyFJBX/ggnu/KE4kQAB7a3Dp8f/YXC1FlUprWmA==}
     engines: {node: '>= 16'}
 
-  chromatic@18.10.1:
-    resolution: {integrity: sha512-oeCv4HvMrZPB7SzCD9yuzAPgB4c/TfhqLzDn1/K7dIYGvF/mWhOrwDa5sXHIkaXFJ+mYx9rMKy9fPShWPujH5Q==}
-    engines: {node: '>=22.0.0'}
-    hasBin: true
-    peerDependencies:
-      '@chromatic-com/cypress': ^0.*.* || ^1.0.0
-      '@chromatic-com/playwright': ^0.*.* || ^1.0.0
-      '@chromatic-com/vitest': ^0.*.* || ^1.0.0
-    peerDependenciesMeta:
-      '@chromatic-com/cypress':
-        optional: true
-      '@chromatic-com/playwright':
-        optional: true
-      '@chromatic-com/vitest':
-        optional: true
-
-  chromatic@18.13.3:
-    resolution: {integrity: sha512-86wzIxGIdDMBvyYWCXF+V0RyckI+3kl6ki9lJoZem6a0UfwHtEEg5ruORpryTpu6c9dVtBk2qSTX4xtkz3gwsA==}
+  chromatic@18.13.6:
+    resolution: {integrity: sha512-4NVvud3yFIA8AGuBQeyIGhvYGih+ZcvFaKcnECotTSfHaA3FyUAckNutcqnvofnKDOxZz9ZrA33sT+wz7wz3HQ==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -3673,7 +3657,7 @@ snapshots:
   '@chromatic-com/storybook@5.6.0(storybook@10.6.3(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.0))':
     dependencies:
       '@neoconfetti/react': 1.0.0
-      chromatic: 18.13.3
+      chromatic: 18.13.6
       jsonfile: 6.2.1
       storybook: 10.6.3(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.0)
       strip-ansi: 7.2.0
@@ -5015,11 +4999,7 @@ snapshots:
 
   check-error@2.1.3: {}
 
-  chromatic@18.10.1:
-    dependencies:
-      semver: 7.8.5
-
-  chromatic@18.13.3:
+  chromatic@18.13.6:
     dependencies:
       semver: 7.8.5
 
