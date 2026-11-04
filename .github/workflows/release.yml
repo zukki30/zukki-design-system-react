@@ -78,6 +78,8 @@ jobs:
       # タグと Release の作成に必要。個人の PAT は使わない
       # （GITHUB_TOKEN は実行ごとに発行され、終了時に失効する）
       contents: write
+      # GitHub Packages への publish に必要
+      packages: write
     steps:
       - uses: actions/checkout@v7
 
@@ -90,10 +92,15 @@ jobs:
           # ローカルの mise と CI の固定箇所を 1 つにまとめ、片方だけ古くなるのを防ぐ
           node-version-file: .mise.toml
           cache: pnpm
+          # GitHub Packages 用の .npmrc を runner 上に作らせる。scope を渡すと
+          # 「@zukki30 はこのレジストリ」「認証は NODE_AUTH_TOKEN から読む」の
+          # 2 行が書き出される。トークンをワークフローでファイルへ書く手順が要らない
+          registry-url: https://npm.pkg.github.com
+          scope: '@zukki30'
 
-      # 壊れたコミットにタグが付くと、利用側が #v3.1.0 で固定した先が install できなくなるため、
-      # タグを打つ前にここで配布物として成立することを確かめる。
-      # install 時の prepare でビルドまで走る（利用側が install したときと同じ経路）
+      # 壊れた配布物を publish すると、同じバージョン番号は再利用できないため取り返しがつかない。
+      # publish とタグ作成の前に、ここで配布物として成立することを確かめる。
+      # install 時の prepare でビルドまで走る（publish 時に走るのと同じ経路）
       #
       # main は ruleset「protect main」で保護しているが、この検証は省けない。
       #   - 必須チェックは「PR の時点で通ったこと」しか保証しない。最新同期は要求していない
@@ -103,6 +110,77 @@ jobs:
 
       - run: pnpm verify:dist
 
+      # publish はタグより先に行う。check ジョブの判定基準が「タグの有無」なので、
+      # タグが「このバージョンは完了した」という最後の印になっていないと、
+      # publish だけ失敗した状態から再実行で復帰できない
+      # （タグがある = should-release が false となり、二度と publish されない）。
+      #
+      # pnpm ではなく npm を使う理由は 2 つ。
+      #   - .npmrc は setup-node が npm のために書き出したもので、npm が確実に読む
+      #   - pnpm publish は既定で git の状態を検査する。対象コミットは check ジョブで
+      #     確定済みなので無意味な検査であり、--no-git-checks の付け忘れで落ちる要因になる
+      # publish はレジストリとの通信であって依存解決ではないため、依存ツリーには影響しない
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # ci.yml / check ジョブと同じく node で読む。runner に jq 等を要求しない
+          name="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+
+          # 既に publish 済みかを調べる。並走した run が同じバージョンを publish した場合と、
+          # 前回タグ作成だけが失敗した場合に、ここで冪等にスキップする。
+          #
+          # 「無かった」と「確認できなかった」は必ず分ける。認証切れや一時障害を
+          # 「無い」と読むと publish を試して失敗するだけだが、原因が分からなくなる。
+          # check ジョブの ls-remote と同じく fail closed にする
+          set +e
+          view="$(npm view "$name@$version" version 2>&1)"
+          status=$?
+          set -e
+
+          if [ "$status" -eq 0 ]; then
+            {
+              echo "### publish をスキップしました"
+              echo
+              echo "\`$name@$version\` は既に公開済みです。"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if ! printf '%s' "$view" | grep -q 'E404'; then
+            echo "::error::publish 済みかどうかを確認できませんでした"
+            printf '%s\n' "$view"
+            exit 1
+          fi
+
+          # publish するものと検査したものを同一にするため、tarball を作ってから publish する。
+          # --ignore-scripts を付けるのは、直前の install で prepare が走って dist が
+          # 揃っているため（pack 時の再ビルドは無駄になる）
+          file="$(npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP" --silent | tail -n 1)"
+
+          if ! npm publish "$RUNNER_TEMP/$file" 2>"$RUNNER_TEMP/publish.log"; then
+            # 並走した run が一瞬先に publish した場合。バージョンは上書きできないため、
+            # 競合は「既に publish 済み」と同義であり、冪等に成功扱いとする
+            if grep -qE 'E409|EPUBLISHCONFLICT|cannot publish over' "$RUNNER_TEMP/publish.log"; then
+              {
+                echo "### publish 済みでした"
+                echo
+                echo "\`$name@$version\` は並走した実行が公開済みのため、何もしませんでした。"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "::error::publish に失敗しました"
+            cat "$RUNNER_TEMP/publish.log"
+            exit 1
+          fi
+
+          {
+            echo "### publish しました"
+            echo
+            echo "- パッケージ: \`$name@$version\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # タグ作成・Release 作成・ノート生成を 1 コマンドで行う。
       # タグが無ければ GitHub 側が --target のコミットに軽量タグを作る。
       #
@@ -110,8 +188,8 @@ jobs:
       # 実行中に別の push が入ると、検証したコミットとタグがずれる
       #
       # なお GITHUB_TOKEN で作ったタグは他のワークフローを発火しない（無限ループ防止の仕様）。
-      # 「タグ作成をトリガーに publish」のような構成にはできないので、
-      # 処理を足すときはこのジョブの中へ追加すること
+      # 「タグ作成をトリガーに publish」のような構成にはできないため、publish は
+      # 上のステップとしてこのジョブの中に置いている。処理を足すときも同じようにすること
       - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
