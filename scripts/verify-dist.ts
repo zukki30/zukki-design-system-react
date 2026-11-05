@@ -21,7 +21,10 @@ const REGISTRY = 'https://npm.pkg.github.com';
 const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as {
   name: string;
   private?: boolean;
-  repository?: { url?: string };
+  // npm は文字列形式（"https://github.com/OWNER/REPO"）も認める。GitHub の
+  // ドキュメントが示すのはこちらで、リポジトリとの紐づけが効かないときの
+  // 切り替え先として release-checklist.md に書いてあるため、両方を読めるようにする
+  repository?: string | { url?: string };
   publishConfig?: { registry?: string };
 };
 
@@ -185,7 +188,9 @@ check('package.json に private が残っていない', pkg.private === undefine
 
 // GitHub Packages はスコープが所有者と一致することを要求する。所有者は
 // repository から読む（名前の側に所有者を二度書かない）
-const owner = /github\.com\/([^/]+)\//.exec(pkg.repository?.url ?? '')?.[1]?.toLowerCase();
+const repositoryUrl = typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url;
+
+const owner = /github\.com[/:]([^/]+)\//.exec(repositoryUrl ?? '')?.[1]?.toLowerCase();
 
 check(
   'name のスコープが repository の所有者と一致している',

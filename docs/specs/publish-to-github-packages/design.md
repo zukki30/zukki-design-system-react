@@ -136,7 +136,7 @@ MIT を推すのは、デザインシステムの利用（コードの改変・�
 - **`exports` / `files` / `main` / `module` / `types` は変更しない。** 既に publish 向けの形になっている
 - **バンドルの出力ファイル名（`zukki-design-system.js` / `.cjs` / `.css`）は変更しない。** パッケージ名とは別物であり、`exports` から参照されているだけなので改名の必要がない。変えると `vite.config.ts` と `verify-dist.ts`、`build-css-variants.ts` に無意味な差分が出る
 - `publishConfig.registry` を**パッケージ側に置く**のは、手元や CI の設定に関係なく publish 先を定めるため。npmjs へ誤って publish されない防御にもなる
-- `--access` は指定しない。GitHub Packages のパッケージの可視性はリポジトリに従うため、npmjs の `--access` とは意味が異なる
+- `--access` は指定しない。npm レジストリのパッケージは **granular permissions** の対象で、**個人アカウントのスコープへの初回 publish は既定で private**（リポジトリの可視性を継承しない）。public にするのはパッケージ設定での操作であり、npmjs の `--access` では切り替わらない。初回 publish 後の手順として [`release-checklist.md`](./release-checklist.md) に書く
 
 Chromatic は `CHROMATIC_PROJECT_TOKEN` を読む（`chromatic` CLI が標準で参照する環境変数）。手元では `.env` に置き、CI で使う場合は Secrets から渡す。`.env` は `.gitignore` に無いため**追加する**。
 
@@ -378,8 +378,10 @@ pnpm add @zukki30/zukki-design-system@^4.0.0
 | `version` 据え置きで push | しない | 作らない | 成功（`check` でスキップ、理由をサマリに出す） |
 | `verify:dist` が落ちた | しない | 作らない | 失敗 |
 | publish が落ちた | 失敗 | 作らない | 失敗（再実行で復帰できる） |
-| 既に publish 済みでタグが無い | スキップ | 作る | 成功 |
-| 並走した run が先に publish した | スキップ（409 を冪等に扱う） | 作る | 成功 |
+| 既に publish 済み（**同じコミットから**）でタグが無い | スキップ | 作る | 成功 |
+| 既に publish 済み（**別のコミットから**） | スキップ | **作らない** | 失敗（人が判断する） |
+| 同じバージョンの run が並走した | 後続は待機し、タグの再確認で何もしない | 作らない | 成功 |
+| 直列化の外から先に publish された | スキップ（409 を冪等に扱う。公開元のコミットは照合する） | 作る | 成功 |
 | publish 済みかを確認できない | しない | 作らない | 失敗（fail closed） |
 
 ## 変更するファイル
@@ -389,7 +391,7 @@ pnpm add @zukki30/zukki-design-system@^4.0.0
 | `package.json` | 改名・`private` 削除・`version` 4.0.0・`repository` / `homepage` / `bugs` / `publishConfig` 追加・`license` MIT・Chromatic トークン外出し |
 | `LICENSE` | 新規（MIT） |
 | `.gitignore` | `.env` を追加 |
-| `.github/workflows/release.yml` | `permissions` に `packages: write`・`setup-node` にレジストリ設定・publish ステップ追加・コメント更新 |
+| `.github/workflows/release.yml` | `permissions` に `packages: write`・`setup-node` にレジストリ設定・publish ステップ追加・同一バージョンの直列化とタグの再確認・コメント更新 |
 | `scripts/probes/usage.tsx` | import 元を新しい名前に |
 | `scripts/verify-dist.ts` | `pkg.name` 参照・`ALWAYS_PACKED` に LICENSE・tarball の必須ファイルとメタ情報の検査を追加 |
 | `docs/agent-guide.template.md` | パッケージ名・読み込みパス |
@@ -404,8 +406,8 @@ pnpm add @zukki30/zukki-design-system@^4.0.0
 | FR-1 publish できる状態 | 「パッケージのメタ情報」 |
 | FR-2 名前の波及 | 「名前の波及」 |
 | FR-3 CI から自動 publish | 「リリース CI」 |
-| FR-4 冪等性 | publish ステップの `npm view` による事前確認と 409 の扱い |
-| FR-5 再実行で復帰 | 論点 1（publish → タグの順） |
+| FR-4 冪等性 | publish ステップの `npm view` による事前確認と 409 の扱い・ジョブ先頭でのタグの再確認 |
+| FR-5 再実行で復帰 | 論点 1（publish → タグの順）・`gitHead` による公開元コミットの照合 |
 | FR-6 PAT を使わない | `GITHUB_TOKEN` + `permissions: packages: write` |
 | FR-7 利用側ドキュメント | 「`README.md` — インストール節を置き換える」 |
 | FR-8 `AGENTS.md` | 「`AGENTS.md`」 |
@@ -415,13 +417,49 @@ pnpm add @zukki30/zukki-design-system@^4.0.0
 | NFR-2 実行結果から読み取れる | 各分岐で `$GITHUB_STEP_SUMMARY` に出力 |
 | NFR-3 `GITHUB_TOKEN` の制約 | publish を同一ジョブ内に置く |
 | NFR-4 流儀を揃える | `node-version-file` / fail closed / 理由コメント |
-| NFR-5 可視性の把握 | publish 後に確認（実装計画の検証手順） |
+| NFR-5 可視性の把握 | publish 後に Public へ変更する（既定は private。`release-checklist.md`） |
+
+## レビューで判明した設計の不足（PR #161）
+
+実装後のレビューで 3 件の指摘を受け、いずれも実装で修正した。設計の記録としてここに残す。
+
+### 1. 同じバージョンの run が並走すると、配布物とタグが別のコミットを指す
+
+同じ `version` のまま `main` へ連続してマージすると、`check` ジョブの判定（タグの有無）を**両方の run が通過**しうる。その結果、
+
+1. run A（コミット A）が publish する
+2. run B（コミット B）は publish を冪等にスキップする
+3. run B が `--target $GITHUB_SHA`（= コミット B）にタグと Release を作る
+
+となり、**配布物は A の内容なのにタグは B を指す**。論点 1 で「publish を先にする」と決めた判断自体は変わらないが、**同一バージョンの直列化が欠けていた**。
+
+対処は 2 段にした。
+
+- **`release` ジョブに `concurrency: release-<タグ>` を付けて、同じバージョンの run を直列化する。** group にバージョンを含めるのは、「待機中の run は 1 件しか保持されない」制約の影響を同一バージョンに閉じるため（ワークフロー単位で直列化すると、auto-release-tag で避けた「途中のバージョンだけ消える」事故に戻る）
+- **待機のあとでタグを取り直す。** `check` の判定はキュー投入前のものなので、ジョブの先頭で `git ls-remote` をやり直し、既にタグがあれば以降のステップを飛ばす（重いビルドの前に判定する）
+
+これで並走の経路は閉じるが、**非並走でも起きる経路**が残る。「A が publish → A のタグ作成だけ失敗 → 別コミット B が同じ version で流れてくる」場合である。そこで公開元のコミットを照合できるようにした。
+
+- publish の直前に `package.json` の `gitHead` へ `$GITHUB_SHA` を書き込む。**npm は `gitHead` を自動では付けない**（ディレクトリ publish・tarball publish のどちらでも付かないことを実測で確認した）
+- 既に公開済みのバージョンに出会ったら `npm view <pkg>@<version> gitHead` と `$GITHUB_SHA` を比べ、**違うコミットならタグを作らずに中断する**。同じコミットなら「タグ作成だけ失敗した実行の再開」なので続行する（FR-5 の復帰性は保たれる）
+
+### 2. 文字列形式の `repository` にすると `verify:dist` が落ちる
+
+`verify-dist.ts` が `repository.url` だけを読んでいたため、R-1 の復旧手順（オブジェクト形式 → 文字列形式への変更）を実行すると `owner` が `undefined` になり、**ドキュメント化した手順が検査とリリース CI を壊す**状態だった。
+
+文字列形式・オブジェクト形式・SSH 形式のいずれからも所有者を読めるようにし、`repository` 自体が無い場合だけ落ちることを実機で確認した。
+
+### 3. npm レジストリのパッケージはリポジトリの可視性を継承しない
+
+**「リポジトリが public なのでパッケージも public になる見込み」という前提が誤りだった。** GitHub Packages のレジストリは granular permissions と repository-scoped permissions に分かれており、npm は前者（ユーザー / Organization のスコープ）である。個人アカウントのスコープへの初回 publish は**既定で private** で、public にするにはパッケージ設定の Danger Zone で変更する必要がある。`npm publish --access public` では切り替わらない。
+
+要件の NFR-5 と公開チェックリストを書き換え、**初回 publish 後の必須作業**として明記した。
 
 ## 残るリスク
 
 | # | リスク | 対処 |
 | --- | --- | --- |
-| R-1 | **`repository` の形式でリポジトリに紐づかない可能性。** ドキュメントは文字列形式（`https://github.com/OWNER/REPOSITORY`）を示しているが、ここでは npm 標準のオブジェクト形式を採る | publish 後にパッケージがリポジトリに紐づいているかを確認し、紐づかなければ文字列形式に変える |
+| R-1 | **`repository` の形式でリポジトリに紐づかない可能性。** ドキュメントは文字列形式（`https://github.com/OWNER/REPOSITORY`）を示しているが、ここでは npm 標準のオブジェクト形式を採る | publish 後にパッケージがリポジトリに紐づいているかを確認し、紐づかなければ文字列形式に変える。**どちらの形式でも `verify:dist` が通ることは確認済み**（上記 2） |
 | R-2 | **tarball を渡す `npm publish` が `publishConfig.registry` を読まない可能性** | `setup-node` が書き出すスコープのレジストリ指定でも同じ宛先になるため、二重に担保されている。publish 先が GitHub Packages であることを実機で確認する |
 | R-3 | **別リポジトリの Actions から `secrets.GITHUB_TOKEN` で install できない可能性** | 実機で確認し、必要ならパッケージ側のアクセス許可か classic PAT を README に案内する（論点 3 で代替を併記済み） |
 | R-4 | **既存の 3.x 利用者は `import` 文の書き換えが必要** | 破壊的変更として 4.0.0 にした。Release ノートに移行手順を書く |

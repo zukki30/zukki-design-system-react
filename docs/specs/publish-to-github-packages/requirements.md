@@ -197,7 +197,13 @@ self-reference（`name` + `exports` によって自分自身をパッケージ�
 
 ### NFR-5: パッケージの公開範囲を把握した状態にすること
 
-GitHub Packages のパッケージの可視性は、関連付けられたリポジトリに従う。このリポジトリは public なのでパッケージも public になる見込みだが、**実際の可視性を publish 後に確認し、意図と一致していること**。
+**npm レジストリのパッケージはリポジトリの可視性を継承しない。** GitHub Packages のレジストリは「granular permissions」と「repository-scoped permissions」に分かれており、npm は前者（ユーザー / Organization のスコープ）に属する。そして個人アカウントのスコープへ初めて publish したパッケージは **既定で private** になる。
+
+> 「When you first publish a package that is scoped to your personal account, the default visibility is private and only you can see the package」（[configuring-a-packages-access-control-and-visibility](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)）
+
+したがって**初回 publish 後に、パッケージの設定で可視性を public へ変更する作業が必要**である。この手順を公開チェックリストに明記し、変更後の可視性が意図と一致していることを確認すること。
+
+> **2026-11-05 追記:** 当初この節は「可視性はリポジトリに従うため public になる見込み」と書いていた。PR #161 のレビュー指摘を受けて公式ドキュメントを確認し、誤りだったため書き換えた。
 
 public であっても install には認証が必要（C-2）という非対称性を、README の案内に反映すること。
 

@@ -67,9 +67,12 @@
     "repository": "https://github.com/zukki30/zukki-design-system-react"
     ```
 
-- [ ] 可視性が意図と一致している
-  - リポジトリが public なのでパッケージも public になる見込み
-  - **public でも install には認証が必要**（GitHub Packages の仕様）
+- [ ] **パッケージを Public に変更する（初回 publish 後に必ず必要）**
+  - npm レジストリのパッケージは**リポジトリの可視性を継承しない**。個人アカウントのスコープへの初回 publish は**既定で private** で、この状態では自分以外は install できない
+  - 手順: パッケージのページ → Package settings → 最下部の「Danger Zone」→ **Change visibility** → Public
+  - `npm publish --access public` では切り替わらない（GitHub Packages では npmjs の `--access` と意味が異なる）
+  - **Public にしても install には認証が必要**（GitHub Packages の仕様）。README の案内はこれを前提にしている
+- [ ] 変更後の可視性が意図と一致している
 - [ ] 実際に install できる（自分のプロジェクトで README の手順をそのまま実行する）
 
   ```bash
