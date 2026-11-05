@@ -20,7 +20,7 @@
 import type { ReactNode } from 'react';
 
 // 利用側が README のとおりに書く形。exports の types 条件が外れると TS2882 で落ちる
-import 'zukki-design-system/styles.css';
+import '@zukki30/zukki-design-system/styles.css';
 
 import {
   Button,
@@ -42,7 +42,7 @@ import {
   type SpinnerVariant,
   type TagVariant,
   type ZukkiVariantType,
-} from 'zukki-design-system';
+} from '@zukki30/zukki-design-system';
 
 /* ------------------------------------------------------------------ *
  * 書けるべきもの
@@ -67,8 +67,8 @@ const SECTIONS: SectionTheme[] = [{ variant: 'profile', label: 'プロフィー�
 // 配色を固定した CSS も同じ経路で解決できる。
 // 3 つ同時に import すると「1 つだけ読み込む」という案内と矛盾するため、
 // 副作用 import ではなく型参照で確かめる
-export type LightCss = typeof import('zukki-design-system/styles-light.css');
-export type DarkCss = typeof import('zukki-design-system/styles-dark.css');
+export type LightCss = typeof import('@zukki30/zukki-design-system/styles-light.css');
+export type DarkCss = typeof import('@zukki30/zukki-design-system/styles-dark.css');
 
 // アイコン名を型でも値でも扱える
 const renderIcon = (name: IconName) => <Icon name={name} width={16} height={16} />;
@@ -164,7 +164,7 @@ const WrongHeadingLevel = () => <Card.Title level={1}>タイトル</Card.Title>;
 // 同じ行に残り、`noUnusedLocals` を足したときに @ts-expect-error がそちらで
 // 満たされて、このアサーションが黙って無効になる
 // @ts-expect-error SizeType は汎用的すぎるため公開していない（ButtonSize を使う）
-export type NoSizeType = import('zukki-design-system').SizeType;
+export type NoSizeType = import('@zukki30/zukki-design-system').SizeType;
 
 /* 未使用エラーを避けるためにまとめて参照する（実行はしない） */
 export const PROBE = {
