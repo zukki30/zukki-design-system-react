@@ -98,7 +98,7 @@
   &[data-variant='primary'] {
     background-color: var(--color-primary-default);
     border-color: var(--color-primary-default);
-    color: var(--color-text-on-accent-default);
+    color: var(--color-white);
 
     &:hover {
       background-color: var(--color-primary-hover);
@@ -119,7 +119,7 @@
   &[data-variant='secondary'] {
     background-color: var(--color-secondary-default);
     border-color: var(--color-secondary-default);
-    color: var(--color-text-on-accent-default);
+    color: var(--color-white);
 
     &:hover {
       background-color: var(--color-secondary-hover);
@@ -140,7 +140,7 @@
   &[data-variant='success'] {
     background-color: var(--color-success-default);
     border-color: var(--color-success-default);
-    color: var(--color-text-on-accent-default);
+    color: var(--color-white);
 
     &:hover {
       background-color: var(--color-success-hover);
@@ -161,7 +161,7 @@
   &[data-variant='failure'] {
     background-color: var(--color-failure-default);
     border-color: var(--color-failure-default);
-    color: var(--color-text-on-accent-default);
+    color: var(--color-white);
 
     &:hover {
       background-color: var(--color-failure-hover);
@@ -182,7 +182,7 @@
   &[data-variant='profile'] {
     background-color: var(--color-profile-default);
     border-color: var(--color-profile-default);
-    color: var(--color-text-on-accent-default);
+    color: var(--color-white);
 
     &:hover {
       background-color: var(--color-profile-hover);
@@ -203,7 +203,7 @@
   &[data-variant='works'] {
     background-color: var(--color-works-default);
     border-color: var(--color-works-default);
-    color: var(--color-text-on-accent-default);
+    color: var(--color-white);
 
     &:hover {
       background-color: var(--color-works-hover);
@@ -224,7 +224,7 @@
   &[data-variant='outputs'] {
     background-color: var(--color-outputs-default);
     border-color: var(--color-outputs-default);
-    color: var(--color-text-on-accent-default);
+    color: var(--color-white);
 
     &:hover {
       background-color: var(--color-outputs-hover);
