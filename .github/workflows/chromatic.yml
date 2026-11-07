@@ -1,0 +1,88 @@
+name: Chromatic
+
+# Chromatic は push で動かす。
+#
+# 公式ドキュメントが pull_request ではなく push を推奨している。pull_request で動かすと
+# GitHub が作る一時的なマージコミット（PR の内容 + main の最新）に対してビルドされ、
+# main 側の無関係な変更まで差分に混ざる。その結果ベースラインが失われたり、
+# 意図しないベースラインと比較されたりする。
+#
+# ブランチを絞らないのは、ベースラインがブランチをまたいで引き継がれるには
+# main 自身もテストされている必要があるため（main と作業ブランチの両方で動かす）。
+on: push
+
+# 既定を読み取りのみにする。Chromatic への publish はプロジェクトトークンで行い、
+# GITHUB_TOKEN は使わない（チェックの表示は Chromatic の GitHub App 側が担う）
+permissions:
+  contents: read
+
+# 同じブランチへ連続 push したときは古い実行をキャンセルする。
+# ci.yml と同じ考え方だが、こちらはスナップショットの消費を抑える意味も兼ねる
+# （追い越された実行のビルドは結果を見ないため）
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    name: chromatic
+    runs-on: ubuntu-latest
+    # Dependabot の push では動かさない。理由は 2 つあり、どちらも回避できない。
+    #
+    #   1. シークレットが渡らない。Dependabot が発火させた実行は「fork から開かれた」
+    #      のと同じ扱いになり、通常のリポジトリシークレットは参照できない
+    #      （Dependabot シークレットだけが渡る）。projectToken が空になるため、
+    #      除外しなければ毎週の依存更新 PR で必ず認証エラーになる
+    #   2. スナップショットを食い潰す。1 ビルドで約 115 スナップショット消費するのに対し、
+    #      Free プランの枠は月 5,000。依存更新の PR は直近で 59 件あり、
+    #      これを見ているだけで枠を使い切る
+    #
+    # 依存更新で見た目が変わったかは、マージ後の main の push で検出される
+    if: github.actor != 'dependabot[bot]' && !startsWith(github.ref_name, 'dependabot/')
+    steps:
+      # Chromatic は git の履歴からベースラインを決めるため、浅い clone では
+      # 比較対象を見つけられない。TurboSnap が変更ファイルを辿るのにも履歴が要る
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # pnpm のバージョンは package.json の packageManager から解決される
+      - uses: pnpm/action-setup@v6.1.0
+
+      - uses: actions/setup-node@v7
+        with:
+          # バージョンは .mise.toml の [tools] node から読む（setup-node v7.1.0 以降が対応）。
+          # ローカルの mise と CI の固定箇所を 1 つにまとめ、片方だけ古くなるのを防ぐ
+          node-version-file: .mise.toml
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Storybook のビルドは action が package.json の build-storybook を実行する。
+      # バージョンは移動タグ（v18）で追い、メジャーの更新は Dependabot の
+      # github-actions グループで上がってくる
+      - uses: chromaui/action@v18
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+          # TurboSnap。変更ファイルから影響のあるストーリーだけを撮り直す。
+          # Free プランの枠は月 5,000 スナップショットで、全撮りだと 1 ビルド約 115。
+          # push ごとにビルドされるため、絞らないと枠に収まらない
+          #
+          # 全体に影響する変更（src/styles/variables*.css など）を触った場合は、
+          # 依存を辿って全ストーリーが対象になる。撮り漏らしにはならない
+          onlyChanged: true
+
+          # 見た目の差分が出ても、このワークフロー自体は失敗させない。
+          #
+          # 差分は「確認して受け入れるかどうか」を人が決めるものなので、デザインシステムでは
+          # UI を変える PR のほとんどで差分が出る。それでワークフローを赤くすると、
+          # 赤いのが常態になって本当の失敗（ビルドや認証の失敗）が埋もれる。
+          #
+          # 差分のレビューは Chromatic 側の UI Tests チェックと Chromatic の画面で行う。
+          # マージをブロックしたくなったら、この値を false にして
+          # ruleset の必須チェックへ chromatic を加える
+          exitZeroOnChanges: true
+
+          # autoAcceptChanges は設定しない。main で自動承認すると、PR の時点で
+          # 見落とした差分がそのまま新しいベースラインになり、退行が黙って固定される

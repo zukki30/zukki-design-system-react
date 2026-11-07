@@ -62,7 +62,27 @@ pnpm build:tokens      # JSON → CSS 変数（両対応版 + 配色固定版 2 
 # CSS Modules のクラス名の型
 pnpm build:css-types   # *.module.css.d.ts を生成する
 pnpm check:css-types   # 生成物が最新かを検査する（CI と同じ）
+
+# 見た目の回帰テスト（Chromatic）
+pnpm chromatic         # 手元から実行する。通常は CI に任せてよい
 ```
+
+## 見た目の回帰テスト（Chromatic）
+
+ストーリーのスクリーンショットを Chromatic で比較します。`.github/workflows/chromatic.yml` が **push ごとに**実行します（`pull_request` ではありません。理由はワークフローのコメントに書いています）。
+
+**プロジェクトトークンをコードに書かないこと。** `CHROMATIC_PROJECT_TOKEN` から読みます。
+
+| 場所 | 渡し方 |
+| --- | --- |
+| CI | リポジトリの Secrets（`CHROMATIC_PROJECT_TOKEN`） |
+| 手元 | `.env` に `CHROMATIC_PROJECT_TOKEN=...` を書く（`.gitignore` 済み。CLI が `.env` を読みます） |
+
+`package.json` の `chromatic` スクリプトに `--project-token=...` を書き戻さないでください。**`package.json` は配布物の tarball に必ず含まれる**ため、書くと publish したパッケージにトークンが同梱されます。
+
+- **差分が出てもワークフローは失敗しません**（`exitZeroOnChanges: true`）。デザインシステムでは UI を変える PR のほとんどで差分が出るため、赤いのが常態になって本当の失敗が埋もれるのを避けています。差分のレビューは Chromatic の画面で行います
+- **Dependabot の push では動きません。** Dependabot が発火させた実行にはリポジトリシークレットが渡らないため（fork からの実行と同じ扱いになる）、動かしても必ず認証に失敗します。依存更新で見た目が変わったかは、マージ後の main の push で検出されます
+- **TurboSnap（`onlyChanged`）で撮る範囲を絞っています。** Free プランの枠は月 5,000 スナップショットで、全撮りだと 1 ビルド約 115 です。全体に影響する変更（`src/styles/variables*.css` など）では依存を辿って全ストーリーが対象になるため、撮り漏らしにはなりません
 
 ## アーキテクチャ
 
