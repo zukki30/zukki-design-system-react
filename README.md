@@ -8,7 +8,7 @@ https://github.com/zukki30/zukki-design-system の React only のデザインシ
 
 [GitHub Packages](https://github.com/zukki30/zukki-design-system-react/packages) で配布している。npmjs には publish していない。
 
-**公開パッケージだが、install には認証が必要**（GitHub Packages の仕様）。
+**パッケージは private で、install には認証が必要。** 利用できるのはパッケージの所有者（`zukki30`）と、アクセスを許可されたリポジトリの GitHub Actions だけ。
 
 ### 1. スコープのレジストリを指定する
 
@@ -59,7 +59,11 @@ pnpm add @zukki30/zukki-design-system@4.0.0
     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-このリポジトリ以外のワークフローから install する場合は、パッケージ側でそのリポジトリへの read を許可するか、`read:packages` の classic PAT を Secrets に置いて `NODE_AUTH_TOKEN` に渡す。
+**このリポジトリ以外のワークフローから install する場合は、先にアクセスを許可する。** private なので、他リポジトリの `GITHUB_TOKEN` では既定で読めない。
+
+パッケージのページ → Package settings → **Manage Actions access** → そのリポジトリを `Read` で追加する。許可しない場合は `read:packages` の classic PAT を Secrets に置いて `NODE_AUTH_TOKEN` に渡す。
+
+> **`GITHUB_TOKEN` で download する分は data transfer の無料枠を消費しない。** private パッケージは storage と data transfer の枠（GitHub Free は 500 MB / 月 1 GB）を使うが、CI からの install は計上されないため、実質消費するのは手元の install だけになる。
 
 ## 3.x からの移行
 

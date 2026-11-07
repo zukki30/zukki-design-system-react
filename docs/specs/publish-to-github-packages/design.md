@@ -136,7 +136,7 @@ MIT を推すのは、デザインシステムの利用（コードの改変・�
 - **`exports` / `files` / `main` / `module` / `types` は変更しない。** 既に publish 向けの形になっている
 - **バンドルの出力ファイル名（`zukki-design-system.js` / `.cjs` / `.css`）は変更しない。** パッケージ名とは別物であり、`exports` から参照されているだけなので改名の必要がない。変えると `vite.config.ts` と `verify-dist.ts`、`build-css-variants.ts` に無意味な差分が出る
 - `publishConfig.registry` を**パッケージ側に置く**のは、手元や CI の設定に関係なく publish 先を定めるため。npmjs へ誤って publish されない防御にもなる
-- `--access` は指定しない。npm レジストリのパッケージは **granular permissions** の対象で、**個人アカウントのスコープへの初回 publish は既定で private**（リポジトリの可視性を継承しない）。public にするのはパッケージ設定での操作であり、npmjs の `--access` では切り替わらない。初回 publish 後の手順として [`release-checklist.md`](./release-checklist.md) に書く
+- `--access` は指定しない。npm レジストリのパッケージは **granular permissions** の対象で、**個人アカウントのスコープへの初回 publish は既定で private**（リポジトリの可視性を継承しない）。可視性を変えるのはパッケージ設定での操作であり、npmjs の `--access` では切り替わらない。**このパッケージは private のまま運用する**（[`release-checklist.md`](./release-checklist.md)）
 
 Chromatic は `CHROMATIC_PROJECT_TOKEN` を読む（`chromatic` CLI が標準で参照する環境変数）。手元では `.env` に置き、CI で使う場合は Secrets から渡す。`.env` は `.gitignore` に無いため**追加する**。
 
@@ -310,7 +310,7 @@ git install の案内（`:9-41`）と `onlyBuiltDependencies` の注意書き（
 ````markdown
 ## インストール
 
-GitHub Packages で配布している。**公開パッケージだが、install には認証が必要**（GitHub Packages の仕様）。
+GitHub Packages で配布している。**パッケージは private で、install には認証が必要。**
 
 ### 1. スコープのレジストリを指定する
 
@@ -417,7 +417,7 @@ pnpm add @zukki30/zukki-design-system@^4.0.0
 | NFR-2 実行結果から読み取れる | 各分岐で `$GITHUB_STEP_SUMMARY` に出力 |
 | NFR-3 `GITHUB_TOKEN` の制約 | publish を同一ジョブ内に置く |
 | NFR-4 流儀を揃える | `node-version-file` / fail closed / 理由コメント |
-| NFR-5 可視性の把握 | publish 後に Public へ変更する（既定は private。`release-checklist.md`） |
+| NFR-5 可視性の把握 | publish 後に明示的に決める。**private のまま運用する**（`release-checklist.md`） |
 
 ## レビューで判明した設計の不足（PR #161）
 
@@ -453,7 +453,7 @@ pnpm add @zukki30/zukki-design-system@^4.0.0
 
 **「リポジトリが public なのでパッケージも public になる見込み」という前提が誤りだった。** GitHub Packages のレジストリは granular permissions と repository-scoped permissions に分かれており、npm は前者（ユーザー / Organization のスコープ）である。個人アカウントのスコープへの初回 publish は**既定で private** で、public にするにはパッケージ設定の Danger Zone で変更する必要がある。`npm publish --access public` では切り替わらない。
 
-要件の NFR-5 と公開チェックリストを書き換え、**初回 publish 後の必須作業**として明記した。
+要件の NFR-5 と公開チェックリストを書き換えた。なお初回 publish 後、**private のまま運用することに決めた**（利用するのは所有者と、アクセスを許可したリポジトリの Actions だけという前提）。public にする場合の手順はチェックリストに残してある。
 
 ## 残るリスク
 

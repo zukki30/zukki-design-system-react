@@ -44,9 +44,9 @@ publish 済みの成果物を配れば、上の 4 つはすべて消える。利
 | # | 制約 | 影響 |
 | --- | --- | --- |
 | C-1 | **スコープ付きの名前しか受け付けない。スコープは所有者と一致する必要がある** | `zukki-design-system` → **`@zukki30/zukki-design-system`** への改名が必須。利用側の `import` 文が変わる |
-| C-2 | **公開パッケージでも install に認証が必要** | 利用側に `.npmrc`（スコープごとのレジストリ指定）と `read:packages` 権限のトークンが必要。README での案内が不可欠 |
+| C-2 | **install に認証が必要。public にしても変わらない** | 利用側に `.npmrc`（スコープごとのレジストリ指定）と `read:packages` 権限のトークンが必要。README での案内が不可欠 |
 | C-3 | **npm の provenance（`--provenance`）は npmjs 専用** | GitHub Packages では使えない。来歴の証明が要るなら Actions の attestation など別手段になる |
-| C-4 | **同じバージョン番号を再利用できない** | publish のやり直しは必ずバージョンを上げる。ただしバージョンの削除自体は npmjs より柔軟（公開パッケージはダウンロード数が一定を超えると削除不可） |
+| C-4 | **同じバージョン番号を再利用できない** | publish のやり直しは必ずバージョンを上げる。ただしバージョンの削除自体は npmjs より柔軟（private なら制限なし。public にするとダウンロード数が一定を超えた版は削除不可） |
 
 ### 名前の変更が波及する箇所
 
@@ -201,9 +201,11 @@ self-reference（`name` + `exports` によって自分自身をパッケージ�
 
 > 「When you first publish a package that is scoped to your personal account, the default visibility is private and only you can see the package」（[configuring-a-packages-access-control-and-visibility](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)）
 
-したがって**初回 publish 後に、パッケージの設定で可視性を public へ変更する作業が必要**である。この手順を公開チェックリストに明記し、変更後の可視性が意図と一致していることを確認すること。
+したがって「publish すれば public になる」という前提は成立しない。**可視性は publish 後に明示的に決める**こととし、意図と一致していることを確認する。
 
 > **2026-11-05 追記:** 当初この節は「可視性はリポジトリに従うため public になる見込み」と書いていた。PR #161 のレビュー指摘を受けて公式ドキュメントを確認し、誤りだったため書き換えた。
+>
+> **2026-11-08 追記:** 初回 publish 後、**private のまま運用することに決めた。** 利用するのは所有者と、アクセスを許可したリポジトリの Actions だけという前提のため。install 手順は public でも private でも同じ（`.npmrc` + classic PAT）であり、利用側のドキュメントに差は出ない。public にする場合の手順は [`release-checklist.md`](./release-checklist.md) の「公開範囲を変えるとき」に残した。
 
 public であっても install には認証が必要（C-2）という非対称性を、README の案内に反映すること。
 

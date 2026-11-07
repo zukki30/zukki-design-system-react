@@ -86,6 +86,8 @@ TypeScript と CSS Modules で構築した **React コンポーネントライ�
 
 **パッケージ名はスコープ付きである必要があります。** GitHub Packages はスコープ付きの名前のみを受け付け、スコープは所有者（`zukki30`）と一致していなければなりません。`verify:dist` が `repository` から所有者を読み、名前のスコープと一致するかを検査しています。
 
+**パッケージは private です。** npm レジストリのパッケージはリポジトリの可視性を継承せず、個人アカウントのスコープへの初回 publish は既定で private になります。これをそのまま運用しており、install できるのは所有者と、アクセスを許可したリポジトリの Actions だけです。可視性を変えるのはパッケージ設定での操作で、`npm publish --access public` では切り替わりません（手順は `docs/specs/publish-to-github-packages/release-checklist.md`）。
+
 **`pnpm build` が作るもの:**
 
 | 成果物 | 備考 |
