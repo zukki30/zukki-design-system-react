@@ -16,6 +16,11 @@ permissions:
 # 途中のバージョンの run が実行されないまま消え、そのタグだけが永久に欠落する。
 # commit ごとに別グループにすれば、どの push も必ず処理される
 # （まとめられるのは同じ sha の re-run だけになる）
+#
+# なお「同じバージョンを処理する run を並走させない」ための直列化は、
+# release ジョブ側の concurrency（group にバージョンを含める）で行っている。
+# ここで直列化してしまうと上記の「途中のバージョンが消える」事故に戻るため、
+# 直列化の範囲は同一バージョンだけに絞っている
 concurrency:
   group: release-${{ github.sha }}
   cancel-in-progress: false
@@ -74,34 +79,182 @@ jobs:
     needs: check
     if: needs.check.outputs.should-release == 'true'
     runs-on: ubuntu-latest
+    # 同じバージョンをリリースしようとする run は直列化する。
+    #
+    # 並走させると「A が publish → B は publish をスキップ → B のコミットにタグ」が
+    # 成立してしまい、配布物は A の内容なのにタグと Release は B を指す、という
+    # ずれが起きる（同じ version のまま main へ連続してマージした場合に起きうる）。
+    #
+    # group にバージョンを含めるのは、「待機中の run は 1 件しか保持されない」制約の
+    # 影響を同一バージョンに閉じるため。別バージョンのリリースは並走できるので、
+    # ワークフロー単位で直列化したときのような「途中のバージョンだけ消える」事故が起きない。
+    # 同一バージョンで押し出された run は、どうせタグの再確認で何もせず終わるものである
+    concurrency:
+      group: release-${{ needs.check.outputs.tag }}
+      cancel-in-progress: false
     permissions:
       # タグと Release の作成に必要。個人の PAT は使わない
       # （GITHUB_TOKEN は実行ごとに発行され、終了時に失効する）
       contents: write
+      # GitHub Packages への publish に必要
+      packages: write
     steps:
       - uses: actions/checkout@v7
 
+      # check ジョブの判定は直列化の待機に入る前のものなので、待っている間に
+      # 同じバージョンの別 run がリリースを終えている可能性がある。ここで取り直す。
+      #
+      # 以降のステップはこの結果で分岐させる。重いビルドの前に判定するため、
+      # 既にリリース済みならそのまま何もせず終わる
+      - name: Re-check the tag after serialization
+        id: recheck
+        env:
+          TAG: ${{ needs.check.outputs.tag }}
+        run: |
+          # check ジョブと同じく、「確認できなかった」を「無かった」と読まないようにする
+          if ! existing="$(git ls-remote --tags origin "refs/tags/$TAG")"; then
+            echo "::error::タグの存在を確認できませんでした（git ls-remote が失敗）"
+            exit 1
+          fi
+
+          if [ -n "$existing" ]; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "### リリース済みでした"
+              echo
+              echo "タグ \`$TAG\` は、同じバージョンを処理した別の実行が作成済みのため、何もしませんでした。"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # pnpm のバージョンは package.json の packageManager から解決される
       - uses: pnpm/action-setup@v6.1.0
+        if: steps.recheck.outputs.released == 'false'
 
       - uses: actions/setup-node@v7
+        if: steps.recheck.outputs.released == 'false'
         with:
           # バージョンは .mise.toml の [tools] node から読む（setup-node v7.1.0 以降が対応）。
           # ローカルの mise と CI の固定箇所を 1 つにまとめ、片方だけ古くなるのを防ぐ
           node-version-file: .mise.toml
           cache: pnpm
+          # GitHub Packages 用の .npmrc を runner 上に作らせる。scope を渡すと
+          # 「@zukki30 はこのレジストリ」「認証は NODE_AUTH_TOKEN から読む」の
+          # 2 行が書き出される。トークンをワークフローでファイルへ書く手順が要らない
+          registry-url: https://npm.pkg.github.com
+          scope: '@zukki30'
 
-      # 壊れたコミットにタグが付くと、利用側が #v3.1.0 で固定した先が install できなくなるため、
-      # タグを打つ前にここで配布物として成立することを確かめる。
-      # install 時の prepare でビルドまで走る（利用側が install したときと同じ経路）
+      # 壊れた配布物を publish すると、同じバージョン番号は再利用できないため取り返しがつかない。
+      # publish とタグ作成の前に、ここで配布物として成立することを確かめる。
+      # install 時の prepare でビルドまで走る（publish 時に走るのと同じ経路）
       #
       # main は ruleset「protect main」で保護しているが、この検証は省けない。
       #   - 必須チェックは「PR の時点で通ったこと」しか保証しない。最新同期は要求していない
       #     （strict: false）ため、マージ後に他の PR と組み合わさった状態は検証されていない
       #   - 管理者は ruleset をバイパスして直接 push できる
       - run: pnpm install --frozen-lockfile
+        if: steps.recheck.outputs.released == 'false'
 
       - run: pnpm verify:dist
+        if: steps.recheck.outputs.released == 'false'
+
+      # publish はタグより先に行う。check ジョブの判定基準が「タグの有無」なので、
+      # タグが「このバージョンは完了した」という最後の印になっていないと、
+      # publish だけ失敗した状態から再実行で復帰できない
+      # （タグがある = should-release が false となり、二度と publish されない）。
+      #
+      # pnpm ではなく npm を使う理由は 2 つ。
+      #   - .npmrc は setup-node が npm のために書き出したもので、npm が確実に読む
+      #   - pnpm publish は既定で git の状態を検査する。対象コミットは check ジョブで
+      #     確定済みなので無意味な検査であり、--no-git-checks の付け忘れで落ちる要因になる
+      # publish はレジストリとの通信であって依存解決ではないため、依存ツリーには影響しない
+      - name: Publish to GitHub Packages
+        if: steps.recheck.outputs.released == 'false'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # ci.yml / check ジョブと同じく node で読む。runner に jq 等を要求しない
+          name="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+
+          # 既に公開済みのバージョンに出会ったとき、それが「このコミットから publish
+          # されたもの」かを確かめる。
+          #   - 同じコミットなら、前回タグ作成だけが失敗した実行の再開なので続行してよい
+          #   - 違うコミットなら、タグを作ると配布物とタグがずれるので中断する
+          # 公開元が記録されていない場合（この仕組みより前に publish された版）は
+          # 判定できないため、続行して人の目に任せる
+          assert_same_commit() {
+            published="$(npm view "$name@$version" gitHead 2>/dev/null || true)"
+
+            if [ -n "$published" ] && [ "$published" != "$GITHUB_SHA" ]; then
+              echo "::error::$name@$version は別のコミット（$published）から publish されています。タグを作ると配布物とずれるため中断します"
+              exit 1
+            fi
+          }
+
+          # 既に publish 済みかを調べる。
+          #
+          # 「無かった」と「確認できなかった」は必ず分ける。認証切れや一時障害を
+          # 「無い」と読むと publish を試して失敗するだけだが、原因が分からなくなる。
+          # check ジョブの ls-remote と同じく fail closed にする
+          set +e
+          view="$(npm view "$name@$version" version 2>&1)"
+          status=$?
+          set -e
+
+          if [ "$status" -eq 0 ]; then
+            assert_same_commit
+            {
+              echo "### publish をスキップしました"
+              echo
+              echo "\`$name@$version\` は、このコミットから既に公開済みです。"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if ! printf '%s' "$view" | grep -q 'E404'; then
+            echo "::error::publish 済みかどうかを確認できませんでした"
+            printf '%s\n' "$view"
+            exit 1
+          fi
+
+          # 公開元のコミットを manifest に残す。npm は gitHead を自動では付けない
+          # （ディレクトリ publish でも tarball publish でも付かないことを実測で確認）。
+          # これが無いと「このバージョンがどのコミットから publish されたか」を
+          # レジストリ側から確かめられず、上の照合ができない。
+          # package.json を書き換えるのは pack の直前。検査はすべて済んでいる
+          node -e "const fs=require('node:fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));p.gitHead=process.env.GITHUB_SHA;fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n');"
+
+          # publish するものと検査したものを同一にするため、tarball を作ってから publish する。
+          # --ignore-scripts を付けるのは、直前の install で prepare が走って dist が
+          # 揃っているため（pack 時の再ビルドは無駄になる）
+          file="$(npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP" --silent | tail -n 1)"
+
+          if ! npm publish "$RUNNER_TEMP/$file" 2>"$RUNNER_TEMP/publish.log"; then
+            # 同一バージョンの run は直列化しているので通常ここへは来ないが、
+            # 直列化の外（手元からの publish など）と競合する余地は残る。
+            # バージョンは上書きできないため、競合は「既に publish 済み」と同義であり、
+            # 公開元のコミットを確かめたうえで冪等に成功扱いとする
+            if grep -qE 'E409|EPUBLISHCONFLICT|cannot publish over' "$RUNNER_TEMP/publish.log"; then
+              assert_same_commit
+              {
+                echo "### publish 済みでした"
+                echo
+                echo "\`$name@$version\` は並走した実行が公開済みのため、何もしませんでした。"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "::error::publish に失敗しました"
+            cat "$RUNNER_TEMP/publish.log"
+            exit 1
+          fi
+
+          {
+            echo "### publish しました"
+            echo
+            echo "- パッケージ: \`$name@$version\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # タグ作成・Release 作成・ノート生成を 1 コマンドで行う。
       # タグが無ければ GitHub 側が --target のコミットに軽量タグを作る。
@@ -110,16 +263,16 @@ jobs:
       # 実行中に別の push が入ると、検証したコミットとタグがずれる
       #
       # なお GITHUB_TOKEN で作ったタグは他のワークフローを発火しない（無限ループ防止の仕様）。
-      # 「タグ作成をトリガーに publish」のような構成にはできないので、
-      # 処理を足すときはこのジョブの中へ追加すること
+      # 「タグ作成をトリガーに publish」のような構成にはできないため、publish は
+      # 上のステップとしてこのジョブの中に置いている。処理を足すときも同じようにすること
       - name: Create release
+        if: steps.recheck.outputs.released == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.check.outputs.tag }}
         run: |
-          # check の判定からここまでにビルドを挟むため、その間に別の push の run が
-          # 同じ version をリリースしている可能性がある（concurrency を sha ごとに
-          # 分けたので run は並走しうる）。失敗したらタグの有無を見て、
+          # 同一バージョンの run は直列化しているが、直列化の外（管理者による直接 push や
+          # 手動のタグ作成）と競合する余地は残る。失敗したらタグの有無を見て、
           # 既にあるなら冪等に成功扱いとする。権限不足などの本当の失敗は落とす
           if ! url="$(gh release create "$TAG" \
             --target "$GITHUB_SHA" \

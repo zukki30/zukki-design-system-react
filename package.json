@@ -1,9 +1,17 @@
 {
-  "name": "zukki-design-system",
+  "name": "@zukki30/zukki-design-system",
   "type": "module",
-  "private": true,
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "デザインシステム",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zukki30/zukki-design-system-react.git"
+  },
+  "homepage": "https://github.com/zukki30/zukki-design-system-react#readme",
+  "bugs": "https://github.com/zukki30/zukki-design-system-react/issues",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "main": "./dist/zukki-design-system.cjs",
   "module": "./dist/zukki-design-system.js",
   "types": "./dist/main.d.ts",
@@ -61,10 +69,10 @@
     "test:ui": "vitest --ui --project unit",
     "test:coverage": "vitest run --project unit --coverage",
     "test:a11y": "vitest run --project a11y-light --project a11y-dark",
-    "chromatic": "npx chromatic --project-token=chpt_652ded7838afb3a"
+    "chromatic": "npx chromatic"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "clsx": "^2.1.1"

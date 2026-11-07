@@ -14,6 +14,20 @@ import { ROOT, readComponentNames, readCompoundParts, readIconNames } from './li
 
 const DIST = join(ROOT, 'dist');
 
+const REGISTRY = 'https://npm.pkg.github.com';
+
+// パッケージ名は probe の import 元と exports の解決に使う。ここで直書きすると
+// 改名のときに片方だけ古くなるため、package.json から読む
+const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as {
+  name: string;
+  private?: boolean;
+  // npm は文字列形式（"https://github.com/OWNER/REPO"）も認める。GitHub の
+  // ドキュメントが示すのはこちらで、リポジトリとの紐づけが効かないときの
+  // 切り替え先として release-checklist.md に書いてあるため、両方を読めるようにする
+  repository?: string | { url?: string };
+  publishConfig?: { registry?: string };
+};
+
 const failures: string[] = [];
 
 const check = (label: string, ok: boolean, detail: string) => {
@@ -41,7 +55,7 @@ const required = [
   'styles-light.css',
   'styles-dark.css',
   // TypeScript 6 は副作用 import の型解決を既定で検査する。
-  // 宣言が無いと利用側で `import 'zukki-design-system/styles.css'` が TS2882 になる
+  // 宣言が無いと利用側で `import '@zukki30/zukki-design-system/styles.css'` が TS2882 になる
   'styles.css.d.ts',
   'styles-light.css.d.ts',
   'styles-dark.css.d.ts',
@@ -136,8 +150,8 @@ const packed = JSON.parse(
   })
 ) as [{ files: { path: string }[] }];
 
-// package.json は npm が files の指定によらず必ず含める
-const ALWAYS_PACKED = ['README.md', 'package.json'];
+// package.json / README / LICENSE は npm が files の指定によらず必ず含める
+const ALWAYS_PACKED = ['README.md', 'LICENSE', 'package.json'];
 
 const paths = packed[0].files.map((f) => f.path);
 const unwanted = paths.filter((p) => !p.startsWith('dist/') && !ALWAYS_PACKED.includes(p));
@@ -151,6 +165,44 @@ check(
 if (unwanted.length > 0) {
   console.log(`     混入: ${unwanted.slice(0, 10).join(', ')}`);
 }
+
+// 混入の検査だけでは逆方向に気づけない。files を触って「生成されているのに
+// 配られない」状態になると、dist を直接見る検査（1.）は通ってしまう。
+// 一覧は required から導き、手書きの二重管理を作らない
+const packedPaths = new Set(paths);
+const missingFromTarball = [...ALWAYS_PACKED, ...required.map((file) => `dist/${file}`)].filter(
+  (path) => !packedPaths.has(path)
+);
+
+check(
+  '配布物に必要なファイルがすべて入っている',
+  missingFromTarball.length === 0,
+  missingFromTarball.length === 0
+    ? `${paths.length} ファイル`
+    : `不足: ${missingFromTarball.join(', ')}`
+);
+
+// publish できる形のメタ情報になっている。private の復活や publishConfig の消失は
+// ビルドを壊さないまま publish 先を変えてしまうため、ファイルの検査では気づけない
+check('package.json に private が残っていない', pkg.private === undefined, '');
+
+// GitHub Packages はスコープが所有者と一致することを要求する。所有者は
+// repository から読む（名前の側に所有者を二度書かない）
+const repositoryUrl = typeof pkg.repository === 'string' ? pkg.repository : pkg.repository?.url;
+
+const owner = /github\.com[/:]([^/]+)\//.exec(repositoryUrl ?? '')?.[1]?.toLowerCase();
+
+check(
+  'name のスコープが repository の所有者と一致している',
+  owner !== undefined && pkg.name.startsWith(`@${owner}/`),
+  `${pkg.name} / owner=${owner ?? '読み取れない'}`
+);
+
+check(
+  'publishConfig が GitHub Packages を指している',
+  pkg.publishConfig?.registry === REGISTRY,
+  pkg.publishConfig?.registry ?? '未設定'
+);
 
 // 7. 公開している型が利用側から名指しできる。
 //
@@ -172,7 +224,7 @@ mkdirSync(probeDir, { recursive: true });
 const propsTypes = componentNames.map((name) => `${name}Props`);
 const generatedProbe = [
   '// scripts/verify-dist.ts が生成する。手で編集しない',
-  `import type {\n${propsTypes.map((t) => `  ${t},`).join('\n')}\n} from 'zukki-design-system';`,
+  `import type {\n${propsTypes.map((t) => `  ${t},`).join('\n')}\n} from '${pkg.name}';`,
   '',
   ...propsTypes.map((t, i) => `type _${i} = ${t};`),
   '',
@@ -264,8 +316,8 @@ const resolvesFromExports = (specifier: string) => {
 };
 
 check(
-  'zukki-design-system/AGENTS.md が exports から解決できる',
-  resolvesFromExports('zukki-design-system/AGENTS.md'),
+  `${pkg.name}/AGENTS.md が exports から解決できる`,
+  resolvesFromExports(`${pkg.name}/AGENTS.md`),
   ''
 );
 

@@ -36,7 +36,7 @@
   Tooltip: 補足を示す吹き出し
 -->
 
-# zukki-design-system を使うためのガイド
+# @zukki30/zukki-design-system を使うためのガイド
 
 React のデザインシステムです。**このファイルは配布物に同梱された生成物**で、install されているバージョンの実際の中身から作られています。
 
@@ -47,13 +47,13 @@ React のデザインシステムです。**このファイルは配布物に同
 **CSS を必ず読み込んでください。** 色も余白もすべて CSS 変数で定義されているため、読み込まないと無スタイルで描画されます。アプリのエントリポイントで 1 回だけ import します。
 
 ```tsx
-import 'zukki-design-system/styles.css';
+import '@zukki30/zukki-design-system/styles.css';
 ```
 
 そのうえでコンポーネントを import します。
 
 ```tsx
-import { Button, Card } from 'zukki-design-system';
+import { Button, Card } from '@zukki30/zukki-design-system';
 ```
 
 React 19（`^19.0.0`）が必要です（peer dependency）。
@@ -113,7 +113,7 @@ React 19（`^19.0.0`）が必要です（peer dependency）。
 {{ICON_NAMES}}
 
 ```tsx
-import { Icon, iconNames, type IconName } from 'zukki-design-system';
+import { Icon, iconNames, type IconName } from '@zukki30/zukki-design-system';
 
 <Icon name="chevronRight" width={16} height={16} />;
 ```
@@ -127,7 +127,7 @@ import { Icon, iconNames, type IconName } from 'zukki-design-system';
 すべてのコンポーネントの props 型を公開しています。ラッパーを作るときに使ってください。
 
 ```tsx
-import { Button, type ButtonProps } from 'zukki-design-system';
+import { Button, type ButtonProps } from '@zukki30/zukki-design-system';
 
 export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
   <Button {...props} type="submit" />
@@ -170,9 +170,9 @@ export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
 ```
 
 ```tsx
-❌ import { Button } from 'zukki-design-system';   // CSS を読み込んでいない
-✅ import { Button } from 'zukki-design-system';
-   import 'zukki-design-system/styles.css';
+❌ import { Button } from '@zukki30/zukki-design-system';   // CSS を読み込んでいない
+✅ import { Button } from '@zukki30/zukki-design-system';
+   import '@zukki30/zukki-design-system/styles.css';
 ```
 
 ```tsx
@@ -194,9 +194,9 @@ export const SubmitButton = (props: Omit<ButtonProps, 'type'>) => (
 
 | CSS | 配色 |
 | --- | --- |
-| `zukki-design-system/styles.css` | `color-scheme` に従って切り替わる（既定） |
-| `zukki-design-system/styles-light.css` | ライトに固定 |
-| `zukki-design-system/styles-dark.css` | ダークに固定 |
+| `@zukki30/zukki-design-system/styles.css` | `color-scheme` に従って切り替わる（既定） |
+| `@zukki30/zukki-design-system/styles-light.css` | ライトに固定 |
+| `@zukki30/zukki-design-system/styles-dark.css` | ダークに固定 |
 
 **ビルド設定に注意してください。** `styles.css` は `light-dark()` に依存しています。ビルドツールの対応ブラウザ設定が古いと `light-dark()` がポリフィルへ変換され、`prefers-color-scheme` にしか反応しなくなります（要素単位の切り替えができなくなります）。Vite なら次を指定します。
 

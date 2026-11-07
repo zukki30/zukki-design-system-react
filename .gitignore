@@ -13,6 +13,10 @@ dist-ssr
 storybook-static
 *.local
 
+# 環境変数（Chromatic の project token など）。
+# *.local は .env.local しか拾わないため .env も明示する
+.env
+
 # verify-dist が生成する型 probe の置き場
 .tmp
 
