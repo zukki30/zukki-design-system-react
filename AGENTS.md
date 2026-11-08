@@ -441,18 +441,31 @@ src/utils/
 | `surface.page` / `surface.raised` | `{semantic}.text` | 意味カラーを面の上の**文字・アイコン**として使うとき（Breadcrumb の現在ページ、FormField の必須マーク） |
 | `input.background.*` | `textOnLight.*` | `inputColorSchemeLight` でライト固定にした入力面の **内側だけ** |
 
-- **`grey` などの生のプリミティブを面や文字色に使わない。** プリミティブのランプはライトとダークで反転するため、反転しない `textOnLight` / `textOnAccent` と組むと壊れる（Card の `grey.0` × `textOnLight`、Tooltip の `grey.900` × `textOnDark` がこれだった）。区切り線や淡い塗りは `surface.subtle` を使う
+- **`grey` などの生のプリミティブを面や文字色に使わない。** プリミティブのランプはライトとダークで反転するため、反転しない `textOnLight` と組むと壊れる（Card の `grey.0` × `textOnLight`、Tooltip の `grey.900` × `textOnDark` がこれだった）。区切り線や淡い塗りは `surface.subtle` を使う
 - **`textOnLight.*` はライト固定の面の内側専用。** ライト・ダークで同じ濃色を返すため、ページ面の上で使うとダーク配色で読めなくなる
-- **意味カラー（`primary` / `success` / `profile` …）は「塗り」と「文字」で段が分かれている。** 同じ色を両方に使い回さない。塗りは濃色ラベルを載せる前提で明るく、文字は面に対して読める濃さが要るため、必要な明度が逆になる
+- **意味カラー（`primary` / `success` / `profile` …）は「塗り」と「文字」で段が分かれている。** 同じ色を両方に使い回さない。塗りは**白ラベルを載せる前提で暗く**、文字は面に対して読める濃さが要る
 
   | ロール | 契約 | ライト / ダーク |
   | --- | --- | --- |
-  | `default` | 塗り。`textOnAccent.default`（両配色とも `#15171a`）に対して 4.5:1 以上 | 同じ値。**塗りは配色で変わらない** |
-  | `hover` / `seleted` | `default` の 1 段 / 2 段明るい側 | 同じ値 |
+  | `default` | 塗り。`textOnAccent.default`（両配色とも `#ffffff`）に対して 4.5:1 以上 | 同じ値。**塗りは配色で変わらない** |
+  | `hover` / `seleted` | `default` の 1 段 / 2 段**暗い**側 | 同じ値 |
   | `strong` | `hover` と同じ段 | 同じ値 |
   | `text` | 面の上の文字・アイコン。`surface.page` と `surface.raised` の**両方**に対して 4.5:1 以上 | ライトは濃く、ダークは明るい |
 
-- 塗りが両配色とも明るいため、`hover` / `seleted` は**明るくなる方向**にしか動かせない（濃くするとラベルが 4.5:1 を割る）。ライト配色では選択状態が淡く見えるが、ラベルのコントラストは保たれる
+- **`hover` / `seleted` は暗くなる方向へ動かす。** ラベルが白なので、明るくするとコントラストが落ちる
+- **塗りを「両配色で同じ暗い値」にするには、ライトとダークで対になる段を指す。** プリミティブのランプはライト・ダークで反転する（`blue.600` はライトで `#0c5eca`、ダークで `#82b4f8`）ため、同じ段を両方に書くと片方が明るくなってしまう。ランプは対称なので、**ライトの段 X に対してダークは鏡像の段**を指定すると同じ hex に落ちる
+
+  ```jsonc
+  // SemanticColor/light
+  "primary": { "default": { "value": "{color.blue.600}" } }  // → #0c5eca
+  // SemanticColor/dark
+  "primary": { "default": { "value": "{color.blue.200}" } }  // → #0c5eca（同じ）
+  ```
+
+  鏡像の対応は 13 段のランプで `500↔300` / `600↔200` / `700↔150` / `800↔100` / `850↔50`、段が多い `grey` では `600↔400` / `700↔300` / `800↔200` になる。`textOnAccent` も同じ仕掛けで両配色を揃えている
+
+- **ラベル側を `--color-white` のような生のプリミティブで上書きしない。** 白ラベルは `textOnAccent.default` が担う。コンポーネントで個別に白を書くと、同じ塗りを使う他のコンポーネント（`FormField` の必須マーク・`Steps` の現在ステップ・`Spinner` の `accent`）が追従せず、そこだけコントラストが崩れる
+- **塗りを増やすときは意味カラーの一覧をソースから確認する。** `primary` / `secondary` / `success` / `failure` に加えて、zukki サイト固有の `profile` / `works` / `outputs` がある。名前を思い出して列挙すると漏れる
 - Button のように塗りの上へ重ねるスピナーは `Spinner` の `accent` バリアントを使う。`light` / `dark` は背景の明暗に合わせるもので、アクセント塗りには合わない
 - **配色を変えるときは `figma/tokens.json` を直す。** `src/styles/variables*.css` は `pnpm token:transform && pnpm build:tokens` の生成物で、直接編集しても次回の生成で巻き戻る
 
