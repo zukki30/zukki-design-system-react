@@ -300,27 +300,33 @@ describe('Steps', () => {
     // 現在ステップの円は default と形が同じで差が色だけになるため、
     // ラベルの太さを色以外の手がかりにしている（WCAG 1.4.1）
     //
-    // jsdom の getComputedStyle はカスタムプロパティを解決せず、宣言値の
-    // var(--font-weight-bold) をそのまま返す
-    // （jsdom が var の解決に対応したら 700 / 400 が返って落ちるため、その際は
-    // 期待値も getComputedStyle 越しに取る形へ寄せる）
+    // jsdom 31 以降の getComputedStyle は var() を解決するため、期待値は
+    // トークンの実値を引いて比較する。Figma 側で太さの値が変わっても追従する
+    const fontWeightToken = (name: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
     it('現在ステップのラベルだけを太字にする', () => {
       render(<Steps current={2}>{stepItems()}</Steps>);
 
       const [finished, current, upcoming] = labels.map((label) => screen.getByText(label));
+      const bold = fontWeightToken('--font-weight-bold');
+      const normal = fontWeightToken('--font-weight-normal');
 
-      expect(getComputedStyle(current).fontWeight).toBe('var(--font-weight-bold)');
-      expect(getComputedStyle(finished).fontWeight).toBe('var(--font-weight-normal)');
-      expect(getComputedStyle(upcoming).fontWeight).toBe('var(--font-weight-normal)');
+      // 変数が読み込まれていないと両方が初期値へ潰れ、太字の差を見分けられなくなる
+      expect(bold).not.toBe(normal);
+
+      expect(getComputedStyle(current).fontWeight).toBe(bold);
+      expect(getComputedStyle(finished).fontWeight).toBe(normal);
+      expect(getComputedStyle(upcoming).fontWeight).toBe(normal);
     });
 
     it('現在ステップがないときはどのラベルも太字にしない', () => {
       render(<Steps current={labels.length + 1}>{stepItems()}</Steps>);
 
+      const normal = fontWeightToken('--font-weight-normal');
+
       labels.forEach((label) => {
-        expect(getComputedStyle(screen.getByText(label)).fontWeight).toBe(
-          'var(--font-weight-normal)'
-        );
+        expect(getComputedStyle(screen.getByText(label)).fontWeight).toBe(normal);
       });
     });
 
