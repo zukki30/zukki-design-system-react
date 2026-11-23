@@ -98,7 +98,7 @@
     "@vitejs/plugin-react-swc": "^4.3.3",
     "@vitest/browser": "5.1.0",
     "@vitest/browser-playwright": "5.1.0",
-    "chromatic": "^18.13.6",
+    "chromatic": "^18.15.1",
     "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",

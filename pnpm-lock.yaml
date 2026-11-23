@@ -61,8 +61,8 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(playwright@1.65.1)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.0))(vitest@5.1.0)
       chromatic:
-        specifier: ^18.13.6
-        version: 18.13.6
+        specifier: ^18.15.1
+        version: 18.15.1
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -1795,8 +1795,8 @@ packages:
     resolution: {integrity: sha512-PAJdDJusoxnwm1VwW07VWwUN1sl7smmC3OKggvndJFadxxDRyFJBX/ggnu/KE4kQAB7a3Dp8f/YXC1FlUprWmA==}
     engines: {node: '>= 16'}
 
-  chromatic@18.13.6:
-    resolution: {integrity: sha512-4NVvud3yFIA8AGuBQeyIGhvYGih+ZcvFaKcnECotTSfHaA3FyUAckNutcqnvofnKDOxZz9ZrA33sT+wz7wz3HQ==}
+  chromatic@18.15.1:
+    resolution: {integrity: sha512-h8wshAe1nvfBlCVnAoYno264pAF5CCwebpau6DzGUqBTZ6dIeDFl+LDMHkVfYthEDJp37XT9f0EFgh98jEFyfQ==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -2887,11 +2887,6 @@ packages:
     resolution: {integrity: sha512-GYrCADwpu6yV5OAvchkQ27Z5wwMxWAEMg5NNWjyHh/5DboFFqbdbvYNIvZouQpxXyeMPoTOh0vdPYKlf0ZswdQ==}
     hasBin: true
 
-  semver@7.8.5:
-    resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   semver@7.8.6:
     resolution: {integrity: sha512-9lpSSU4Mly3mrtruwLs1eLK6+gzbzqeBFwRNjIjE+9LuDpWdYctrQlQ3ej1Ilgi7gknpsTRnPoLP8DpCHqHIJw==}
     engines: {node: '>=10'}
@@ -3665,7 +3660,7 @@ snapshots:
   '@chromatic-com/storybook@5.6.0(storybook@10.6.7(@types/react@19.3.0)(prettier@3.10.1)(react@19.3.1))':
     dependencies:
       '@neoconfetti/react': 1.0.0
-      chromatic: 18.13.6
+      chromatic: 18.15.1
       jsonfile: 6.2.1
       storybook: 10.6.7(@types/react@19.3.0)(prettier@3.10.1)(react@19.3.1)
       strip-ansi: 7.2.0
@@ -4980,9 +4975,9 @@ snapshots:
 
   check-error@2.1.3: {}
 
-  chromatic@18.13.6:
+  chromatic@18.15.1:
     dependencies:
-      semver: 7.8.5
+      semver: 7.8.6
 
   cliui@8.0.1:
     dependencies:
@@ -6220,8 +6215,6 @@ snapshots:
   scheduler@0.28.0: {}
 
   semver@6.3.2: {}
-
-  semver@7.8.5: {}
 
   semver@7.8.6: {}
 
